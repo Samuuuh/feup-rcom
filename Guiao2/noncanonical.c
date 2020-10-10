@@ -21,8 +21,6 @@
 
 volatile int STOP=FALSE;
 
-enum set_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};
-
 enum set_state state = start;
 
 unsigned char UA[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA, FLAG};
@@ -82,7 +80,7 @@ int process(char received) {
 void read_SET(int fd) {
   unsigned char SET[5];
   
-  int i;
+  int i = 0;
 
   while (state != stop) {
     read(fd, &SET[i], 1);

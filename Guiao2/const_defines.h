@@ -30,4 +30,10 @@
  * BCC_REJ - BCC for framing of type REJ (reject / negative ACK) - A^C_REJ
 */
 
-// ------------------------------------------------
+// --------------------------------------------
+
+// ---------- Structures Declaration ----------
+
+enum set_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};
+
+// --------------------------------------------

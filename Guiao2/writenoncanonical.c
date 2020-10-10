@@ -29,6 +29,72 @@ int resent_times = 0;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 
+enum set_state state = start;
+
+int processByte(char received) {
+  switch(state) {
+    case start:
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
+      }
+      break;
+    case flag_rcv:
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
+      }
+      else if (received == A_Sender_Receiver) {
+        state = a_rcv;
+        return 2;
+      }
+      else state = start;
+      break;
+    case a_rcv:
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
+      }
+      else if (received == C_SET) {
+        state = c_rcv;
+        return 3;
+      }
+      else state = start;
+      break;
+    case c_rcv:
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
+      }
+      else if (received == BCC_SET) {
+        state = bcc_ok;
+        return 4;
+      }
+      else state = start;
+      break;
+    case bcc_ok:
+      if (received == FLAG) {
+        state = stop;
+      }
+      else state = start;
+    default:
+      break;
+  }
+  return 0;
+}
+
+void read_UA() {
+  int i = 0;
+  while (state != stop) {
+    read(fd, &UA[i], 1);
+
+    i = processByte(SET[i]);
+  }
+
+  received_UA = TRUE;
+  printf("Received: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
+}
+
 void send_SET() {
   int i = 0;
   while (i < 5) {
@@ -108,14 +174,7 @@ int main(int argc, char** argv)
 
   alarm(3);
 
-  int i = 0;
-  while (i < 5) {
-    read(fd, &UA[i], 1);
-    i++;
-  }
-
-  received_UA = TRUE;
-  printf("Received: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
+  read_UA();
 
   sleep(1);
   
