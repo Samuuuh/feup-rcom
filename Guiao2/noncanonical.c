@@ -20,14 +20,65 @@
 
 volatile int STOP=FALSE;
 
+enum set_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop}
+
 unsigned char UA[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA, FLAG};
+
+int process(enum set_state) {
+  switch(set_state) {
+    case start:
+      if (SET[i] == FLAG) {
+        set_state = flag_rcv;
+        return 1;
+      }
+    case flag_rcv:
+      if (SET[i] == FLAG) {
+        set_state = flag_rcv;
+      }
+      else if (SET[i] == A_Receiver_Sender) {
+        set_state = a_rcv;
+        return 2;
+      }
+      else set_state = start;
+      break;
+    case a_rcv:
+      if (SET[i] == FLAG) {
+        set_state = flag_rcv;
+      }
+      else if (SET[i] == C_SET) {
+        set_state = c_rcv;
+        return 3;
+      }
+      else set_state = start;
+      break;
+    case c_rcv:
+      if (SET[i] == FLAG) {
+        set_state = flag_rcv;
+      }
+      else if (SET[i] == BCC_SET) {
+        set_state = bcc_ok;
+        return 4;
+      }
+      else set_state = start;
+      break;
+    case bcc_ok:
+      if (SET[i] == FLAG) {
+        set_state = stop;
+      }
+      else set_state = start;
+    default:
+      break;
+  }
+  return 0;
+}
 
 void read_SET(int fd) {
   unsigned char SET[5];
-  int i = 0;
-  while (i < 5) {
+  
+  while (set_state != stop) {
     read(fd, &SET[i], 1);
-    i++;
+
+    i = process(set_state);
   }
 
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
