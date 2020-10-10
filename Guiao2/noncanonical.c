@@ -17,55 +17,62 @@
 #define TRUE 1
 
 #define BCC_UA A_Receiver_Sender^C_UA
+#define BCC_SET A_Sender_Receiver^C_SET
 
 volatile int STOP=FALSE;
 
-enum set_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop}
+enum set_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};
+
+enum set_state state = start;
 
 unsigned char UA[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA, FLAG};
 
-int process(enum set_state) {
-  switch(set_state) {
+int process(char received) {
+  switch(state) {
     case start:
-      if (SET[i] == FLAG) {
-        set_state = flag_rcv;
+      if (received == FLAG) {
+        state = flag_rcv;
         return 1;
       }
+      break;
     case flag_rcv:
-      if (SET[i] == FLAG) {
-        set_state = flag_rcv;
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
       }
-      else if (SET[i] == A_Receiver_Sender) {
-        set_state = a_rcv;
+      else if (received == A_Sender_Receiver) {
+        state = a_rcv;
         return 2;
       }
-      else set_state = start;
+      else state = start;
       break;
     case a_rcv:
-      if (SET[i] == FLAG) {
-        set_state = flag_rcv;
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
       }
-      else if (SET[i] == C_SET) {
-        set_state = c_rcv;
+      else if (received == C_SET) {
+        state = c_rcv;
         return 3;
       }
-      else set_state = start;
+      else state = start;
       break;
     case c_rcv:
-      if (SET[i] == FLAG) {
-        set_state = flag_rcv;
+      if (received == FLAG) {
+        state = flag_rcv;
+        return 1;
       }
-      else if (SET[i] == BCC_SET) {
-        set_state = bcc_ok;
+      else if (received == BCC_SET) {
+        state = bcc_ok;
         return 4;
       }
-      else set_state = start;
+      else state = start;
       break;
     case bcc_ok:
-      if (SET[i] == FLAG) {
-        set_state = stop;
+      if (received == FLAG) {
+        state = stop;
       }
-      else set_state = start;
+      else state = start;
     default:
       break;
   }
@@ -75,10 +82,12 @@ int process(enum set_state) {
 void read_SET(int fd) {
   unsigned char SET[5];
   
-  while (set_state != stop) {
+  int i;
+
+  while (state != stop) {
     read(fd, &SET[i], 1);
 
-    i = process(set_state);
+    i = process(SET[i]);
   }
 
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
