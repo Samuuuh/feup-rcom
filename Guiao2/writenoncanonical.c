@@ -28,6 +28,7 @@ int received_UA = FALSE;
 int resent_times = 0;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
+unsigned char UA[5];
 
 enum set_state state = start;
 
@@ -165,8 +166,6 @@ int main(int argc, char** argv)
   }
 
   printf("New termios structure set\n");
-
-  unsigned char UA[5];
 
   signal(SIGALRM, alarm_handler);
 
