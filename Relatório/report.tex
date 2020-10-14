@@ -1,0 +1,113 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+\documentclass[article, a4paper, 12pt, oneside]{memoir}
+
+% Margins
+\usepackage[top=3cm,left=2cm,right=2cm,bottom=3cm]{geometry}
+
+% Encondings
+\usepackage[utf8]{inputenc}
+
+% Language
+\usepackage[portuguese]{babel}
+
+% Graphics and images
+\usepackage{graphicx}
+	\graphicspath{{./images/}}
+
+% Listings
+\usepackage{listings}
+\usepackage{amsmath}
+
+% Color
+\usepackage[dvipsnames]{xcolor}
+
+% Tables
+\usepackage{tabularx}
+
+% Math symbols
+\usepackage{amssymb}
+
+% Paragraph Spacing
+\usepackage{parskip}
+\usepackage{indentfirst}
+\setlength{\parskip}{0.5cm}
+
+% Hyperreferences
+\usepackage{hyperref}
+
+% Repeated commands
+\usepackage{expl3}
+\ExplSyntaxOn
+\cs_new_eq:NN \Repeat \prg_replicate:nn
+\ExplSyntaxOff
+
+% Header and Footer Things
+\usepackage{wallpaper}
+\usepackage{fancyhdr}
+
+% Following code to edit the pagestyle
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Meat Wagons}
+\lhead{\leftmark}
+\rfoot{Página \thepage}
+
+% Commands
+\usepackage{xargs}
+
+%% Linked Email
+\newcommand{\email}[1]{
+{\texttt{\href{mailto:#1}{#1}} }
+}
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+% Title
+\title{\Huge \texttt{Rede de Computadores} }
+% Authors
+\author{
+\LARGE \textbf{Turma Grupo}\\\\
+\begin{tabular}{l r}
+	\email{up201806250@fe.up.pt} & Diogo Samuel Gonçalves Fernandes	\\
+	\email{up@fe.up.pt} & Paulo Ribeiro \\
+\end{tabular}
+}
+
+%\institute{Faculdade de Engenharia da Universidade do Porto \\ Bases de Dados (BDAD) - Turma 4, grupo 6}
+
+% Date for the report
+\date{\today}
+
+% Table of Contents
+\addto\captionsportuguese{\renewcommand*\contentsname{Índice}}
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT
+%----------------------------------------------------------------------------------------
+\begin{document}
+%----------------------------------------------------------------------------------------
+%	Front Page
+%----------------------------------------------------------------------------------------
+% Title Author and Date
+\maketitle
+
+% More information for front page
+\begin{center}
+\textbf{Projeto CAL - 2019/20 - MIEIC}
+\Repeat{2}{\linebreak}
+\begin{tabular}{l r}
+	\textbf{Professor das Aulas Práticas}: 
+\end{tabular}
+\Repeat{4}{\linebreak}
+
+\end{center}
+
+\newpage
+
+Teste
+
+
+\end{document}

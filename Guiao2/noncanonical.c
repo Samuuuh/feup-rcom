@@ -16,14 +16,14 @@
 #define FALSE 0
 #define TRUE 1
 
-#define BCC_UA A_Receiver_Sender^C_UA
+#define BCC_UA A_Sender_Receiver^C_UA
 #define BCC_SET A_Sender_Receiver^C_SET
 
 volatile int STOP=FALSE;
 
 enum set_state state = start;
 
-unsigned char UA[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA, FLAG};
+unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
 
 int process(char received) {
   switch(state) {
