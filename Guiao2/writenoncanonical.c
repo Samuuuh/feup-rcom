@@ -87,7 +87,7 @@ int processByte(char received) {
 void read_UA() {
   int i = 0;
   while (state != stop) {
-    read(fd, &UA[i], 1);
+    int res = read(fd, &UA[i], 1);
 
     i = processByte(SET[i]);
   }
