@@ -1,7 +1,7 @@
 %----------------------------------------------------------------------------------------
 %	PACKAGES AND DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
-\documentclass[article, a4paper, 12pt, oneside]{memoir}
+\documentclass[article, a4paper, 11pt, oneside]{memoir}
 
 % Margins
 \usepackage[top=3cm,left=2cm,right=2cm,bottom=3cm]{geometry}
@@ -50,7 +50,7 @@
 % Following code to edit the pagestyle
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{Meat Wagons}
+\rhead{RCOM}
 \lhead{\leftmark}
 \rfoot{Página \thepage}
 
@@ -72,11 +72,9 @@
 \LARGE \textbf{Turma Grupo}\\\\
 \begin{tabular}{l r}
 	\email{up201806250@fe.up.pt} & Diogo Samuel Gonçalves Fernandes	\\
-	\email{up@fe.up.pt} & Paulo Ribeiro \\
+	\email{up201806505@fe.up.pt} & Paulo Jorge Salgado Marinho Ribeiro \\
 \end{tabular}
 }
-
-%\institute{Faculdade de Engenharia da Universidade do Porto \\ Bases de Dados (BDAD) - Turma 4, grupo 6}
 
 % Date for the report
 \date{\today}
@@ -96,7 +94,7 @@
 
 % More information for front page
 \begin{center}
-\textbf{Projeto CAL - 2019/20 - MIEIC}
+\textbf{Projeto RCOM - 2019/20 - MIEIC}
 \Repeat{2}{\linebreak}
 \begin{tabular}{l r}
 	\textbf{Professor das Aulas Práticas}: 
@@ -106,8 +104,155 @@
 \end{center}
 
 \newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER - Descrição do Problema
+%----------------------------------------------------------------------------------------
 
-Teste
+Informação sobre o relatório do 1º trabalho laboratorial de RCOM
+
+a) O relatório do 1º trabalho laboratorial de RCOM deverá conter a seguinte informação:
+
+- Título, Autores
+
+- Sumário
+  (dois parágrafos: um sobre o contexto do trabalho; outro sobre as principais conclusões do relatório)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 1 - Descrição do Problema
+%----------------------------------------------------------------------------------------
+\chapter[Introdução][Introdução]{Introdução} \label{\thechapter}
+
+1. Introdução
+  (indicação dos objectivos do trabalho e do relatório; descrição da lógica do relatório com indicações sobre o tipo de informação que poderá ser encontrada em cada uma secções seguintes)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 2 - Arquitetura
+%----------------------------------------------------------------------------------------
+\chapter[Arquitetura][Arquitetura]{Arquitetura} \label{\thechapter}
+
+2. Arquitetura
+  (blocos funcionais e interfaces)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 3 - Estrutura do código
+%----------------------------------------------------------------------------------------
+\chapter[Estrutura do código][Estrutura do código]{Estrutura do código} \label{\thechapter}
+
+3. Estrutura do código
+  (APIs, principais estruturas de dados, principais funções e sua relação com a arquitetura)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 4 - Casos de uso principais
+%----------------------------------------------------------------------------------------
+\chapter[Casos de uso principais][Casos de uso principais]{Casos de uso principais} \label{\thechapter}
+
+
+4. Casos de uso principais
+  (identificação; sequências de chamada de funções)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 5 - Protocolo de ligação lógica
+%----------------------------------------------------------------------------------------
+\chapter[Protocolo de ligação lógica][Protocolo de ligação lógica]{Protocolo de ligação lógica} \label{\thechapter}
+
+5. Protocolo de ligação lógica
+  (identificação dos principais aspectos funcionais; descrição da estratégia de implementação destes aspectos com apresentação de extratos de código)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 6 - Protocolo de aplicação
+%----------------------------------------------------------------------------------------
+\chapter[Protocolo de aplicação][Protocolo de aplicação]{Protocolo de aplicação} \label{\thechapter}
+  
+6. Protocolo de aplicação
+  (identificação dos principais aspectos funcionais; descrição da estratégia de implementação destes aspectos com apresentação de extractos de código)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 7 - Validação
+%----------------------------------------------------------------------------------------
+\chapter[Validação][Validação]{Validação} \label{\thechapter}
+
+7. Validação
+  (descrição dos testes efectuados com apresentação quantificada dos resultados, se possível)
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 8 - Estrutura do código
+%----------------------------------------------------------------------------------------
+\chapter[Eficiência do protocolo de ligação de dados][Eficiência do protocolo de ligação de dados]{Eficiência do protocolo de ligação de dados} \label{\thechapter}
+
+8. Eficiência do protocolo de ligação de dados (caraterização estatística da  eficiência do protocolo, feita com recurso a medidas sobre o código desenvolvido. 
+A caracterização teórica de um protocolo Stop Wait, que 
+   deverá ser usada como termo de comparação, encontra-se descrita nos slides de Ligação Lógica das aulas teóricas).
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 9 - Conclusões
+%----------------------------------------------------------------------------------------
+\chapter[Conclusões][Conclusões]{Conclusões} \label{\thechapter}
+
+9. Conclusões
+  (síntese da informação apresentada nas secções anteriores; reflexão sobre os objectivos de aprendizagem alcançados)
+
+- Anexo I - Código fonte
+- Outros anexos, se necessário
+
+
+b) O estudante tem a liberdade de "fundir" algumas das secções apresentadas (Sec. 2 a Sec.8). Poderá, por exemplo, despromover algumas das secções a subsecções.
+
+
+c) O relatório não pode exceder 8 páginas A4, fonte de 11pt. Os anexos não estão incluidos nestas 8 páginas.
+
+
+d) O relatório pode ser entregue até uma semana depois da demonstração ter sido aceite pelo professor.
+
+
+e) Os relatórios devem ser submetidos via moodle, na turma correspondente. O grupo de alunos deverá, no entanto, facultar uma cópia do relatório em papel ao professor, caso este lhe seja pedido.
+
+
+f) Algumas dicas sobre o estilo de escrita a adoptar em relatórios técnicos:
+
+
+1. a escrita deve ser organizada em torno do parágrafo.
+  Cada parágrafo deve ser dedicado a um único assunto e,
+  na primeira linha do parágrafo, deve poder perceber-se
+  de imediato qual é esse assunto;
+
+2. o parágrafo deve ser grande. Este estilo de escrita permite
+  uma leitura "fotográfica" da página;
+
+3. escreva pela positiva; descreva o que fez e não o que não fez;
+
+4. seja cuidadoso com a utilização de adjetivos e evite
+  descrições vagas.  Não diga que  o seu código é rápido; diga
+  que determinada função é executada em cerca de 200 ms. Não diga
+  que fez muito código; diga que fez cerca de 800 linhas de código;
+
+5. depois de escrever uma frase ou um parágrafo releia-o. Se
+  conseguir colocar a mesma informação num menor número de
+  palavras, faça-o;
+
+6. Não use uma segunda frase para explicar de outra forma o assunto
+  que descreveu na primeira frase; nesta situação deverá re-escrever
+  a primeira frase;
+
+7. Se, durante a escrita, sentir necessidade de abrir parenteses ou
+  introduzir um parágrafo adicional para introduzir um qualquer
+  conceito, reformule o texto. Provavelmente estes conceitos deveriam
+  ter sido introduzidos numa secção ou num capítulo anterior. As frases e
+  os parágrafos devem aparecer sempre em sequência natural;
+
+8. Escreva o texto como se estivesse a fazer software. Defina nomes
+    e conceitos antes de os usar e depois, no texto, use sempre o mesmo nome
+  para o mesmo conceito, mesmo que tenha de o usar múltiplas vezes na
+  mesma frase.
+  
 
 
 \end{document}

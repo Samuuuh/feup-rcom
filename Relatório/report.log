@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.13)  14 OCT 2020 12:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.13)  14 OCT 2020 18:49
 entering extended mode
 **c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex
 (c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex
@@ -17,8 +17,8 @@ Package: iftex 2020/03/06 v1.0d TeX engine tests
 \stockwidth=\skip51
 \trimtop=\skip52
 \trimedge=\skip53
- (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/memoir\mem12.clo
-File: mem12.clo 2010/10/19 v0.4b memoir class 12pt size option
+ (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/memoir\mem11.clo
+File: mem11.clo 2008/01/30 v0.3 memoir class 11pt size option
 )
 \binding=\skip54
 \spinemargin=\skip55
@@ -649,22 +649,22 @@ File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ) (c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 88.
+LaTeX Font Info:    ... okay on input line 88.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -682,12 +682,12 @@ LaTeX Font Info:    ... okay on input line 90.
 * \textheight=674.33032pt
 * \oddsidemargin=-15.36449pt
 * \evensidemargin=-15.36449pt
-* \topmargin=-21.28552pt
-* \headheight=14.5pt
+* \topmargin=-20.38553pt
+* \headheight=13.6pt
 * \headsep=19.8738pt
-* \topskip=12.0pt
-* \footskip=30.0pt
-* \marginparwidth=42.0pt
+* \topskip=11.0pt
+* \footskip=27.46295pt
+* \marginparwidth=49.0pt
 * \marginparsep=7.0pt
 * \columnsep=10.0pt
 * \skip\footins=12.0pt plus 4.0pt minus 4.0pt
@@ -718,7 +718,7 @@ Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
 )
 \c@lstlisting=\count348
-Package hyperref Info: Link coloring OFF on input line 90.
+Package hyperref Info: Link coloring OFF on input line 88.
  (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
  (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
@@ -730,39 +730,46 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 Redoing nameref's sectioning
 Redoing nameref's label
-LaTeX Info: Redefining \nameref on input line 90.
-LaTeX Info: Redefining \ref on input line 90.
-LaTeX Info: Redefining \pageref on input line 90.
-LaTeX Info: Redefining \nameref on input line 90.
+LaTeX Info: Redefining \nameref on input line 88.
+LaTeX Info: Redefining \ref on input line 88.
+LaTeX Info: Redefining \pageref on input line 88.
+LaTeX Info: Redefining \nameref on input line 88.
 (c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.out) (c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.out)
 \@outlinefile=\write4
 \openout4 = `report.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 96.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 94.
  (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 96.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 94.
  (C:\Users\diogo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-{C:/Users/diogo/AppData/Local/MiKTeX/pdftex/config/pdftex.map}] [2] (c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.aux)
+{C:/Users/diogo/AppData/Local/MiKTeX/pdftex/config/pdftex.map}] [2]
+
+Package Fancyhdr Warning: \headheight is too small (13.6pt): 
+Make it at least 14.4521pt.
+We now make it that large for the rest of the document.
+This may cause the page layout to be inconsistent, however.
+
+[3] [4] [5] [6] [7] [8] [9] [10] [11] (c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+(rerunfilecheck)             Checksum: 38693A44FA93C91C8A10C335C61330DE;531.
  ) 
 Here is how much of TeX's memory you used:
- 13325 strings out of 480236
- 194814 string characters out of 2880557
- 567081 words of memory out of 3000000
- 29665 multiletter control sequences out of 15000+200000
- 544182 words of font info for 65 fonts, out of 3000000 for 9000
+ 13385 strings out of 480236
+ 195379 string characters out of 2880557
+ 571806 words of memory out of 3000000
+ 29704 multiletter control sequences out of 15000+200000
+ 544077 words of font info for 63 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,13n,66p,263b,353s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.pdf (2 pages, 36017 bytes).
+ 60i,15n,66p,276b,353s stack positions out of 5000i,500n,10000p,200000b,50000s
+ <C:\Users\diogo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.pdf (11 pages, 88947 bytes).
 PDF statistics:
- 29 PDF objects out of 1000 (max. 8388607)
- 3 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 121 PDF objects out of 1000 (max. 8388607)
+ 21 named destinations out of 1000 (max. 500000)
+ 73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
