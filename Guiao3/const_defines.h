@@ -52,7 +52,7 @@
 
 // ---------- Structures Declaration ----------
 
-extern int fd;
+int fd_write;
 
 // Estados
 enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};

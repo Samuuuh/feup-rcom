@@ -18,8 +18,6 @@ volatile int STOP=FALSE;
 
 extern struct termios oldtio;
 
-int fd;
-
 int main(int argc, char** argv)
 {
   int c, res;
@@ -32,19 +30,19 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  struct applicationLayer *application;
+  struct applicationLayer application;
 
-  application->fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (application->fileDescriptor < 0) {perror(argv[1]); exit(-1); }
+  application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
+  if (application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
 
-  application->status = RECEIVER;
+  application.status = RECEIVER;
 
-  llopen(application);
+  llopen(&application);
 
   sleep(1);
 
-  tcsetattr(application->fileDescriptor,TCSANOW,&oldtio);
-  close(fd);
+  tcsetattr(application.fileDescriptor,TCSANOW,&oldtio);
+  close(application.fileDescriptor);
   return 0;
 }
 

@@ -12,7 +12,7 @@ int resent_times = 0;
 
 void alarm_handler() {
   if (!received_UA) {
-    write_SET(fd);
+    write_SET(fd_write);
     resent_times++;
     if (resent_times < 3)
       alarm(3);

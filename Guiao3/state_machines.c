@@ -77,7 +77,7 @@ int process_UA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == C_SET) {
+      else if (received == C_UA) {
         *state = c_rcv;
         return 3;
       }
@@ -88,7 +88,7 @@ int process_UA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_SET) {
+      else if (received == BCC_UA) {
         *state = bcc_ok;
         return 4;
       }
