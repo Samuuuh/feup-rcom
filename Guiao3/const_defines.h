@@ -39,9 +39,10 @@
 // Used in struct termios
 #define BAUDRATE B38400
 
-// Used in messages SET and UA
+// Used in messages SET, UA and DISC
 #define BCC_SET A_Sender_Receiver^C_SET
 #define BCC_UA A_Sender_Receiver^C_UA
+#define BCC_DISC A_Sender_Receiver^C_DISC
 
 // Used in struct applicationLayer
 #define RECEIVER 0

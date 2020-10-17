@@ -54,11 +54,25 @@ int llopen(struct applicationLayer *application) {
     write_SET(application->fileDescriptor);
     alarm(3);
     read_UA(application->fileDescriptor);
+    return 0;
   }
   else if (application->status == RECEIVER) {
     read_SET(application->fileDescriptor);
     write_UA(application->fileDescriptor);
+    return 0;
   }
+
+  // PERGUNTAR AO STOR O QUE É PARA METER AQUI 
+  // RETURN VALUE 
+  // 
+  // PERGUNTAR
+  //
+  // PERGUNTAR
+  //
+  //
+  // PERGUNTAR
+  // FD?
+  return 0;
 }
 
 int llwrite(int fd, char * buffer, int length) {
@@ -312,11 +326,23 @@ int llread(int fd, char * buffer) {
   return message;
 }*/
 
-int llclose(int fd) {
-    
+int llclose(struct applicationLayer *application) {
+  if (application->status == TRANSMITTER) {
+    write_DISC(application->fileDescriptor);
+    read_DISC(application->fileDescriptor);
+    write_UA(application->fileDescriptor);
+    return 0;
+  }
+  else if (application->status == RECEIVER) {
+    read_DISC(application->fileDescriptor);
+    write_DISC(application->fileDescriptor);
+    read_UA(application->fileDescriptor);
+    return 0;
+  }
+  return -1;
 }
 
-/*void LLCLOSE(int fd)
+/*void LLCLOSE(int fd) -- read
 {
   readControlMessage(fd, DISC_C);
   printf("Recebeu DISC\n");
@@ -329,7 +355,7 @@ int llclose(int fd) {
   tcsetattr(fd, TCSANOW, &oldtio);
 }*/
 
-/*void LLCLOSE(int fd)
+/*void LLCLOSE(int fd) -- write
 {
   sendControlMessage(fd, DISC);
   printf("Mandou DISC\n");

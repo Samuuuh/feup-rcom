@@ -10,9 +10,11 @@
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
+unsigned char DISC[5] = {FLAG, A_Sender_Receiver, C_DISC, BCC_DISC, FLAG};
 
-enum current_state transmitter_state = start;
-enum current_state receiver_state = start;
+enum current_state SET_state = start;
+enum current_state UA_state = start;
+enum current_state DISC_state = start;
 
 extern int received_UA;
 
@@ -30,10 +32,10 @@ void read_SET(int fd) {
   unsigned char SET_read[5];
   int i = 0;
 
-  while (receiver_state != stop) {
+  while (SET_state != stop) {
     read(fd, &SET_read[i], 1);
 
-    i = process_SET(SET_read[i], &receiver_state);
+    i = process_SET(SET_read[i], &SET_state);
   }
 
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET_read[0], SET_read[1], SET_read[2], SET_read[3], SET_read[4]);
@@ -53,12 +55,35 @@ void read_UA(int fd) {
   unsigned char UA_read[5];
   int i = 0;
 
-  while (transmitter_state != stop) {
+  while (UA_state != stop) {
     read(fd, &UA_read[i], 1);
 
-    i = process_UA(UA_read[i], &transmitter_state);
+    i = process_UA(UA_read[i], &UA_state);
   }
 
   received_UA = TRUE;
   printf("Received: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA_read[0], UA_read[1], UA_read[2], UA_read[3], UA_read[4]);
+}
+
+void write_DISC(int fd) {
+  int i = 0;
+  while (i < 5) {
+    write(fd, &DISC[i], 1);
+    i++;
+  }
+  
+  printf("Sent: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC[0], DISC[1], DISC[2], DISC[3], DISC[4]);
+}
+
+void read_DISC(int fd) {
+  unsigned char DISC_read[5];
+  int i = 0;
+
+  while (DISC_state != stop) {
+    read(fd, &DISC_read[i], 1);
+
+    i = process_DISC(DISC_read[i], &DISC_state);
+  }
+
+  printf("Received: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_read[0], DISC_read[1], DISC_read[2], DISC_read[3], DISC_read[4]);
 }
