@@ -10,8 +10,6 @@
 int received_UA = FALSE;
 int resent_times = 0;
 
-extern int fd;
-
 void alarm_handler() {
   if (!received_UA) {
     write_SET(fd);

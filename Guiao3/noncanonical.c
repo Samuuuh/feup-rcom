@@ -18,9 +18,11 @@ volatile int STOP=FALSE;
 
 extern struct termios oldtio;
 
+int fd;
+
 int main(int argc, char** argv)
 {
-  int fd,c, res;
+  int c, res;
   char buf[255];
 
   if ( (argc < 2) || 

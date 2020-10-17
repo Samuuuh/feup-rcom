@@ -52,6 +52,8 @@
 
 // ---------- Structures Declaration ----------
 
+extern int fd;
+
 // Estados
 enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};
 
