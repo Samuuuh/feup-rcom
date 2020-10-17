@@ -1,6 +1,6 @@
 // ----- Interface Protocolo-Aplicação -----
 
-int llopen(int fd, int x);
+int llopen(struct applicationLayer *application);
 
 int llwrite(int fd, char * buffer, int length);
 

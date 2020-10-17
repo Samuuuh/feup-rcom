@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
 #include <string.h>
 
 #include "const_defines.h"
@@ -24,22 +23,7 @@ volatile int STOP=FALSE;
 
 int fd;
 
-int received_UA = FALSE;
-int resent_times = 0;
-
 unsigned char UA[5];
-
-// ----- Signal Handlers -----
-void alarm_handler() {
-  if (!received_UA) {
-    send_SET();
-    resent_times++;
-    if (resent_times < 3)
-      alarm(3);
-    else
-      exit(1);
-  }
-}
 
 int main(int argc, char** argv)
 {

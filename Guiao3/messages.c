@@ -24,7 +24,7 @@ void read_SET(int fd) {
   while (receiver_state != stop) {
     read(fd, &SET_read[i], 1);
 
-    i = process_SET(SET_read[i]);
+    i = process_SET(SET_read[i], receiver_state);
   }
 
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET_read[0], SET_read[1], SET_read[2], SET_read[3], SET_read[4]);
@@ -42,7 +42,7 @@ void read_UA(int fd) {
   while (transmitter_state != stop) {
     read(fd, &UA_read[i], 1);
 
-    i = process_UA(UA_read[i]);
+    i = process_UA(UA_read[i], transmitter_state);
   }
 
   received_UA = TRUE;

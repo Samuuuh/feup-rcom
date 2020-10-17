@@ -36,6 +36,9 @@
 #define RECEIVER 0
 #define TRANSMITTER 1
 
+// Used in struct linkLayer
+#define MAX_SIZE 256
+
 // ---------- Structures Declaration ----------
 
 // Estados

@@ -36,15 +36,15 @@ int main(int argc, char** argv)
   struct applicationLayer application;
 
   *application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (*application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
+  if (application->fileDescriptor < 0) {perror(argv[1]); exit(-1); }
 
-  application.status = RECEIVER;
+  application->status = RECEIVER;
 
   llopen(&application);
 
   sleep(1);
 
-  tcsetattr(application.fileDescriptor,TCSANOW,&oldtio);
+  tcsetattr(application->fileDescriptor,TCSANOW,&oldtio);
   close(fd);
   return 0;
 }

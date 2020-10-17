@@ -1,3 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <termios.h>
+#include <signal.h>
+#include <string.h>
+
 #include "llfunctions.h"
 #include "const_defines.h"
 #include "alarm.h"
@@ -11,7 +17,7 @@ int llopen(struct applicationLayer *application) {
     because we don't want to get killed if linenoise sends CTRL-C.
   */
 
-  if ( tcgetattr(*application.fileDescriptor,&oldtio) == -1) { /* save current port settings */
+  if ( tcgetattr(application->fileDescriptor,&oldtio) == -1) { /* save current port settings */
     perror("tcgetattr");
     exit(-1);
   }
@@ -32,9 +38,9 @@ int llopen(struct applicationLayer *application) {
     leitura do(s) próximo(s) caracter(es)
   */
 
-  tcflush(*application.fileDescriptor, TCIOFLUSH);
+  tcflush(application->fileDescriptor, TCIOFLUSH);
 
-  if ( tcsetattr(*application.fileDescriptor,TCSANOW,&newtio) == -1) {
+  if ( tcsetattr(application->fileDescriptor,TCSANOW,&newtio) == -1) {
     perror("tcsetattr");
     exit(-1);
   }
@@ -57,7 +63,7 @@ int llwrite(int fd, char * buffer, int length) {
 
 }
 
-int LLWRITE(int fd, unsigned char *mensagem, int size)
+/*int LLWRITE(int fd, unsigned char *mensagem, int size)
 {
   unsigned char BCC2;
   unsigned char *BCC2Stuffed = (unsigned char *)malloc(sizeof(unsigned char));
@@ -153,13 +159,13 @@ int LLWRITE(int fd, unsigned char *mensagem, int size)
     return FALSE;
   else
     return TRUE;
-}
+}*/
 
 int llread(int fd, char * buffer) {
 
 }
 
-unsigned char *LLREAD(int fd, int *sizeMessage)
+/*unsigned char *LLREAD(int fd, int *sizeMessage)
 {
   unsigned char *message = (unsigned char *)malloc(0);
   *sizeMessage = 0;
@@ -302,13 +308,13 @@ unsigned char *LLREAD(int fd, int *sizeMessage)
   else
     *sizeMessage = 0;
   return message;
-}
+}*/
 
 int llclose(int fd) {
     
 }
 
-void LLCLOSE(int fd)
+/*void LLCLOSE(int fd)
 {
   readControlMessage(fd, DISC_C);
   printf("Recebeu DISC\n");
@@ -319,9 +325,9 @@ void LLCLOSE(int fd)
   printf("Receiver terminated\n");
 
   tcsetattr(fd, TCSANOW, &oldtio);
-}
+}*/
 
-void LLCLOSE(int fd)
+/*void LLCLOSE(int fd)
 {
   sendControlMessage(fd, DISC);
   printf("Mandou DISC\n");
@@ -342,4 +348,4 @@ void LLCLOSE(int fd)
     perror("tcsetattr");
     exit(-1);
   }
-}
+}*/
