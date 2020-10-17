@@ -12,4 +12,8 @@ void write_DISC(int fd);
 
 void read_DISC(int fd);
 
+void write_DATA(int fd);
+
+void read_DATA(int fd);
+
 // ---------------------------------

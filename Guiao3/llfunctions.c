@@ -76,7 +76,7 @@ int llopen(struct applicationLayer *application) {
 }
 
 int llwrite(int fd, char * buffer, int length) {
-
+  
 }
 
 /*int LLWRITE(int fd, unsigned char *mensagem, int size)
@@ -341,39 +341,3 @@ int llclose(struct applicationLayer *application) {
   }
   return -1;
 }
-
-/*void LLCLOSE(int fd) -- read
-{
-  readControlMessage(fd, DISC_C);
-  printf("Recebeu DISC\n");
-  sendControlMessage(fd, DISC_C);
-  printf("Mandou DISC\n");
-  readControlMessage(fd, UA_C);
-  printf("Recebeu UA\n");
-  printf("Receiver terminated\n");
-
-  tcsetattr(fd, TCSANOW, &oldtio);
-}*/
-
-/*void LLCLOSE(int fd) -- write
-{
-  sendControlMessage(fd, DISC);
-  printf("Mandou DISC\n");
-  unsigned char C;
-  //espera ler o DISC
-  C = readControlMessageC(fd);
-  while (C != DISC)
-  {
-    C = readControlMessageC(fd);
-  }
-  printf("Leu DISC\n");
-  sendControlMessage(fd, UA_C);
-  printf("Mandou UA final\n");
-  printf("Writer terminated \n");
-
-  if (tcsetattr(fd, TCSANOW, &oldtio) == -1)
-  {
-    perror("tcsetattr");
-    exit(-1);
-  }
-}*/

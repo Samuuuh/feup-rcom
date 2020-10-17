@@ -45,10 +45,8 @@ int main(int argc, char** argv)
 
   llopen(&application);
 
-  printf("llclose next\n");
   llclose(&application);
-  printf("llclose after\n");
-  
+
   sleep(1);
   
   if (tcsetattr(application.fileDescriptor,TCSANOW,&oldtio) == -1) {

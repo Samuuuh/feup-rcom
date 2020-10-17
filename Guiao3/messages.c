@@ -11,10 +11,12 @@
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
 unsigned char DISC[5] = {FLAG, A_Sender_Receiver, C_DISC, BCC_DISC, FLAG};
+unsigned char DATA[128];
 
 enum current_state SET_state = start;
 enum current_state UA_state = start;
 enum current_state DISC_state = start;
+enum current_state DATA_state = start;
 
 extern int received_UA;
 
@@ -86,4 +88,34 @@ void read_DISC(int fd) {
   }
 
   printf("Received: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_read[0], DISC_read[1], DISC_read[2], DISC_read[3], DISC_read[4]);
+}
+
+void write_DATA(int fd) {   // ALTERAR ISTO
+  int i = 0;
+  DATA[0] = FLAG;
+  DATA[1] = A_Sender_Receiver;
+  while (i < 128) {
+    DATA[i] = 0x66;   // RANDOM?
+    write(fd, &DATA[i], 1);
+    i++;
+  }
+  
+  for (int j = 0 ; j < i ; j++) {
+    printf("Sent DATA[%d] = %c\n", j, DATA[j]);
+  }
+}
+
+void read_DATA(int fd) {
+  unsigned char DATA_read[128];
+  int i = 0;
+
+  while (DATA_state != stop) {
+    read(fd, &DATA_read[i], 1);
+
+    i = process_DATA(DATA_read[i], &DATA_state);
+  }
+
+  for (int j = 0 ; j < i ; j++) {
+    printf("Received DATA[%d] = %c\n", j, DATA_read[j]);
+  }
 }
