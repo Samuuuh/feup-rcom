@@ -38,6 +38,8 @@ int main(int argc, char** argv)
   application.status = RECEIVER;
 
   llopen(&application);
+  
+  llclose(&application);
 
   sleep(1);
 
