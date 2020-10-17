@@ -11,11 +11,8 @@
 
 #include "const_defines.h"
 
-#define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
-#define FALSE 0
-#define TRUE 1
 
 #define BCC_SET A_Sender_Receiver^C_SET
 
@@ -36,12 +33,14 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  struct applicationLayer application;
+  struct applicationLayer *application;
 
-  *application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (*application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
+  application->fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
+  if (application->fileDescriptor < 0) {perror(argv[1]); exit(-1); }
 
-  application.status = TRANSMITTER;
+  fd = application->fileDescriptor;
+
+  application->status = TRANSMITTER;
 
   llopen(&application);
 

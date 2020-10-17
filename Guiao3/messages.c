@@ -1,11 +1,20 @@
+#include <stdio.h>
+#include <unistd.h>
+
 #include "messages.h"
+#include "const_defines.h"
 #include "state_machines.h"
+
+#define BCC_SET A_Sender_Receiver^C_SET
+#define BCC_UA A_Sender_Receiver^C_UA
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
 
 enum current_state transmitter_state = start;
 enum current_state receiver_state = start;
+
+extern int received_UA;
 
 void write_SET(int fd) {
   int i = 0;
@@ -24,14 +33,19 @@ void read_SET(int fd) {
   while (receiver_state != stop) {
     read(fd, &SET_read[i], 1);
 
-    i = process_SET(SET_read[i], receiver_state);
+    i = process_SET(SET_read[i], &receiver_state);
   }
 
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET_read[0], SET_read[1], SET_read[2], SET_read[3], SET_read[4]);
 }
 
 void write_UA(int fd) {
-  write(application.fileDescriptor, UA, 5);
+  int i = 0;
+  while (i < 5) {
+    write(fd, &UA[i], 1);
+    i++;
+  }
+  
   printf("Sent: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 }
 
@@ -42,7 +56,7 @@ void read_UA(int fd) {
   while (transmitter_state != stop) {
     read(fd, &UA_read[i], 1);
 
-    i = process_UA(UA_read[i], transmitter_state);
+    i = process_UA(UA_read[i], &transmitter_state);
   }
 
   received_UA = TRUE;

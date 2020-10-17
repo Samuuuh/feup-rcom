@@ -30,7 +30,18 @@
  * BCC_REJ - BCC for framing of type REJ (reject / negative ACK) - A^C_REJ
 */
 
-// --------------------------------------------
+// --------------- Defines --------------------
+
+// Boolean values
+#define FALSE 0
+#define TRUE 1
+
+// Used in struct termios
+#define BAUDRATE B38400
+
+// Used in messages SET and UA
+#define BCC_SET A_Sender_Receiver^C_SET
+#define BCC_UA A_Sender_Receiver^C_UA
 
 // Used in struct applicationLayer
 #define RECEIVER 0
@@ -58,6 +69,6 @@ struct linkLayer {
   unsigned int timeout; //Valor do temporizador: 1 s
   unsigned int numTransmissions; //Número de tentativas em caso defalha
   char frame[MAX_SIZE]; //Trama
-}
+};
 
 // --------------------------------------------

@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <termios.h>
 #include <signal.h>
 #include <string.h>
 
 #include "llfunctions.h"
 #include "const_defines.h"
+#include "messages.h"
 #include "alarm.h"
 
 struct termios oldtio,newtio;
@@ -47,15 +49,15 @@ int llopen(struct applicationLayer *application) {
 
   printf("New termios structure set\n");
 
-  if (application.status == TRANSMITTER) {
+  if (application->status == TRANSMITTER) {
     signal(SIGALRM, alarm_handler);
-    write_SET();
+    write_SET(application->fileDescriptor);
     alarm(3);
-    read_UA();
+    read_UA(application->fileDescriptor);
   }
-  else if (application.status == RECEIVER) {
-    read_SET(application.fileDescriptor);
-    write_UA();
+  else if (application->status == RECEIVER) {
+    read_SET(application->fileDescriptor);
+    write_UA(application->fileDescriptor);
   }
 }
 

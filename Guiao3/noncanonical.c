@@ -10,16 +10,13 @@
 #include <string.h>
 
 #include "const_defines.h"
+#include "llfunctions.h"
 
-#define BAUDRATE B38400
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
-#define FALSE 0
-#define TRUE 1
-
-#define BCC_UA A_Sender_Receiver^C_UA
-#define BCC_SET A_Sender_Receiver^C_SET
 
 volatile int STOP=FALSE;
+
+extern struct termios oldtio;
 
 int main(int argc, char** argv)
 {
@@ -33,14 +30,14 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  struct applicationLayer application;
+  struct applicationLayer *application;
 
-  *application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
+  application->fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
   if (application->fileDescriptor < 0) {perror(argv[1]); exit(-1); }
 
   application->status = RECEIVER;
 
-  llopen(&application);
+  llopen(application);
 
   sleep(1);
 
@@ -49,20 +46,20 @@ int main(int argc, char** argv)
   return 0;
 }
 
-int checkBCC1(unsigned char *message, int sizeMessage) {
+/*int checkBCC1(unsigned char *message, int sizeMessage) {
   unsigned char BCC1;
 
   BCC1 = A ^ C;
 
   return 0;
-}
+}*/
 
 
-int checkBCC2(unsigned char *message, int sizeMessage) {
+/*int checkBCC2(unsigned char *message, int sizeMessage) {
   unsigned char BCC2 = message[0];
   for (int i = 1; i < sizeMessage; i++) {
     BCC2 ^= message[i];
   }
 
   return 0;
-}
+}*/
