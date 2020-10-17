@@ -9,9 +9,6 @@ int llopen(struct applicationLayer *application) {
     Open serial port device for reading and writing and not as controlling tty
     because we don't want to get killed if linenoise sends CTRL-C.
   */
-    
-  *application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (*application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
 
   if ( tcgetattr(*application.fileDescriptor,&oldtio) == -1) { /* save current port settings */
     perror("tcgetattr");

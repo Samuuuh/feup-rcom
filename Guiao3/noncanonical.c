@@ -21,76 +21,6 @@
 
 volatile int STOP=FALSE;
 
-enum set_state state = start;
-
-unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
-
-int process(char received) {
-  switch(state) {
-    case start:
-      if (received == FLAG) {
-        state = flag_rcv;
-        return 1;
-      }
-      break;
-    case flag_rcv:
-      if (received == FLAG) {
-        state = flag_rcv;
-        return 1;
-      }
-      else if (received == A_Sender_Receiver) {
-        state = a_rcv;
-        return 2;
-      }
-      else state = start;
-      break;
-    case a_rcv:
-      if (received == FLAG) {
-        state = flag_rcv;
-        return 1;
-      }
-      else if (received == C_SET) {
-        state = c_rcv;
-        return 3;
-      }
-      else state = start;
-      break;
-    case c_rcv:
-      if (received == FLAG) {
-        state = flag_rcv;
-        return 1;
-      }
-      else if (received == BCC_SET) {
-        state = bcc_ok;
-        return 4;
-      }
-      else state = start;
-      break;
-    case bcc_ok:
-      if (received == FLAG) {
-        state = stop;
-      }
-      else state = start;
-    default:
-      break;
-  }
-  return 0;
-}
-
-void read_SET(int fd) {
-  unsigned char SET[5];
-  
-  int i = 0;
-
-  while (state != stop) {
-    read(fd, &SET[i], 1);
-
-    i = process(SET[i]);
-  }
-
-  printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET[0], SET[1], SET[2], SET[3], SET[4]);
-}
-
 int main(int argc, char** argv)
 {
   int fd,c, res;
@@ -105,16 +35,34 @@ int main(int argc, char** argv)
 
   struct applicationLayer application;
 
+  *application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
+  if (*application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
+
+  application.status = RECEIVER;
+
   llopen(&application);
-
-  read_SET(application.fileDescriptor);
-
-  write(application.fileDescriptor, UA, 5);
-  printf("Sent: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 
   sleep(1);
 
   tcsetattr(application.fileDescriptor,TCSANOW,&oldtio);
   close(fd);
+  return 0;
+}
+
+int checkBCC1(unsigned char *message, int sizeMessage) {
+  unsigned char BCC1;
+
+  BCC1 = A ^ C;
+
+  return 0;
+}
+
+
+int checkBCC2(unsigned char *message, int sizeMessage) {
+  unsigned char BCC2 = message[0];
+  for (int i = 1; i < sizeMessage; i++) {
+    BCC2 ^= message[i];
+  }
+
   return 0;
 }
