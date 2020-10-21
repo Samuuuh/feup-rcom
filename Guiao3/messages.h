@@ -1,3 +1,7 @@
+// ----- Check BCC Functions -----
+
+unsigned char calculateBCC2(unsigned char *message, int sizeMessage);
+
 // ----- Input/Output Messages -----
 
 void write_SET(int fd);

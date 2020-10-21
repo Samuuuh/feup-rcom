@@ -53,6 +53,9 @@
 // Used in struct linkLayer
 #define MAX_SIZE 256
 
+// ESC byte, used in byte stuffing
+#define ESC 0x7D
+
 // ---------- Structures Declaration ----------
 
 int fd_write;

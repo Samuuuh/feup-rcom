@@ -157,7 +157,8 @@ int process_DISC(char received, enum current_state *state) {
   return 0;
 }
 
-int process_DATA(char received, int index, enum current_state *state) {
+int process_DATA(char* message, int index, enum current_state *state) {
+  unsigned char received = message[index];
   switch(*state) {
     case start:
       if (received == FLAG) {
@@ -199,12 +200,11 @@ int process_DATA(char received, int index, enum current_state *state) {
       else *state = start;
       break;
     case data_rcv:
-      if (received == FLAG) {
+      if (received == FLAG && message[index - 1] != ESC) {
         *state = stop;
       }
       index++;
       return index;
-      break;
     default:
       break;
   }

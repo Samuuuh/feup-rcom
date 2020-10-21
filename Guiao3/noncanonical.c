@@ -60,21 +60,3 @@ int main(int argc, char** argv)
   close(application.fileDescriptor);
   return 0;
 }
-
-/*int checkBCC1(unsigned char *message, int sizeMessage) {
-  unsigned char BCC1;
-
-  BCC1 = A ^ C;
-
-  return 0;
-}*/
-
-
-/*int checkBCC2(unsigned char *message, int sizeMessage) {
-  unsigned char BCC2 = message[0];
-  for (int i = 1; i < sizeMessage; i++) {
-    BCC2 ^= message[i];
-  }
-
-  return 0;
-}*/
