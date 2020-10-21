@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   application.status = RECEIVER;
 
   if (llopen(&application) < 0) {
-    perror("LLOPEN() failed");
+    printf("LLOPEN() failed");
     exit(2);
   }
   
@@ -47,11 +47,14 @@ int main(int argc, char** argv)
   strncpy(link.port, argv[1], sizeof(link.port));
   link.sequenceNumber = 0;
 
-  llread(&application, &link);
+  if (llread(&application, &link) < 0) {
+    printf("LLREAD() failed");
+    exit(3);
+  }
 
   if (llclose(&application) < 0) {
-    perror("LLCLOSE() failed");
-    exit(3);
+    printf("LLCLOSE() failed");
+    exit(4);
   }
 
   sleep(1);

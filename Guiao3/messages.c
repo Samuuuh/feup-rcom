@@ -5,9 +5,6 @@
 #include "const_defines.h"
 #include "state_machines.h"
 
-#define BCC_SET A_Sender_Receiver^C_SET
-#define BCC_UA A_Sender_Receiver^C_UA
-
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
 unsigned char DISC[5] = {FLAG, A_Sender_Receiver, C_DISC, BCC_DISC, FLAG};

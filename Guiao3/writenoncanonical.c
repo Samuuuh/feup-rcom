@@ -15,8 +15,6 @@
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
-#define BCC_SET A_Sender_Receiver^C_SET
-
 volatile int STOP=FALSE;
 
 extern struct termios oldtio;
@@ -44,7 +42,7 @@ int main(int argc, char** argv)
   application.status = TRANSMITTER;
 
   if (llopen(&application) < 0) {
-    perror("LLOPEN() failed");
+    printf("LLOPEN() failed");
     exit(2);
   }
 
@@ -58,11 +56,14 @@ int main(int argc, char** argv)
   link.sequenceNumber = 0;
   link.timeout = 3;
 
-  llwrite(&application, &link);
+  if (llwrite(&application, &link) < 0) {
+    printf("LLWRITE() failed");
+    exit(3);
+  }
 
   if (llclose(&application) < 0) {
-    perror("LLCLOSE() failed");
-    exit(3);
+    printf("LLCLOSE() failed");
+    exit(4);
   }
 
   sleep(1);

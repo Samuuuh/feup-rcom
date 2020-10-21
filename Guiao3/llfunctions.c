@@ -132,6 +132,8 @@ int llwrite(struct applicationLayer *application, struct linkLayer *link) {
     write(application->fileDescriptor, &link->frame[k], 1);
     k++;
   }
+
+  return 0;
 }
 
 int llread(struct applicationLayer *application, struct linkLayer *link) {
@@ -150,6 +152,13 @@ int llread(struct applicationLayer *application, struct linkLayer *link) {
   for (int i = 0; i < 4; i++) {
     link->frame[j] = stuffed_msg[i];
     j++;
+  }
+
+  // Check BCC1
+  unsigned char BCC1 = (link->frame[1] ^ link->frame[2]);
+  if (BCC1 != BCC_RR0_DATA) {
+    printf("BCC1 ERROR\n");
+    return -1;
   }
 
   for (int i = 4; i < index; i++) {
@@ -181,8 +190,10 @@ int llread(struct applicationLayer *application, struct linkLayer *link) {
   unsigned char BCC2 = calculateBCC2(link->frame, j - 1);
 
   if (BCC2 != link->frame[j-2]) {
-    printf("BCC2 IS WRONG\n");
+    printf("BCC2 ERROR\n");
   }
+
+  return 0;
 }
 
 int llclose(struct applicationLayer *application) {

@@ -32,10 +32,10 @@
  * BCC_REJ - BCC for framing of type REJ (reject / negative ACK) - A^C_REJ
 */
 
-#define BCC_SET A_Sender_Receiver^C_SET
-#define BCC_UA A_Sender_Receiver^C_UA
-#define BCC_DISC A_Sender_Receiver^C_DISC
-#define BCC_RR0_DATA A_Sender_Receiver^C_RR_0
+#define BCC_SET (A_Sender_Receiver ^ C_SET)
+#define BCC_UA (A_Sender_Receiver ^ C_UA)
+#define BCC_DISC (A_Sender_Receiver ^ C_DISC)
+#define BCC_RR0_DATA (A_Sender_Receiver ^ C_RR_0)
 
 // --------------- Defines --------------------
 
