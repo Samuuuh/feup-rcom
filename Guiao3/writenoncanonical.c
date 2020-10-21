@@ -43,9 +43,27 @@ int main(int argc, char** argv)
 
   application.status = TRANSMITTER;
 
-  llopen(&application);
+  if (llopen(&application) < 0) {
+    perror("LLOPEN() failed");
+    exit(2);
+  }
 
-  llclose(&application);
+  struct linkLayer link;
+
+  unsigned char data[] = { FLAG, A_Sender_Receiver, C_RR_0, BCC_RR0_DATA, 0x55, 0x84, 0x55, 0x44, 0x55, 0x66, 0x77, 0x55, FLAG };
+  strncpy(link.frame, data, sizeof(link.frame));
+  link.baudRate = strlen(link.frame);
+  link.numTransmissions = 3;
+  strncpy(link.port, argv[1], sizeof(link.port));
+  link.sequenceNumber = 0;
+  link.timeout = 3;
+
+  llwrite(&application, &link);
+
+  if (llclose(&application) < 0) {
+    perror("LLCLOSE() failed");
+    exit(3);
+  }
 
   sleep(1);
   

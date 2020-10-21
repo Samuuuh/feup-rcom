@@ -9,6 +9,7 @@
 #include "const_defines.h"
 #include "messages.h"
 #include "alarm.h"
+#include "state_machines.h"
 
 struct termios oldtio,newtio;
 
@@ -75,8 +76,13 @@ int llopen(struct applicationLayer *application) {
   return 0;
 }
 
-int llwrite(int fd, char * buffer, int length) {
-  
+int llwrite(struct applicationLayer *application, struct linkLayer *link) {
+  int i = 0;
+  while (i < link->baudRate) {
+    write(application->fileDescriptor, &link->frame[i], 1);
+    printf("Sent: D%d = 0x%02x\n", i, link->frame[i]);
+    i++;
+  }
 }
 
 /*int LLWRITE(int fd, unsigned char *mensagem, int size)
@@ -177,8 +183,18 @@ int llwrite(int fd, char * buffer, int length) {
     return TRUE;
 }*/
 
-int llread(int fd, char * buffer) {
+int llread(struct applicationLayer *application, struct linkLayer *link) {
+  //unsigned char DATA_read[MAX_SIZE];
+  enum current_state DATA_state = start;
 
+  int index = 0;
+  while (DATA_state != stop) {
+    read(application->fileDescriptor, &link->frame[index], 1);
+
+    printf("Received: D%d = 0x%02x\n", index, link->frame[index]);
+
+    index = process_DATA(link->frame[index], index, &DATA_state);
+  }
 }
 
 /*unsigned char *LLREAD(int fd, int *sizeMessage)

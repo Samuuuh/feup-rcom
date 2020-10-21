@@ -157,7 +157,7 @@ int process_DISC(char received, enum current_state *state) {
   return 0;
 }
 
-int process_DATA(char received, enum current_state *state) {
+int process_DATA(char received, int index, enum current_state *state) {
   switch(*state) {
     case start:
       if (received == FLAG) {
@@ -181,7 +181,7 @@ int process_DATA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == C_DATA) {
+      else if (received == C_RR_0) { // alternar entre c rr 0 e 1
         *state = c_rcv;
         return 3;
       }
@@ -192,17 +192,19 @@ int process_DATA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_DISC) {
-        *state = bcc_ok;
+      else if (received == BCC_RR0_DATA) {
+        *state = data_rcv;
         return 4;
       }
       else *state = start;
       break;
-    case bcc_ok:
+    case data_rcv:
       if (received == FLAG) {
         *state = stop;
       }
-      else *state = start;
+      index++;
+      return index;
+      break;
     default:
       break;
   }

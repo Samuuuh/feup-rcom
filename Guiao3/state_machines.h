@@ -8,6 +8,6 @@ int process_UA(char received, enum current_state *state);
 
 int process_DISC(char received, enum current_state *state);
 
-int process_DATA(char received, enum current_state *state);
+int process_DATA(char received, int index, enum current_state *state);
 
 // ------------------------------------

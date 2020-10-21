@@ -18,8 +18,10 @@
 #define C_SET 0x03    // Defines framing of type SET (set up)
 #define C_DISC 0x0B    // Defines framing of type DISC (disconnect)
 #define C_UA 0x07    // Defines framing of type UA (unnumbered acknowledgment)
-// C_RR - Defines framing of type RR (receiver ready / positive ACK) - R0000101
-// C_REJ - Defines framing of type REJ (reject / negative ACK) - R0000001
+#define C_RR_0 0x05  // C_RR - Defines framing of type RR (receiver ready / positive ACK) - R0000101
+#define C_RR_1 0x85  // C_RR - Defines framing of type RR (receiver ready / positive ACK) - R0000101
+#define C_REJ_0 0x01  // C_REJ - Defines framing of type REJ (reject / negative ACK) - R0000001
+#define C_REJ_1 0x81  // C_REJ - Defines framing of type REJ (reject / negative ACK) - R0000001
 
 /* BCC - Protection Camp - A^C (XOR / Exclusive OR)
  *
@@ -30,6 +32,11 @@
  * BCC_REJ - BCC for framing of type REJ (reject / negative ACK) - A^C_REJ
 */
 
+#define BCC_SET A_Sender_Receiver^C_SET
+#define BCC_UA A_Sender_Receiver^C_UA
+#define BCC_DISC A_Sender_Receiver^C_DISC
+#define BCC_RR0_DATA A_Sender_Receiver^C_RR_0
+
 // --------------- Defines --------------------
 
 // Boolean values
@@ -38,11 +45,6 @@
 
 // Used in struct termios
 #define BAUDRATE B38400
-
-// Used in messages SET, UA and DISC
-#define BCC_SET A_Sender_Receiver^C_SET
-#define BCC_UA A_Sender_Receiver^C_UA
-#define BCC_DISC A_Sender_Receiver^C_DISC
 
 // Used in struct applicationLayer
 #define RECEIVER 0
@@ -56,7 +58,7 @@
 int fd_write;
 
 // Estados
-enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, stop};
+enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, stop};
 
 // Aplicação
 struct applicationLayer {
@@ -71,7 +73,7 @@ struct linkLayer {
   unsigned int sequenceNumber;   //Número de sequência da trama: 0, 1
   unsigned int timeout; //Valor do temporizador: 1 s
   unsigned int numTransmissions; //Número de tentativas em caso defalha
-  char frame[MAX_SIZE]; //Trama
+  unsigned char frame[MAX_SIZE]; //Trama
 };
 
 // --------------------------------------------
