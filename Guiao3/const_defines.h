@@ -65,6 +65,7 @@ enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, st
 
 // Aplicação
 struct applicationLayer {
+  char port[20];  //Dispositivo /dev/ttySx, x = 0, 1
   int fileDescriptor; //Descritor correspondente à porta série*/
   int status;   // TRANSMITTER | RECEIVER
 };

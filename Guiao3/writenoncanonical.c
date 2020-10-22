@@ -1,8 +1,5 @@
 /*Non-Canonical Input Processing*/
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <termios.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,17 +31,15 @@ int main(int argc, char** argv)
 
   struct applicationLayer application;
 
-  application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
-
-  fd_write = application.fileDescriptor;
-
   application.status = TRANSMITTER;
+  strncpy(application.port, argv[1], sizeof(application.port));
 
   if (llopen(&application) < 0) {
     printf("LLOPEN() failed");
     exit(2);
   }
+
+  printf("fd_write = %d\n", fd_write);
 
   struct linkLayer link;
 

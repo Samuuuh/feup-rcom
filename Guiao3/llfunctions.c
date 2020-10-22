@@ -4,6 +4,9 @@
 #include <termios.h>
 #include <signal.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "llfunctions.h"
 #include "const_defines.h"
@@ -20,9 +23,12 @@ int llopen(struct applicationLayer *application) {
     because we don't want to get killed if linenoise sends CTRL-C.
   */
 
+  application->fileDescriptor = open(application->port, O_RDWR | O_NOCTTY );
+  if (application->fileDescriptor < 0) {perror(application->port); return -1; }
+
   if ( tcgetattr(application->fileDescriptor,&oldtio) == -1) { /* save current port settings */
     perror("tcgetattr");
-    exit(-1);
+    return -1;
   }
 
   bzero(&newtio, sizeof(newtio));
@@ -45,35 +51,24 @@ int llopen(struct applicationLayer *application) {
 
   if ( tcsetattr(application->fileDescriptor,TCSANOW,&newtio) == -1) {
     perror("tcsetattr");
-    exit(-1);
+    return -1;
   }
 
   printf("New termios structure set\n");
 
   if (application->status == TRANSMITTER) {
+    fd_write = application->fileDescriptor;  // Used by alarm
     signal(SIGALRM, alarm_handler);
     write_SET(application->fileDescriptor);
     alarm(3);
     read_UA(application->fileDescriptor);
-    return 0;
   }
   else if (application->status == RECEIVER) {
     read_SET(application->fileDescriptor);
     write_UA(application->fileDescriptor);
-    return 0;
   }
 
-  // PERGUNTAR AO STOR O QUE É PARA METER AQUI 
-  // RETURN VALUE 
-  // 
-  // PERGUNTAR
-  //
-  // PERGUNTAR
-  //
-  //
-  // PERGUNTAR
-  // FD?
-  return 0;
+  return application->fileDescriptor;
 }
 
 int llwrite(struct applicationLayer *application, struct linkLayer *link) {

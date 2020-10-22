@@ -32,10 +32,8 @@ int main(int argc, char** argv)
 
   struct applicationLayer application;
 
-  application.fileDescriptor = open(argv[1], O_RDWR | O_NOCTTY );
-  if (application.fileDescriptor < 0) {perror(argv[1]); exit(-1); }
-
   application.status = RECEIVER;
+  strncpy(application.port, argv[1], sizeof(application.port));
 
   if (llopen(&application) < 0) {
     printf("LLOPEN() failed");
