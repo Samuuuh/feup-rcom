@@ -5,9 +5,9 @@ struct linkLayer;
 
 int llopen(struct applicationLayer *application);
 
-int llwrite(struct applicationLayer *application, struct linkLayer *link);
+int llwrite(int fd, unsigned char* buffer, int length);
 
-int llread(struct applicationLayer *application, struct linkLayer *link);
+int llread(int fd, unsigned char* buffer);
 
 int llclose(struct applicationLayer *application);
 

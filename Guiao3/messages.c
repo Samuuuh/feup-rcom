@@ -16,10 +16,9 @@ enum current_state DISC_state = start;
 
 extern int received_UA;
 
-unsigned char calculateBCC2(unsigned char *message, int sizeMessage) {    // TO DO
+unsigned char calculateBCC2(unsigned char *message, int sizeMessage) {
   unsigned char BCC2 = message[4];
-
-  for (int i = 5; i < sizeMessage - 1; i++) {
+  for (int i = 5; i < sizeMessage; i++) {
     BCC2 ^= message[i];
   }
 

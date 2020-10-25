@@ -54,7 +54,7 @@ int llopen(struct applicationLayer *application) {
     return -1;
   }
 
-  printf("New termios structure set\n");
+  printf("New termios structure set\n\n");
 
   if (application->status == TRANSMITTER) {
     fd_write = application->fileDescriptor;  // Used by alarm
@@ -71,86 +71,92 @@ int llopen(struct applicationLayer *application) {
   return application->fileDescriptor;
 }
 
-int llwrite(struct applicationLayer *application, struct linkLayer *link) {
+int llwrite(int fd, unsigned char* buffer, int length) {
   int j = 0;
-  char stuffed_msg[MAX_SIZE];
+  unsigned char stuffed_msg[MAX_SIZE * 2];
 
-  // Calculate BCC2 with original Data
-  unsigned char BCC2 = calculateBCC2(link->frame, link->baudRate);
-
-  // Adds BCC2 to original Data, right before last FLAG
-  char last_flag = link->frame[link->baudRate - 1];
-  link->frame[link->baudRate - 1] = BCC2;
-  link->frame[link->baudRate] = last_flag;
-  link->baudRate++;
-
-  // Adds initial FLAG, A, C, BCC1 bytes
-  for (int i = 0; i < 4; i++) {
-    stuffed_msg[j] = link->frame[i];
-    j++;
+  // Prints the Data Sent
+  printf("Sent:\n");
+  for (int k = 0 ; k < length ; k++) {
+    printf("DATA[%d] = 0x%02x\n", k, buffer[k]);
   }
+  printf("\n");
 
   // Byte stuffing in Data
-  for (int i = 4; i < link->baudRate - 1; i++) {
+  for (int i = 0; i < length; i++) {
     // 0x7e -> 0x7d 0x5e (FLAG byte)
     // 0x7d -> 0x7d 0x5d (ESC byte)
-    if(link->frame[i] == FLAG) {
+    if(buffer[i] == FLAG) {
       stuffed_msg[j] = ESC;
-      stuffed_msg[j + 1] = FLAG^0x20; // 0x5e
+      stuffed_msg[j + 1] = 0x5e; // FLAG^0x20
       j += 2;
     }
-    else if (link->frame[i] == ESC) {
+    else if (buffer[i] == ESC) {
       stuffed_msg[j] = ESC;
-      stuffed_msg[j + 1] = ESC^0x20; // 0x5d
+      stuffed_msg[j + 1] = 0x5d; //  ESC^0x20
       j += 2;
     }
     else {
-      stuffed_msg[j] = link->frame[i];
+      stuffed_msg[j] = buffer[i];
       j++;
     }
   }
 
-  // Adds last FLAG to msg
-  stuffed_msg[j] = link->frame[link->baudRate - 1];
-  j++;
-
-  // Prints Data before stuffing (Original Message)
-  for (int k = 0 ; k < link->baudRate ; k++) {
-    printf("Sent: [%d] = 0x%02x\n", k, link->frame[k]);
-  }
-
-  strncpy(link->frame, stuffed_msg, sizeof(link->frame));
-
-  // Write I-frame to the port
-  int k = 0;
-  while (k < j) {
-    write(application->fileDescriptor, &link->frame[k], 1);
+  int ind = 4, k = 0;
+  sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR_0, BCC_RR0_DATA);
+  while (k < length) {
+    buffer[ind] = stuffed_msg[k];
+    ind++;
     k++;
   }
 
-  return 0;
+  // Calculate BCC2 with Data
+  unsigned char BCC2 = calculateBCC2(buffer, ind);
+
+  // Adds BCC2 to original Data, right before last FLAG
+  buffer[ind] = BCC2;
+  ind++;
+
+  buffer[ind] = FLAG;
+  ind++;
+
+  length = ind;
+
+  /*for (int k = 0 ; k < ind; k++) {
+    printf("FRAME[%d] = 0x%02x\n", k, buffer[k]);
+  }*/
+
+  // Write I-frame to the port
+  int b = 0;
+  while (b < length + 6) {
+    write(fd, &buffer[b], 1);
+    b++;
+  }
+
+  return length;
 }
 
-int llread(struct applicationLayer *application, struct linkLayer *link) {
+int llread(int fd, unsigned char* buffer) {
   enum current_state DATA_state = start;
   int j = 0;
-  unsigned char stuffed_msg[MAX_SIZE];
+  unsigned char stuffed_msg[128];
 
   int index = 0;
   while (DATA_state != stop) {
-    read(application->fileDescriptor, &stuffed_msg[index], 1);
+    read(fd, &stuffed_msg[index], 1);
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
   }
 
   // Adds initial FLAG, A, C, BCC1 bytes
+  memset(buffer, 0, sizeof (buffer));
   for (int i = 0; i < 4; i++) {
-    link->frame[j] = stuffed_msg[i];
+    buffer[j] = stuffed_msg[i];
     j++;
   }
 
   // Check BCC1
-  unsigned char BCC1 = (link->frame[1] ^ link->frame[2]);
+  unsigned char BCC1 = (stuffed_msg[1] ^ stuffed_msg[2]);
   if (BCC1 != BCC_RR0_DATA) {
     printf("BCC1 ERROR\n");
     return -1;
@@ -161,34 +167,50 @@ int llread(struct applicationLayer *application, struct linkLayer *link) {
     // 0x7d 0x5d --> 0x7d (ESC byte)
     if(stuffed_msg[i] == ESC) {
       if (stuffed_msg[i + 1] == (FLAG ^ 0x20)) {  // 0x5e
-        link->frame[j] = FLAG;
+        buffer[j] = FLAG;
         i++;
         j++;
       }
       else if (stuffed_msg[i + 1] == (ESC ^ 0x20)) {  // 0x5d
-        link->frame[j] = ESC;
+        buffer[j] = ESC;
         i++;
         j++;
       }
     }
     else {
-      link->frame[j] = stuffed_msg[i];
+      buffer[j] = stuffed_msg[i];
       j++;
     }
   }
 
   // Print Data already destuffed (Original Message)
-  for (int k = 0 ; k < j ; k++) {
-    printf("Received: [%d] = 0x%02x\n", k, link->frame[k]);
-  }
+  /*for (int k = 0 ; k < j ; k++) {
+    printf("FRAME[%d] = 0x%02x\n", k, buffer[k]);
+  }*/
 
-  unsigned char BCC2 = calculateBCC2(link->frame, j - 1);
+  unsigned char BCC2 = calculateBCC2(buffer, j - 2);
 
-  if (BCC2 != link->frame[j-2]) {
+  if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR\n");
+    return -1;
   }
 
-  return 0;
+  // Return only the DATA, remove the special bytes
+  unsigned char frame[128];
+  strcpy(frame, buffer);
+  memset(buffer, 0, sizeof (buffer));
+  for (int i = 0; i < j - 6; i++) {
+    buffer[i] = frame[i + 4];
+  }
+
+  // Prints the Data received
+  printf("Received:\n");
+  for (int i = 0 ; i < j - 6; i++) {
+    printf("DATA[%d] = 0x%02x\n", i, buffer[i]);
+  }
+  printf("\n");
+
+  return j - 6;
 }
 
 int llclose(struct applicationLayer *application) {

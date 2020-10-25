@@ -36,6 +36,10 @@
 #define BCC_UA (A_Sender_Receiver ^ C_UA)
 #define BCC_DISC (A_Sender_Receiver ^ C_DISC)
 #define BCC_RR0_DATA (A_Sender_Receiver ^ C_RR_0)
+#define BCC_RR1_DATA (A_Sender_Receiver ^ C_RR_1)
+#define BCC_REJ0_DATA (A_Sender_Receiver ^ C_REJ_0)
+#define BCC_REJ1_DATA (A_Sender_Receiver ^ C_REJ_1)
+
 
 // --------------- Defines --------------------
 
@@ -51,23 +55,46 @@
 #define TRANSMITTER 1
 
 // Used in struct linkLayer
-#define MAX_SIZE 256
+#define MAX_SIZE 8
 
 // ESC byte, used in byte stuffing
 #define ESC 0x7D
+
+// MIN: Find minimal element, used in llwrite()
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 // ---------- Structures Declaration ----------
 
 int fd_write;
 
 // Estados
-enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, stop};
+enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, stop, finished};
 
 // Aplicação
 struct applicationLayer {
   char port[20];  //Dispositivo /dev/ttySx, x = 0, 1
   int fileDescriptor; //Descritor correspondente à porta série*/
   int status;   // TRANSMITTER | RECEIVER
+};
+
+// Parameter Struct of Control Packets
+struct parameter {
+  unsigned char T, L;
+  unsigned char V[128];
+};
+
+// Pacote de Aplicação
+struct applicationPacket {
+  int controlCamp;
+
+  // Control Packet
+  struct parameter parameters[4];
+  int number_parameters;
+
+  // Data Packet
+  int sequenceNumber;
+  unsigned char L1, L2;
+  unsigned char data[MAX_SIZE];
 };
 
 // Protocolo
@@ -77,7 +104,7 @@ struct linkLayer {
   unsigned int sequenceNumber;   //Número de sequência da trama: 0, 1
   unsigned int timeout; //Valor do temporizador: 1 s
   unsigned int numTransmissions; //Número de tentativas em caso defalha
-  unsigned char frame[MAX_SIZE]; //Trama
+  unsigned char frame[128]; //Trama
 };
 
 // --------------------------------------------

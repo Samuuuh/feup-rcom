@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <math.h>
 
 #include "const_defines.h"
 #include "llfunctions.h"
@@ -39,21 +40,40 @@ int main(int argc, char** argv)
     printf("LLOPEN() failed");
     exit(2);
   }
-  
-  struct linkLayer link;
 
-  strncpy(link.port, argv[1], sizeof(link.port));
-  link.sequenceNumber = 0;
+  printf("LLOPEN() done successfully\n\n");
 
-  if (llread(&application, &link) < 0) {
+  // Read Control Start Packet
+  unsigned char start_packet[128];
+  if ((res = llread(application.fileDescriptor, start_packet)) < 0) {
     printf("LLREAD() failed");
     exit(3);
   }
 
-  if (llclose(&application) < 0) {
-    printf("LLCLOSE() failed");
+  // Check if the packet received was the Control Start Packet (C = 2)
+  if (((long int) start_packet[0] - 48) != 2) {
+    printf("Received a wrong Start Packet (C != 2)");
     exit(4);
   }
+
+  // Read Control End Packet
+  if ((res = llread(application.fileDescriptor, start_packet)) < 0) {
+    printf("LLREAD() failed");
+    exit(3);
+  }
+
+  // Check if the packet received was the Control End Packet (C = 3)
+  if (((long int) start_packet[0] - 48) != 3) {
+    printf("Received a wrong Start Packet (C != 2)");
+    exit(4);
+  }
+
+  if (llclose(&application) < 0) {
+    printf("LLCLOSE() failed");
+    exit(5);
+  }
+
+  printf("LLCLOSE() done successfully\n");
 
   sleep(1);
 

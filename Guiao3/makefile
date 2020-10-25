@@ -1,35 +1,7 @@
-cc = GCC
+compile:
+	gcc alarm.h const_defines.h llfunctions.h messages.h state_machines.h alarm.c llfunctions.c messages.c writenoncanonical.c state_machines.c -o writenoncanonical
+	gcc alarm.h const_defines.h llfunctions.h messages.h state_machines.h alarm.c llfunctions.c messages.c noncanonical.c state_machines.c -o noncanonical
 
-# ---- Directories
-# Source files
-SDIR =./src
-# Header files
-IDIR =./include
-# Library files
-LDIR =./lib
-# Object files
-ODIR =./obj
-# Executable files
-BDIR =./bin
-
-CFLAGS =-Wall
-
-TARGET = reader
-
-.PHONY: all clean
-
-all: $(BDIR)/$(TARGET)
-
-$(ODIR)/%.o: $(SDIR)/%.c
-	$(CC) $(CFLAGS) -c $(IFLAGS) $< -o $@
-
-# Create library
-makelib: makefolders &(LDIR)/lib.a
-
-$(BDIR)/$(TARGET): makelib $(ODIR)/$(MAIN)
-	$(CC) $(CFLAGS) -o $@ $(word 2, $^) $(DEPS)
-
-makefolders:
-	mkdir -p $(LDIR)
-	mkdir -p $(ODIR)
-	mkdir -p $(BDIR)
+clean:
+	rm -f writenoncanonical
+	rm -f noncanonical
