@@ -56,6 +56,22 @@ int main(int argc, char** argv)
     exit(4);
   }
 
+  int file_size = 10;   // MUDAR ISTO, PROCESSA START PACKET PARA SABER ISTO
+  unsigned char total_data[file_size];
+   
+  // Calculate the number of Data Packets to receive
+  int packet_number = file_size / MAX_SIZE;
+  packet_number += ((file_size % MAX_SIZE) ? 1 : 0);
+
+  // Read Data Packets
+  unsigned char data_packet[128];
+  for (int i = 0; i < packet_number; i++) {
+    if ((res = llread(application.fileDescriptor, data_packet)) < 0) {
+      printf("LLREAD() failed");
+      exit(3);
+    }
+  }
+
   // Read Control End Packet
   if ((res = llread(application.fileDescriptor, start_packet)) < 0) {
     printf("LLREAD() failed");
@@ -64,7 +80,7 @@ int main(int argc, char** argv)
 
   // Check if the packet received was the Control End Packet (C = 3)
   if (((long int) start_packet[0] - 48) != 3) {
-    printf("Received a wrong Start Packet (C != 2)");
+    printf("Received a wrong End Packet (C != 3)");
     exit(4);
   }
 

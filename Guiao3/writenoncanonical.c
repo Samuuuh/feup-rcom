@@ -64,6 +64,46 @@ int main(int argc, char** argv)
     exit(3);
   }
 
+  // Send Data Packets
+  unsigned char data_packet[128];
+  long int bytes_to_process = sizeof(data);
+  int data_ind = 0;
+  for (int i = 1; i <= packet_number; i++) {
+    memset(data_packet, 0, sizeof (data_packet));
+    int K = MIN(MAX_SIZE, bytes_to_process);
+    sprintf(data_packet, "%d%d%d%d", 1, i % 255, K / 256, K % 256);   // C, N, L2, L1
+    bytes_to_process -= K;
+    for (int j = 0; j < K; j++) {
+      data_packet[j + 4] = data[data_ind];
+      data_ind++;
+    }
+    if (llwrite(application.fileDescriptor, data_packet, 4 + K) < 0) {
+      printf("LLWRITE() failed");
+      exit(3);
+    }
+  }
+/*
+   for(int i = 1; i <= packet_number; i++) {
+    struct applicationPacket packet;
+    packet.controlCamp = 1;
+    packet.sequenceNumber = i;
+    int K = MIN(MAX_SIZE, total_size);
+    printf("K = %d\n", K);
+    packet.L2 = (K / 256);
+    packet.L1 = (K % 256);
+    
+    for(int j = 0; j < K; j++) {
+      packet.data[j] = data[data_index];
+      data_index++;
+      total_size--;
+    }
+
+    printf("total_size = %d\n", total_size);
+
+    packets[i] = packet;
+  }
+*/
+
   // Create End Control Packet
   unsigned char end_packet[128];
   sprintf(end_packet, "%d%d%d", 3, 0, 1);
