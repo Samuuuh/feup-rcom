@@ -4,6 +4,10 @@
 #include "messages.h"
 #include "const_defines.h"
 #include "state_machines.h"
+#include "llfunctions.h"
+
+extern int received_UA;
+extern int Ns;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
@@ -13,8 +17,7 @@ unsigned char DATA[128];
 enum current_state SET_state = start;
 enum current_state UA_state = start;
 enum current_state DISC_state = start;
-
-extern int received_UA;
+enum current_state RR_state = start;
 
 unsigned char calculateBCC2(unsigned char *message, int sizeMessage) {
   unsigned char BCC2 = message[4];
@@ -39,6 +42,7 @@ void read_SET(int fd) {
   unsigned char SET_read[5];
   int i = 0;
 
+  SET_state = start;
   while (SET_state != stop) {
     read(fd, &SET_read[i], 1);
 
@@ -62,6 +66,7 @@ void read_UA(int fd) {
   unsigned char UA_read[5];
   int i = 0;
 
+  UA_state = start;
   while (UA_state != stop) {
     read(fd, &UA_read[i], 1);
 
@@ -86,6 +91,7 @@ void read_DISC(int fd) {
   unsigned char DISC_read[5];
   int i = 0;
 
+  DISC_state = start;
   while (DISC_state != stop) {
     read(fd, &DISC_read[i], 1);
 
@@ -93,4 +99,29 @@ void read_DISC(int fd) {
   }
 
   printf("Received: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_read[0], DISC_read[1], DISC_read[2], DISC_read[3], DISC_read[4]);
+}
+
+void write_RR(int fd) {
+  unsigned char RR[5] = { FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns), FLAG };
+  int i = 0;
+  while (i < 5) {
+    write(fd, &RR[i], 1);
+    i++;
+  }
+
+  printf("Sent: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR[0], RR[1], RR[2], RR[3], RR[4]);
+}
+
+void read_RR(int fd) {
+  unsigned char RR_read[5];
+  int i = 0;
+
+  RR_state = start;
+  while (RR_state != stop) {
+    read(fd, &RR_read[i], 1);
+
+    i = process_RR(RR_read[i], &RR_state);
+  }
+
+  printf("Received: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR_read[0], RR_read[1], RR_read[2], RR_read[3], RR_read[4]);
 }

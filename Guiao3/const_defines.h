@@ -18,10 +18,8 @@
 #define C_SET 0x03    // Defines framing of type SET (set up)
 #define C_DISC 0x0B    // Defines framing of type DISC (disconnect)
 #define C_UA 0x07    // Defines framing of type UA (unnumbered acknowledgment)
-#define C_RR_0 0x05  // C_RR - Defines framing of type RR (receiver ready / positive ACK) - R0000101
-#define C_RR_1 0x85  // C_RR - Defines framing of type RR (receiver ready / positive ACK) - R0000101
-#define C_REJ_0 0x01  // C_REJ - Defines framing of type REJ (reject / negative ACK) - R0000001
-#define C_REJ_1 0x81  // C_REJ - Defines framing of type REJ (reject / negative ACK) - R0000001
+#define C_RR(N) (N << 7 | 0b101)  // C_RR - Defines framing of type RR (N = 0 -> 0x05, N = 1 -> 0x85)
+#define C_REJ(N) (N << 7 | 0b1)  //C_REJ - Defines framing of type REJ (N = 0 -> 0x01, N = 1 -> 0x81)
 
 /* BCC - Protection Camp - A^C (XOR / Exclusive OR)
  *
@@ -35,11 +33,8 @@
 #define BCC_SET (A_Sender_Receiver ^ C_SET)
 #define BCC_UA (A_Sender_Receiver ^ C_UA)
 #define BCC_DISC (A_Sender_Receiver ^ C_DISC)
-#define BCC_RR0_DATA (A_Sender_Receiver ^ C_RR_0)
-#define BCC_RR1_DATA (A_Sender_Receiver ^ C_RR_1)
-#define BCC_REJ0_DATA (A_Sender_Receiver ^ C_REJ_0)
-#define BCC_REJ1_DATA (A_Sender_Receiver ^ C_REJ_1)
-
+#define BCC_RR(N) (A_Sender_Receiver ^ C_RR(N))
+#define BCC_REJ(N) (A_Sender_Receiver ^ C_REJ(N))
 
 // --------------- Defines --------------------
 

@@ -16,6 +16,8 @@
 
 struct termios oldtio,newtio;
 
+int Ns = 0;
+
 int llopen(struct applicationLayer *application) {
 
   /*
@@ -80,7 +82,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   for (int k = 0 ; k < length ; k++) {
     printf("DATA[%d] = 0x%02x\n", k, buffer[k]);
   }
-  printf("\n");
 
   // Byte stuffing in Data
   for (int i = 0; i < length; i++) {
@@ -103,7 +104,7 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   }
 
   int ind = 4, k = 0;
-  sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR_0, BCC_RR0_DATA);
+  sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns));
   while (k < length) {
     buffer[ind] = stuffed_msg[k];
     ind++;
@@ -133,6 +134,9 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     b++;
   }
 
+  // Receives RR answer - MUDAR STATE MACHINE PARA PODER SER REJ TB
+  read_RR(fd);
+
   return length;
 }
 
@@ -157,7 +161,7 @@ int llread(int fd, unsigned char* buffer) {
 
   // Check BCC1
   unsigned char BCC1 = (stuffed_msg[1] ^ stuffed_msg[2]);
-  if (BCC1 != BCC_RR0_DATA) {
+  if (BCC1 != BCC_RR(Ns)) {
     printf("BCC1 ERROR\n");
     return -1;
   }
@@ -208,7 +212,9 @@ int llread(int fd, unsigned char* buffer) {
   for (int i = 0 ; i < j - 6; i++) {
     printf("DATA[%d] = 0x%02x\n", i, buffer[i]);
   }
-  printf("\n");
+
+  // Sends RR answer
+  write_RR(fd);
 
   return j - 6;
 }
