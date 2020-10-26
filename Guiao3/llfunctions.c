@@ -73,15 +73,28 @@ int llopen(struct applicationLayer *application) {
   return application->fileDescriptor;
 }
 
+unsigned char calculateBCC2All(unsigned char *message, int sizeMessage) {
+  unsigned char BCC2 = message[0];
+  for (int i = 1; i < sizeMessage; i++) {
+    BCC2 ^= message[i];
+  }
+
+  return BCC2;
+}
+
 int llwrite(int fd, unsigned char* buffer, int length) {
   int j = 0;
   unsigned char stuffed_msg[MAX_SIZE * 2];
 
   // Prints the Data Sent
   printf("Sent:\n");
-  for (int k = 0 ; k < length ; k++) {
+  for (int k = 0 ; k < length; k++) {
     printf("DATA[%d] = 0x%02x\n", k, buffer[k]);
   }
+  printf("\n");
+	
+  // Calculate BCC2 with Data
+  unsigned char BCC2 = calculateBCC2All(buffer, length);
 
   // Byte stuffing in Data
   for (int i = 0; i < length; i++) {
@@ -102,30 +115,40 @@ int llwrite(int fd, unsigned char* buffer, int length) {
       j++;
     }
   }
+  
+  // Byte stuffing BCC2
+  if(BCC2 == FLAG) {
+      stuffed_msg[j] = ESC;
+      stuffed_msg[j + 1] = 0x5e; // FLAG^0x20
+      j += 2;
+   }
+   else if (BCC2 == ESC) {
+     stuffed_msg[j] = ESC;
+     stuffed_msg[j + 1] = 0x5d; //  ESC^0x20
+     j += 2;
+   }
+   else {
+      stuffed_msg[j] = BCC2;
+      j++;
+   }
 
   int ind = 4, k = 0;
   sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns));
-  while (k < length) {
+  while (k < j) {
     buffer[ind] = stuffed_msg[k];
     ind++;
     k++;
   }
 
-  // Calculate BCC2 with Data
-  unsigned char BCC2 = calculateBCC2(buffer, ind);
-
   // Adds BCC2 to original Data, right before last FLAG
-  buffer[ind] = BCC2;
-  ind++;
-
   buffer[ind] = FLAG;
   ind++;
 
   length = ind;
 
-  /*for (int k = 0 ; k < ind; k++) {
-    printf("FRAME[%d] = 0x%02x\n", k, buffer[k]);
-  }*/
+  for (int k = 0 ; k < ind; k++) {
+    printf("sent STUFFED[%d] = 0x%02x\n", k, buffer[k]);
+  }
 
   // Write I-frame to the port
   int b = 0;
@@ -151,7 +174,10 @@ int llread(int fd, unsigned char* buffer) {
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
   }
-
+  for (int k = 0 ; k < index ; k++) {
+    printf("received STUFFED[%d] = 0x%02x\n", k, stuffed_msg[k]);
+  }
+  printf("\n\n");
   // Adds initial FLAG, A, C, BCC1 bytes
   memset(buffer, 0, sizeof (buffer));
   for (int i = 0; i < 4; i++) {
@@ -188,16 +214,17 @@ int llread(int fd, unsigned char* buffer) {
   }
 
   // Print Data already destuffed (Original Message)
-  /*for (int k = 0 ; k < j ; k++) {
-    printf("FRAME[%d] = 0x%02x\n", k, buffer[k]);
-  }*/
+  for (int k = 0 ; k < j ; k++) {
+    printf("received ORIGINAL[%d] = 0x%02x\n", k, buffer[k]);
+  }
 
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);
-
+	
   if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR\n");
     return -1;
   }
+  
 
   // Return only the DATA, remove the special bytes
   unsigned char frame[128];

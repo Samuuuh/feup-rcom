@@ -42,7 +42,7 @@ int main(int argc, char** argv)
   
   printf("LLOPEN() done successfully\n\n");
 
-  unsigned char data[] = { 0x55, 0x84, 0x66, 0x44, 0x55, 0x55, 0x77, 0x55, 0x77, 0x66 };
+  unsigned char data[] = { 0x55, FLAG , 0x55, 0x43, 0x23, 0x46, ESC, 0x45, 0x23, FLAG, FLAG, FLAG, 0x12, 0x12};
 
   // Calculate the number of Data Packets to send
   int packet_number = strlen(data) / MAX_SIZE;
