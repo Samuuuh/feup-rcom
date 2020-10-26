@@ -10,6 +10,6 @@ int process_DISC(char received, enum current_state *state);
 
 int process_DATA(char* message, int index, enum current_state *state);
 
-int process_RR(char received, enum current_state *state);
+int process_RR(unsigned char received, enum current_state *state);
 
 // ------------------------------------

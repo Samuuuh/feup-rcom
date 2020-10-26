@@ -5,8 +5,11 @@
 #include "const_defines.h"
 #include "state_machines.h"
 #include "llfunctions.h"
+#include "alarm.h"
 
 extern int received_UA;
+extern int received_RR;
+extern int resent_times_write;
 extern int Ns;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
@@ -112,9 +115,14 @@ void write_RR(int fd) {
   printf("Sent: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR[0], RR[1], RR[2], RR[3], RR[4]);
 }
 
-void read_RR(int fd) {
+int read_RR(int fd) {
   unsigned char RR_read[5];
   int i = 0;
+
+  received_RR = FALSE;
+  resent_times_write = 0;
+
+  alarm(3);
 
   RR_state = start;
   while (RR_state != stop) {
@@ -123,5 +131,25 @@ void read_RR(int fd) {
     i = process_RR(RR_read[i], &RR_state);
   }
 
+  received_RR = TRUE;
+
+  if (((RR_read[2] == C_REJ(0)) || (RR_read[2] == C_REJ(1))) && ((RR_read[3] == BCC_REJ(0)) || (RR_read[3] == BCC_REJ(1)))) {
+    printf("Received: REJ = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR_read[0], RR_read[1], RR_read[2], RR_read[3], RR_read[4]);
+    return Ns;
+  }
+
   printf("Received: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR_read[0], RR_read[1], RR_read[2], RR_read[3], RR_read[4]);
+
+  return (RR_read[2] & 0x80 ? 1 : 0);
+}
+
+void write_REJ(int fd) {
+  unsigned char REJ[5] = { FLAG, A_Sender_Receiver, C_REJ(Ns), BCC_REJ(Ns), FLAG };
+  int i = 0;
+  while (i < 5) {
+    write(fd, &REJ[i], 1);
+    i++;
+  }
+
+  printf("Sent: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", REJ[0], REJ[1], REJ[2], REJ[3], REJ[4]);
 }

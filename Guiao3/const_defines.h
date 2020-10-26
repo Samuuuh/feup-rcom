@@ -12,6 +12,7 @@
 
 #define FLAG 0x7E   // Delimitation of framing (tramas)
 
+// NÃO ESQUECER DE ALTERAR O A
 #define A_Sender_Receiver 0x03    // Commands sent by Sender and answers sent by Receiver
 #define A_Receiver_Sender 0x01    // Commands sent by Receiver and answers sent by Sender
 

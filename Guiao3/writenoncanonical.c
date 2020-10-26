@@ -8,9 +8,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <math.h>
+#include <signal.h>
        
 #include "const_defines.h"
 #include "llfunctions.h"
+#include "alarm.h"
 
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -22,7 +24,6 @@ extern struct termios oldtio;
 extern int fd_write;
 
 unsigned char UA[5];
-
 
 int main(int argc, char** argv)
 { 
@@ -46,10 +47,10 @@ int main(int argc, char** argv)
   printf("LLOPEN() done successfully\n\n");
 
   FILE *f;
-  struct stat metadata;
-  unsigned char *fileData;
-
-  if ((f = fopen("input_file.txt", "rb")) == NULL) {
+  struct stat metadata;// NÃO ESQUECER DE ALTERAR O A
+  unsigned char *fileData;// NÃO ESQUECER DE ALTERAR O A
+// NÃO ESQUECER DE ALTERAR O A
+  if ((f = fopen("input_file.txt", "rb")) == NULL) {// NÃO ESQUECER DE ALTERAR O A
     perror("error opening file!");
     exit(-1);
   }
@@ -62,6 +63,9 @@ int main(int argc, char** argv)
   fread(fileData, sizeof(unsigned char), sizeFile, f);
 
   // --------------------------------
+
+  // Change alarm handler, for llwrite() function
+  signal(SIGALRM, alarm_handler_write);
 
   // Calculate the number of Data Packets to send
   int packet_number = sizeFile / MAX_SIZE;

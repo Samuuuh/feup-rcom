@@ -18,6 +18,8 @@ void read_DISC(int fd);
 
 void write_RR(int fd);
 
-void read_RR(int fd);
+int read_RR(int fd);  // Returns received Ns
+
+void write_REJ(int fd);
 
 // ---------------------------------

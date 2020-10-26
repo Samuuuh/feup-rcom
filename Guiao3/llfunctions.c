@@ -18,6 +18,9 @@ struct termios oldtio,newtio;
 
 int Ns = 0;
 
+unsigned char frame_copy[MAX_SIZE * 2];
+int length_copy;
+
 int llopen(struct applicationLayer *application) {
 
   /*
@@ -60,7 +63,7 @@ int llopen(struct applicationLayer *application) {
 
   if (application->status == TRANSMITTER) {
     fd_write = application->fileDescriptor;  // Used by alarm
-    signal(SIGALRM, alarm_handler);
+    signal(SIGALRM, alarm_handler_open);
     write_SET(application->fileDescriptor);
     alarm(3);
     read_UA(application->fileDescriptor);
@@ -94,7 +97,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   printf("\n");
 	
   // Calculate BCC2 with Data
-  
   unsigned char BCC2 = calculateBCC2All(buffer, length);
 
   // Byte stuffing in Data
@@ -147,12 +149,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
 
   length = ind;
 
-  // Até aqui está certo
-
-  /*for (int k = 0 ; k < ind; k++) {
-    printf("sent STUFFED[%d] = 0x%02x\n", k, buffer[k]);
-  }*/
-
   // Write I-frame to the port
   int b = 0;
   while (b < length + 6) {
@@ -160,10 +156,37 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     b++;
   }
 
-  // Receives RR answer - MUDAR STATE MACHINE PARA PODER SER REJ TB
-  read_RR(fd);
+  // Make a frame copy, to resend in alarm, in case of trouble receiving RR
+  for (int k = 0; k < length + 6; k++) {
+    frame_copy[k] = buffer[k];
+  }
 
-  return length;
+  length_copy = length;
+
+  // Receives RR or REJ answer
+  int received_Ns = read_RR(fd);
+  if (received_Ns != Ns) {  // Reader asked for next frame (received RR)
+    Ns = received_Ns;
+  }
+  else {  // Reader asked for this frame again (received REJ) - Re-Write I-frame to the port
+    int tries = 0;
+    while (tries < 3) {   // ESTE VALOR VAI SER UM DEFINE (MAX_TRIES)
+      int b = 0;
+      while (b < length + 6) {
+        write(fd, &buffer[b], 1);
+        b++;
+      }
+      int received_Ns = read_RR(fd);
+      if (received_Ns != Ns) {  // Reader asked for next frame (received RR)
+        Ns = received_Ns;
+        return length;
+      }
+      tries++;
+    }
+    return -1;
+  }
+
+  return length_copy;
 }
 
 int llread(int fd, unsigned char* buffer) {
@@ -177,12 +200,6 @@ int llread(int fd, unsigned char* buffer) {
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
   }
-  /*
-  for (int k = 0 ; k < index ; k++) {
-    printf("received STUFFED[%d] = 0x%02x\n", k, stuffed_msg[k]);
-  }
-  printf("\n\n");
-  */
 
   // Adds initial FLAG, A, C, BCC1 bytes
   memset(buffer, 0, sizeof (buffer));
@@ -219,15 +236,11 @@ int llread(int fd, unsigned char* buffer) {
     }
   }
 
-  // Print Data already destuffed (Original Message)
-  /*for (int k = 0 ; k < j ; k++) {
-    printf("received DATA[%d] = 0x%02x\n", k, buffer[k]);
-  }*/
-
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);
 	
   if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR\n");
+    write_REJ(fd);
     return -1;
   }
   
@@ -251,6 +264,10 @@ int llread(int fd, unsigned char* buffer) {
   printf("\n");
 
   // Sends RR answer
+  int received_Ns = (frame[2] & 0x80 ? 1 : 0);
+  if (received_Ns == Ns) {  // Received the wanted frame (Ns requested)
+    Ns = (frame[2] & 0x80 ? 0 : 1);
+  }
   write_RR(fd);
 
   return j - 6;
