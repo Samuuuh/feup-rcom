@@ -94,6 +94,7 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   printf("\n");
 	
   // Calculate BCC2 with Data
+  
   unsigned char BCC2 = calculateBCC2All(buffer, length);
 
   // Byte stuffing in Data
@@ -146,9 +147,11 @@ int llwrite(int fd, unsigned char* buffer, int length) {
 
   length = ind;
 
-  for (int k = 0 ; k < ind; k++) {
+  // Até aqui está certo
+
+  /*for (int k = 0 ; k < ind; k++) {
     printf("sent STUFFED[%d] = 0x%02x\n", k, buffer[k]);
-  }
+  }*/
 
   // Write I-frame to the port
   int b = 0;
@@ -174,17 +177,20 @@ int llread(int fd, unsigned char* buffer) {
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
   }
+  /*
   for (int k = 0 ; k < index ; k++) {
     printf("received STUFFED[%d] = 0x%02x\n", k, stuffed_msg[k]);
   }
   printf("\n\n");
+  */
+
   // Adds initial FLAG, A, C, BCC1 bytes
   memset(buffer, 0, sizeof (buffer));
   for (int i = 0; i < 4; i++) {
     buffer[j] = stuffed_msg[i];
     j++;
   }
-
+  
   // Check BCC1
   unsigned char BCC1 = (stuffed_msg[1] ^ stuffed_msg[2]);
   if (BCC1 != BCC_RR(Ns)) {
@@ -214,9 +220,9 @@ int llread(int fd, unsigned char* buffer) {
   }
 
   // Print Data already destuffed (Original Message)
-  for (int k = 0 ; k < j ; k++) {
-    printf("received ORIGINAL[%d] = 0x%02x\n", k, buffer[k]);
-  }
+  /*for (int k = 0 ; k < j ; k++) {
+    printf("received DATA[%d] = 0x%02x\n", k, buffer[k]);
+  }*/
 
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);
 	
@@ -225,11 +231,14 @@ int llread(int fd, unsigned char* buffer) {
     return -1;
   }
   
-
   // Return only the DATA, remove the special bytes
   unsigned char frame[128];
-  strcpy(frame, buffer);
+  for (int k = 0 ; k < j; k++) {
+    frame[k] = buffer[k];
+  }
+
   memset(buffer, 0, sizeof (buffer));
+
   for (int i = 0; i < j - 6; i++) {
     buffer[i] = frame[i + 4];
   }
@@ -239,6 +248,7 @@ int llread(int fd, unsigned char* buffer) {
   for (int i = 0 ; i < j - 6; i++) {
     printf("DATA[%d] = 0x%02x\n", i, buffer[i]);
   }
+  printf("\n");
 
   // Sends RR answer
   write_RR(fd);

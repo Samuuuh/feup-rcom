@@ -44,6 +44,7 @@ int main(int argc, char** argv)
   printf("LLOPEN() done successfully\n\n");
 
   // Read Control Start Packet
+  printf("-- Start Control Packet --\n");
   unsigned char start_packet[128];
   if ((res = llread(application.fileDescriptor, start_packet)) < 0) {
     printf("LLREAD() failed");
@@ -62,6 +63,8 @@ int main(int argc, char** argv)
     exit(4);
   }
 
+  FILE *file = fopen("output_file.txt", "wb+");
+
   // Read Data Packets
   unsigned char data_packet[128];
   while(TRUE) {
@@ -71,7 +74,14 @@ int main(int argc, char** argv)
     }
     if (((long int) data_packet[0] - 48) == 3)   // Received Control End Packet
       break;
+    // Mandar para o ficheiro
+    int K = 256 * (data_packet[2] - 48) + (data_packet[3] - 48);
+    for (int i = 0 ; i < K; i++) {
+      fwrite((void *)&data_packet[i + 4], 1, 1, file);
+    }
   }
+
+  fclose(file);
 
   if (llclose(&application) < 0) {
     printf("LLCLOSE() failed");
@@ -79,6 +89,8 @@ int main(int argc, char** argv)
   }
 
   printf("LLCLOSE() done successfully\n");
+
+   
 
   sleep(1);
 
