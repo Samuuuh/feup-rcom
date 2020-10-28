@@ -11,15 +11,11 @@
 #include "llfunctions.h"
 #include "const_defines.h"
 #include "messages.h"
-#include "alarm.h"
 #include "state_machines.h"
 
 struct termios oldtio,newtio;
 
 int Ns = 0;
-
-unsigned char frame_copy[MAX_SIZE * 2];
-int length_copy;
 
 int llopen(struct applicationLayer *application) {
 
@@ -44,8 +40,8 @@ int llopen(struct applicationLayer *application) {
   /* set input mode (non-canonical, no echo,...) */
   newtio.c_lflag = 0;
 
-  newtio.c_cc[VTIME]    = 0;   /* inter-character timer unused */
-  newtio.c_cc[VMIN]     = 1;   /* blocking read until 1 char received */
+  newtio.c_cc[VTIME]    = 30;   /* inter-character timer unused */
+  newtio.c_cc[VMIN]     = 0;   /* blocking read until 1 char received */
 
   /* 
     VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
@@ -62,11 +58,18 @@ int llopen(struct applicationLayer *application) {
   printf("New termios structure set\n\n");
 
   if (application->status == TRANSMITTER) {
-    fd_write = application->fileDescriptor;  // Used by alarm
-    signal(SIGALRM, alarm_handler_open);
     write_SET(application->fileDescriptor);
-    alarm(3);
-    read_UA(application->fileDescriptor);
+    int resent_times_open = 0;
+    while (resent_times_open < 3) {
+      if (!read_UA(application->fileDescriptor)) {
+        write_SET(application->fileDescriptor);
+        resent_times_open++;
+      }
+      else
+        break;
+    }
+    if (resent_times_open >= 3)
+      return -1;
   }
   else if (application->status == RECEIVER) {
     read_SET(application->fileDescriptor);
@@ -156,37 +159,34 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     b++;
   }
 
-  // Make a frame copy, to resend in alarm, in case of trouble receiving RR
-  for (int k = 0; k < length + 6; k++) {
-    frame_copy[k] = buffer[k];
-  }
-
-  length_copy = length;
-
   // Receives RR or REJ answer
-  int received_Ns = read_RR(fd);
-  if (received_Ns != Ns) {  // Reader asked for next frame (received RR)
-    Ns = received_Ns;
-  }
-  else {  // Reader asked for this frame again (received REJ) - Re-Write I-frame to the port
-    int tries = 0;
-    while (tries < 3) {   // ESTE VALOR VAI SER UM DEFINE (MAX_TRIES)
-      int b = 0;
-      while (b < length + 6) {
-        write(fd, &buffer[b], 1);
-        b++;
+  int received_NS;
+  int received_RR = read_RR(fd, &received_NS);
+  if (!received_RR) {
+    int resent_times_write = 0;
+    while (resent_times_write < 3) {
+      if (!read_RR(fd, &received_NS)) {
+        // Re-Write I-frame to the port
+        int b = 0;
+        while (b < length + 6) {
+          write(fd, &buffer[b], 1);
+          b++;
+        }
+
+        resent_times_write++;
       }
-      int received_Ns = read_RR(fd);
-      if (received_Ns != Ns) {  // Reader asked for next frame (received RR)
-        Ns = received_Ns;
-        return length;
-      }
-      tries++;
+      else
+        break;
     }
-    return -1;
+    if (resent_times_write >= 3)
+      return -1;
+  }
+  // Processes Ns received
+  if (received_NS != Ns) {  // Reader asked for next frame (received RR)
+    Ns = received_NS;
   }
 
-  return length_copy;
+  return length;
 }
 
 int llread(int fd, unsigned char* buffer) {

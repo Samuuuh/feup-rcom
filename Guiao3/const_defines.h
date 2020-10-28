@@ -61,8 +61,6 @@
 
 // ---------- Structures Declaration ----------
 
-int fd_write;
-
 // Estados
 enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, stop, finished};
 
@@ -71,36 +69,6 @@ struct applicationLayer {
   char port[20];  //Dispositivo /dev/ttySx, x = 0, 1
   int fileDescriptor; //Descritor correspondente à porta série*/
   int status;   // TRANSMITTER | RECEIVER
-};
-
-// Parameter Struct of Control Packets
-struct parameter {
-  unsigned char T, L;
-  unsigned char V[128];
-};
-
-// Pacote de Aplicação
-struct applicationPacket {
-  int controlCamp;
-
-  // Control Packet
-  struct parameter parameters[4];
-  int number_parameters;
-
-  // Data Packet
-  int sequenceNumber;
-  unsigned char L1, L2;
-  unsigned char data[MAX_SIZE];
-};
-
-// Protocolo
-struct linkLayer {
-  char port[20];  //Dispositivo /dev/ttySx, x = 0, 1
-  int baudRate;   //Velocidade de transmissão
-  unsigned int sequenceNumber;   //Número de sequência da trama: 0, 1
-  unsigned int timeout; //Valor do temporizador: 1 s
-  unsigned int numTransmissions; //Número de tentativas em caso defalha
-  unsigned char frame[128]; //Trama
 };
 
 // --------------------------------------------

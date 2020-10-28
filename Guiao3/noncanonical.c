@@ -24,10 +24,10 @@ int main(int argc, char** argv)
   int c, res;
   char buf[255];
 
-  if ( (argc < 2) || 
+  if ( (argc != 3) || 
         ((strcmp("/dev/ttyS0", argv[1])!=0) && 
         (strcmp("/dev/ttyS1", argv[1])!=0) )) {
-    printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
+    printf("Usage:\tnserial SerialPort output_file\n\tex: nserial /dev/ttyS1 pinguim.gif\n");
     exit(1);
   }
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
   strncpy(application.port, argv[1], sizeof(application.port));
 
   if (llopen(&application) < 0) {
-    printf("LLOPEN() failed");
+    printf("LLOPEN() failed\n");
     exit(2);
   }
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
   printf("-- Start Control Packet --\n");
   unsigned char start_packet[128];
   if ((res = llread(application.fileDescriptor, start_packet)) < 0) {
-    printf("LLREAD() failed");
+    printf("LLREAD() failed\n");
     exit(3);
   }
 
@@ -63,13 +63,13 @@ int main(int argc, char** argv)
     exit(4);
   }
 
-  FILE *file = fopen("output_file.txt", "wb+");
+  FILE *file = fopen(argv[2], "wb+");
 
   // Read Data Packets
   unsigned char data_packet[128];
   while(TRUE) {
     if ((res = llread(application.fileDescriptor, data_packet)) < 0) {
-      printf("LLREAD() failed");
+      printf("LLREAD() failed\n");
       exit(3);
     }
     if (((long int) data_packet[0] - 48) == 3)   // Received Control End Packet
@@ -84,13 +84,11 @@ int main(int argc, char** argv)
   fclose(file);
 
   if (llclose(&application) < 0) {
-    printf("LLCLOSE() failed");
+    printf("LLCLOSE() failed\n");
     exit(5);
   }
 
   printf("LLCLOSE() done successfully\n");
-
-   
 
   sleep(1);
 

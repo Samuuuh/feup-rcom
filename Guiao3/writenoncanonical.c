@@ -12,7 +12,6 @@
        
 #include "const_defines.h"
 #include "llfunctions.h"
-#include "alarm.h"
 
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -21,16 +20,14 @@ volatile int STOP=FALSE;
 
 extern struct termios oldtio;
 
-extern int fd_write;
-
 unsigned char UA[5];
 
 int main(int argc, char** argv)
 { 
-  if ( (argc < 2) || 
+  if ((argc != 3) || 
         ((strcmp("/dev/ttyS0", argv[1])!=0) && 
         (strcmp("/dev/ttyS1", argv[1])!=0) )) {
-    printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n"); 
+    printf("Usage:\tnserial SerialPort input_file\n\tex: nserial /dev/ttyS1 pinguim.gif\n"); 
     exit(1);
   }
 
@@ -40,7 +37,7 @@ int main(int argc, char** argv)
   strncpy(application.port, argv[1], sizeof(application.port));
 
   if (llopen(&application) < 0) {
-    printf("LLOPEN() failed");
+    printf("LLOPEN() failed\n");
     exit(2);
   }
   
@@ -50,11 +47,11 @@ int main(int argc, char** argv)
   struct stat metadata;// NÃO ESQUECER DE ALTERAR O A
   unsigned char *fileData;// NÃO ESQUECER DE ALTERAR O A
 // NÃO ESQUECER DE ALTERAR O A
-  if ((f = fopen("input_file.txt", "rb")) == NULL) {// NÃO ESQUECER DE ALTERAR O A
+  if ((f = fopen(argv[2], "rb")) == NULL) {// NÃO ESQUECER DE ALTERAR O A
     perror("error opening file!");
     exit(-1);
   }
-  stat("input_file.txt", &metadata);
+  stat(argv[2], &metadata);
   long int sizeFile = metadata.st_size;
   printf("This file has %ld bytes \n\n", sizeFile);
 
@@ -63,9 +60,6 @@ int main(int argc, char** argv)
   fread(fileData, sizeof(unsigned char), sizeFile, f);
 
   // --------------------------------
-
-  // Change alarm handler, for llwrite() function
-  signal(SIGALRM, alarm_handler_write);
 
   // Calculate the number of Data Packets to send
   int packet_number = sizeFile / MAX_SIZE;
@@ -84,7 +78,7 @@ int main(int argc, char** argv)
   // Send Start Control Packet
   printf("-- Start Control Packet --\n");
   if (llwrite(application.fileDescriptor, start_packet, 3 + digits_V) < 0) {
-    printf("LLWRITE() failed");
+    printf("LLWRITE() failed\n");
     exit(4);
   }
 
@@ -102,7 +96,7 @@ int main(int argc, char** argv)
       data_ind++;
     }
     if (llwrite(application.fileDescriptor, data_packet, 4 + K) < 0) {
-      printf("LLWRITE() failed");
+      printf("LLWRITE() failed\n");
       exit(4);
     }
   }
@@ -119,12 +113,12 @@ int main(int argc, char** argv)
   printf("-- End Control Packet --\n");
   // Send End Control Packet
   if (llwrite(application.fileDescriptor, end_packet, 3 + digits_V) < 0) {
-    printf("LLWRITE() failed");
+    printf("LLWRITE() failed\n");
     exit(4);
   }
 
   if (llclose(&application) < 0) {
-    printf("LLCLOSE() failed");
+    printf("LLCLOSE() failed\n");
     exit(5);
   }
 
