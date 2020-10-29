@@ -53,7 +53,7 @@
 #define TRANSMITTER 1
 
 // Used in struct linkLayer
-#define MAX_SIZE 8
+#define MAX_SIZE 120
 
 // ESC byte, used in byte stuffing
 #define ESC 0x7D

@@ -66,7 +66,10 @@ int main(int argc, char** argv)
   // Create Start Control Packet
   unsigned char start_packet[128];
   long int digits_V = log10l(sizeFile) + 1;
-  sprintf(start_packet, "%d%d%ld", 2, 0, digits_V);
+  //sprintf(start_packet, "%d%d%ld", 2, 0, digits_V);
+  start_packet[0] = 2;
+  start_packet[1] = 0;
+  start_packet[2] = digits_V;
   unsigned char V_string[64];
   sprintf(V_string, "%ld", sizeFile);
   for (int i = 0 ; i < digits_V; i++) {
@@ -87,7 +90,11 @@ int main(int argc, char** argv)
   for (int i = 1; i <= packet_number; i++) {
     memset(data_packet, 0, sizeof (data_packet));
     int K = MIN(MAX_SIZE, bytes_to_process);
-    sprintf(data_packet, "%d%c%d%d", 1, i % 255, K / 256, K % 256);   // C, N, L2, L1
+    // sprintf(data_packet, "%d%c%d%d", 1, i % 255, K / 256, K % 256);   // C, N, L2, L1
+    data_packet[0] = 1;
+    data_packet[1] =  i % 255;
+    data_packet[2] = K / 256;
+    data_packet[3] =  K % 256;
     bytes_to_process -= K;
     for (int j = 0; j < K; j++) {
       data_packet[j + 4] = fileData[data_ind];
@@ -101,7 +108,10 @@ int main(int argc, char** argv)
 
   // Create End Control Packet
   unsigned char end_packet[128];
-  sprintf(end_packet, "%d%d%ld", 3, 0, digits_V);
+  //sprintf(end_packet, "%d%d%ld", 3, 0, digits_V);
+  end_packet[0] = 3;
+  end_packet[1] = 0;
+  end_packet[2] = digits_V;
   digits_V = log10l(sizeFile) + 1;
   sprintf(V_string, "%ld", sizeFile);
   for (int i = 0 ; i < digits_V; i++) {

@@ -52,13 +52,13 @@ int main(int argc, char** argv)
   }
 
   // Check if the packet received was the Control Start Packet (C = 2)
-  if (((long int) start_packet[0] - 48) != 2) {
+  if ((long int) start_packet[0] != 2) {
     printf("Received a wrong Start Packet (C != 2)");
     exit(4);
   }
 
   // Check if type of first parameter is the file size (T = 0)
-  if (((long int) start_packet[1] - 48) != 0) {
+  if ((long int) start_packet[1] != 0) {
     printf("First Parameter is not File Size. (T != 0)");
     exit(4);
   }
@@ -72,10 +72,10 @@ int main(int argc, char** argv)
       printf("LLREAD() failed\n");
       exit(3);
     }
-    if (((long int) data_packet[0] - 48) == 3)   // Received Control End Packet
+    if ((long int) data_packet[0] == 3)   // Received Control End Packet
       break;
     // Mandar para o ficheiro
-    int K = 256 * (data_packet[2] - 48) + (data_packet[3] - 48);
+    int K = 256 * data_packet[2] + data_packet[3];
     for (int i = 0 ; i < K; i++) {
       fwrite((void *)&data_packet[i + 4], 1, 1, file);
     }
