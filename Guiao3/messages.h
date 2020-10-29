@@ -1,18 +1,21 @@
+
 // ----- Check BCC Functions -----
 
 unsigned char calculateBCC2(unsigned char *message, int sizeMessage);
 
 // ----- Input/Output Messages -----
 
+struct applicationLayer;
+
 void write_SET(int fd);
 
 void read_SET(int fd);
 
-void write_UA(int fd);
+void write_UA(struct applicationLayer app);
 
 int read_UA(int fd);  // TRUE if UA was received, FALSE otherwise
 
-void write_DISC(int fd);
+void write_DISC(struct applicationLayer app);
 
 void read_DISC(int fd);
 

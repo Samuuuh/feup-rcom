@@ -20,8 +20,6 @@ volatile int STOP=FALSE;
 
 extern struct termios oldtio;
 
-unsigned char UA[5];
-
 int main(int argc, char** argv)
 { 
   if ((argc != 3) || 

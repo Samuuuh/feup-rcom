@@ -32,8 +32,10 @@
 */
 
 #define BCC_SET (A_Sender_Receiver ^ C_SET)
-#define BCC_UA (A_Sender_Receiver ^ C_UA)
-#define BCC_DISC (A_Sender_Receiver ^ C_DISC)
+#define BCC_UA_Sender_Receiver (A_Sender_Receiver ^ C_UA)
+#define BCC_UA_Receiver_Sender (A_Receiver_Sender ^ C_UA)
+#define BCC_DISC_Sender_Receiver (A_Sender_Receiver ^ C_DISC)
+#define BCC_DISC_Receiver_Sender (A_Receiver_Sender ^ C_DISC)
 #define BCC_RR(N) (A_Sender_Receiver ^ C_RR(N))
 #define BCC_REJ(N) (A_Sender_Receiver ^ C_REJ(N))
 

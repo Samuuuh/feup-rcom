@@ -10,8 +10,10 @@ extern int received_UA;
 extern int Ns;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
-unsigned char UA[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA, FLAG};
-unsigned char DISC[5] = {FLAG, A_Sender_Receiver, C_DISC, BCC_DISC, FLAG};
+unsigned char UA_Sender_Receiver[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA_Sender_Receiver, FLAG};
+unsigned char UA_Receiver_Sender[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA_Receiver_Sender, FLAG};
+unsigned char DISC_Sender_Receiver[5] = {FLAG, A_Sender_Receiver, C_DISC, BCC_DISC_Sender_Receiver, FLAG};
+unsigned char DISC_Receiver_Sender[5] = {FLAG, A_Receiver_Sender, C_DISC, BCC_DISC_Receiver_Sender, FLAG};
 unsigned char DATA[128];
 
 enum current_state SET_state = start;
@@ -52,14 +54,24 @@ void read_SET(int fd) {
   printf("Received: SET = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", SET_read[0], SET_read[1], SET_read[2], SET_read[3], SET_read[4]);
 }
 
-void write_UA(int fd) {
+void write_UA(struct applicationLayer app) {
   int i = 0;
   while (i < 5) {
-    write(fd, &UA[i], 1);
+    if(app.status == RECEIVER) {
+      write(app.fileDescriptor, &UA_Sender_Receiver[i], 1);
+    }
+    else 
+      write(app.fileDescriptor, &UA_Receiver_Sender[i], 1);
+      
+  
     i++;
   }
+
+  if(app.status == RECEIVER) {
+    printf("Sent: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA_Sender_Receiver[0], UA_Sender_Receiver[1], UA_Sender_Receiver[2], UA_Sender_Receiver[3], UA_Sender_Receiver[4]);
+  }
+  else printf("Sent: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA_Receiver_Sender[0], UA_Receiver_Sender[1], UA_Receiver_Sender[2], UA_Receiver_Sender[3], UA_Receiver_Sender[4]);
   
-  printf("Sent: UA = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", UA[0], UA[1], UA[2], UA[3], UA[4]);
 }
 
 int read_UA(int fd) {
@@ -80,14 +92,24 @@ int read_UA(int fd) {
   return TRUE;
 }
 
-void write_DISC(int fd) {
+void write_DISC(struct applicationLayer app) {
   int i = 0;
   while (i < 5) {
-    write(fd, &DISC[i], 1);
+    if(app.status == TRANSMITTER) {
+      write(app.fileDescriptor, &DISC_Sender_Receiver[i], 1);
+    }
+    else 
+      write(app.fileDescriptor, &DISC_Receiver_Sender[i], 1);
+    
     i++;
   }
-  
-  printf("Sent: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC[0], DISC[1], DISC[2], DISC[3], DISC[4]);
+
+  if(app.status == TRANSMITTER) {
+    printf("Sent: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_Sender_Receiver[0], DISC_Sender_Receiver[1], DISC_Sender_Receiver[2], DISC_Sender_Receiver[3], DISC_Sender_Receiver[4]);
+  }
+  else {
+    printf("Sent: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_Receiver_Sender[0], DISC_Receiver_Sender[1], DISC_Receiver_Sender[2], DISC_Receiver_Sender[3], DISC_Receiver_Sender[4]);
+  }
 }
 
 void read_DISC(int fd) {

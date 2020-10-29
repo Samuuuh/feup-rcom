@@ -69,7 +69,7 @@ int process_UA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == A_Sender_Receiver) {
+      else if (received == A_Sender_Receiver || received == A_Receiver_Sender) {
         *state = a_rcv;
         return 2;
       }
@@ -91,7 +91,7 @@ int process_UA(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_UA) {
+      else if (received == BCC_UA_Sender_Receiver || received == BCC_UA_Receiver_Sender) {
         *state = bcc_ok;
         return 4;
       }
@@ -121,7 +121,7 @@ int process_DISC(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == A_Sender_Receiver) {
+      else if (received == A_Sender_Receiver || received == A_Receiver_Sender) {
         *state = a_rcv;
         return 2;
       }
@@ -143,7 +143,7 @@ int process_DISC(char received, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_DISC) {
+      else if (received == BCC_DISC_Sender_Receiver || received == BCC_DISC_Receiver_Sender) {
         *state = bcc_ok;
         return 4;
       }

@@ -73,7 +73,7 @@ int llopen(struct applicationLayer *application) {
   }
   else if (application->status == RECEIVER) {
     read_SET(application->fileDescriptor);
-    write_UA(application->fileDescriptor);
+    write_UA(*application);
   }
 
   return application->fileDescriptor;
@@ -275,14 +275,14 @@ int llread(int fd, unsigned char* buffer) {
 
 int llclose(struct applicationLayer *application) {
   if (application->status == TRANSMITTER) {
-    write_DISC(application->fileDescriptor);
+    write_DISC(*application);
     read_DISC(application->fileDescriptor);
-    write_UA(application->fileDescriptor);
+    write_UA(*application);
     return 0;
   }
   else if (application->status == RECEIVER) {
     read_DISC(application->fileDescriptor);
-    write_DISC(application->fileDescriptor);
+    write_DISC(*application);
     read_UA(application->fileDescriptor);
     return 0;
   }
