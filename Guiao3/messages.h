@@ -1,5 +1,5 @@
 
-// ----- Check BCC Functions -----
+// ----- Check BCC2 Functions -----
 
 unsigned char calculateBCC2All(unsigned char *message, int sizeMessage);
 

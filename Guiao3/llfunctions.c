@@ -17,8 +17,6 @@ struct termios oldtio,newtio;
 
 int Ns = 0;
 
-int contador = 0; // APAGAR
-
 int llopen(struct applicationLayer *application) {
 
   /*
@@ -42,7 +40,7 @@ int llopen(struct applicationLayer *application) {
   /* set input mode (non-canonical, no echo,...) */
   newtio.c_lflag = 0;
 
-  newtio.c_cc[VTIME]    = 30;   /* inter-character timer unused */
+  newtio.c_cc[VTIME]    = TIMEOUT * 10;   /* inter-character timer unused */
   newtio.c_cc[VMIN]     = 0;   /* blocking read until 1 char received */
 
   /* 
@@ -99,14 +97,14 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   for (int i = 0; i < length; i++) {
     // 0x7e -> 0x7d 0x5e (FLAG byte)
     // 0x7d -> 0x7d 0x5d (ESC byte)
-    if(buffer[i] == FLAG) {
+    if (buffer[i] == FLAG) {
       stuffed_msg[j] = ESC;
       stuffed_msg[j + 1] = 0x5e; // FLAG^0x20
       j += 2;
     }
     else if (buffer[i] == ESC) {
       stuffed_msg[j] = ESC;
-      stuffed_msg[j + 1] = 0x5d; //  ESC^0x20
+      stuffed_msg[j + 1] = 0x5d; // ESC^0x20
       j += 2;
     }
     else {
@@ -115,22 +113,23 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     }
   }
   
-  // Byte stuffing BCC2
-  if(BCC2 == FLAG) {
-      stuffed_msg[j] = ESC;
-      stuffed_msg[j + 1] = 0x5e; // FLAG^0x20
-      j += 2;
-   }
-   else if (BCC2 == ESC) {
-     stuffed_msg[j] = ESC;
-     stuffed_msg[j + 1] = 0x5d; //  ESC^0x20
-     j += 2;
-   }
-   else {
-      stuffed_msg[j] = BCC2;
-      j++;
-   }
+  // Byte stuffing of BCC2
+  if (BCC2 == FLAG) {
+    stuffed_msg[j] = ESC;
+    stuffed_msg[j + 1] = (FLAG ^ 0x20); // 0x5e
+    j += 2;
+  }
+  else if (BCC2 == ESC) {
+    stuffed_msg[j] = ESC;
+    stuffed_msg[j + 1] = (ESC ^ 0x20); // 0x5d
+    j += 2;
+  }
+  else {
+    stuffed_msg[j] = BCC2;
+    j++;
+  }
 
+  // Adds the first 4 special bytes (F, A, C, BCC1)
   int ind = 4, k = 0;
   sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns));
   while (k < j) {
@@ -142,7 +141,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   // Adds BCC2 to original Data, right before last FLAG
   buffer[ind] = FLAG;
   ind++;
-
   length = ind;
 
   // Write I-frame to the port
@@ -175,8 +173,9 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     if (resent_times_write >= 3)
       return -1;
   }
+
   // Processes Ns received
-  if (received_NS != Ns) {  // Reader asked for next frame (received RR)
+  if (received_NS != Ns) {  // Reader asked for next frame (received RR), change Ns
     Ns = received_NS;
   }
 
@@ -188,6 +187,7 @@ int llread(int fd, unsigned char* buffer) {
   int j = 0;
   unsigned char stuffed_msg[128];
 
+  // Reads the Packet Received
   int index = 0;
   while (DATA_state != stop) {
     read(fd, &stuffed_msg[index], 1);
@@ -228,12 +228,6 @@ int llread(int fd, unsigned char* buffer) {
       buffer[j] = stuffed_msg[i];
       j++;
     }
-  }
-
-  contador++;
-  if (contador == 100) {
-    contador = 0;
-    buffer[8] = 0x33;
   }
 
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);

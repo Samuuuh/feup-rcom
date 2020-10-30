@@ -1,7 +1,6 @@
 // ----- Interface Protocolo-Aplicação -----
 
 struct applicationLayer;
-struct linkLayer;
 
 int llopen(struct applicationLayer *application);
 

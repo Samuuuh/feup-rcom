@@ -75,21 +75,21 @@ int main(int argc, char** argv)
     size += (start_packet[i + 3] - 48) * pow;
   }
 
-  // Check if type of first parameter is the file name (T = 1)
+  // Check if type of second parameter is the file name (T = 1)
   if ((long int) start_packet[size_digits + 3] != 1) {
-    printf("First Parameter is not File Name. (T != 1)");
+    printf("Second Parameter is not File Name. (T != 1)");
     exit(4);
   }
 
+  // Process name of file received in Control Start Packet
   int name_bytes = (int) start_packet[size_digits + 4];
   char file_name[128];
   for (int j = 0; j < name_bytes; j++) {
     file_name[j] = start_packet[size_digits + 5 + j];
   }
 
-  FILE *file = fopen(argv[2], "wb+");
-
   // Read Data Packets
+  FILE *file = fopen(argv[2], "wb+");
   unsigned char data_packet[128];
   while(TRUE) {
     if ((res = llread(application.fileDescriptor, data_packet)) < 0) {
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     }
     if ((long int) data_packet[0] == 3)   // Received Control End Packet
       break;
-    // Mandar para o ficheiro
+    // Send the Data Packet received to the file
     int K = 256 * data_packet[2] + data_packet[3];
     for (int i = 0 ; i < K; i++) {
       fwrite((void *)&data_packet[i + 4], 1, 1, file);

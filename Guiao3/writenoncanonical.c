@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <math.h>
-#include <signal.h>
        
 #include "const_defines.h"
 #include "llfunctions.h"
@@ -19,10 +18,6 @@
 volatile int STOP=FALSE;
 
 extern struct termios oldtio;
-
-void alarm_handler() {
-  sleep(3);
-}
 
 int main(int argc, char** argv)
 { 
@@ -45,13 +40,15 @@ int main(int argc, char** argv)
   
   printf("LLOPEN() done successfully\n\n");
 
+
+  // Read the Data Array from the file
   FILE *f;
-  struct stat metadata;// NÃO ESQUECER DE ALTERAR O A
-  unsigned char *fileData;// NÃO ESQUECER DE ALTERAR O A
-// NÃO ESQUECER DE ALTERAR O A
-  if ((f = fopen(argv[2], "rb")) == NULL) {// NÃO ESQUECER DE ALTERAR O A
-    perror("error opening file!");
-    exit(-1);
+  struct stat metadata;
+  unsigned char *fileData;
+
+  if ((f = fopen(argv[2], "rb")) == NULL) {
+    perror("Error opening file!");
+    exit(3);
   }
   stat(argv[2], &metadata);
   long int sizeFile = metadata.st_size;
@@ -67,11 +64,7 @@ int main(int argc, char** argv)
   int packet_number = sizeFile / MAX_SIZE;
   packet_number += ((sizeFile % MAX_SIZE) ? 1 : 0);
 
-  // APAGAR
-  signal(SIGALRM, alarm_handler);
-  alarm(1);
-
-  // Create Start Control Packet
+  // ----- Create Start Control Packet -----
   unsigned char start_packet[128];
   long int digits_V = log10l(sizeFile) + 1;
   start_packet[0] = 2;
@@ -93,6 +86,7 @@ int main(int argc, char** argv)
   }
 
   int start_length = digits_V + 5 + strlen(argv[2]);
+  // ------------------------------------------
 
   // Send Start Control Packet
   printf("-- Start Control Packet --\n");
@@ -108,7 +102,6 @@ int main(int argc, char** argv)
   for (int i = 1; i <= packet_number; i++) {
     memset(data_packet, 0, sizeof (data_packet));
     int K = MIN(MAX_SIZE, bytes_to_process);
-    // sprintf(data_packet, "%d%c%d%d", 1, i % 255, K / 256, K % 256);   // C, N, L2, L1
     data_packet[0] = 1;
     data_packet[1] =  i % 255;
     data_packet[2] = K / 256;
@@ -126,7 +119,6 @@ int main(int argc, char** argv)
 
   // Create End Control Packet
   unsigned char end_packet[128];
-  //sprintf(end_packet, "%d%d%ld", 3, 0, digits_V);
   end_packet[0] = 3;
   end_packet[1] = 0;
   end_packet[2] = digits_V;
@@ -136,8 +128,8 @@ int main(int argc, char** argv)
     end_packet[i + 3] = V_string[i];
   }
 
-  printf("-- End Control Packet --\n");
   // Send End Control Packet
+  printf("-- End Control Packet --\n");
   if (llwrite(application.fileDescriptor, end_packet, 3 + digits_V) < 0) {
     printf("LLWRITE() failed\n");
     exit(4);

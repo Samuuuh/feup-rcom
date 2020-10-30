@@ -185,7 +185,7 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == C_RR(Ns)) { // alternar entre c rr 0 e 1
+      else if (received == C_RR(Ns)) {
         *state = c_rcv;
         return 3;
       }
@@ -214,7 +214,7 @@ int process_DATA(char* message, int index, enum current_state *state) {
   return 0;
 }
 
-int process_RR(unsigned char received, enum current_state *state) {
+int process_RR_REJ(unsigned char received, enum current_state *state) {
   switch(*state) {
     case start:
       if (received == FLAG) {

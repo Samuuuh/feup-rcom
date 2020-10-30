@@ -12,7 +12,6 @@
 
 #define FLAG 0x7E   // Delimitation of framing (tramas)
 
-// NÃO ESQUECER DE ALTERAR O A
 #define A_Sender_Receiver 0x03    // Commands sent by Sender and answers sent by Receiver
 #define A_Receiver_Sender 0x01    // Commands sent by Receiver and answers sent by Sender
 
@@ -52,6 +51,9 @@
 #define RECEIVER 0
 #define TRANSMITTER 1
 
+// Timeout in seconds, to resend the frames
+#define TIMEOUT 3
+
 // Used in struct linkLayer
 #define MAX_SIZE 16
 
@@ -68,8 +70,8 @@ enum current_state {start, flag_rcv, a_rcv, c_rcv, bcc_ok, data_rcv, bcc2_ok, st
 
 // Aplicação
 struct applicationLayer {
-  char port[20];  //Dispositivo /dev/ttySx, x = 0, 1
-  int fileDescriptor; //Descritor correspondente à porta série*/
+  char port[20];  // Dispositivo /dev/ttySx, x = 0, 1
+  int fileDescriptor; // Descritor correspondente à porta série
   int status;   // TRANSMITTER | RECEIVER
 };
 

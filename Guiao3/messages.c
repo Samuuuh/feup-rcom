@@ -6,7 +6,6 @@
 #include "state_machines.h"
 #include "llfunctions.h"
 
-extern int received_UA;
 extern int Ns;
 
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
@@ -69,10 +68,10 @@ void write_UA(struct applicationLayer app) {
     if(app.status == RECEIVER) {
       write(app.fileDescriptor, &UA_Sender_Receiver[i], 1);
     }
-    else 
+    else {
       write(app.fileDescriptor, &UA_Receiver_Sender[i], 1);
+    }
       
-  
     i++;
   }
 
@@ -107,8 +106,9 @@ void write_DISC(struct applicationLayer app) {
     if(app.status == TRANSMITTER) {
       write(app.fileDescriptor, &DISC_Sender_Receiver[i], 1);
     }
-    else 
+    else {
       write(app.fileDescriptor, &DISC_Receiver_Sender[i], 1);
+    }
     
     i++;
   }
@@ -163,11 +163,11 @@ int read_RR(int fd, int* received_NS) {
 
   RR_state = start;
   while (RR_state != stop) {
-    if ((res = read(fd, &RR_read[i], 1)) == 0) {  // Didn't receive RR after timeout
+    if ((res = read(fd, &RR_read[i], 1)) == 0) {  // Didn't receive RR or REJ after timeout
       return FALSE;
     }
 
-    i = process_RR(RR_read[i], &RR_state);
+    i = process_RR_REJ(RR_read[i], &RR_state);
   }
 
   if (((RR_read[2] == C_REJ(0)) || (RR_read[2] == C_REJ(1))) && ((RR_read[3] == BCC_REJ(0)) || (RR_read[3] == BCC_REJ(1)))) {
