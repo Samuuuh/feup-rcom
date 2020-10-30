@@ -66,19 +66,29 @@ int main(int argc, char** argv)
   // Create Start Control Packet
   unsigned char start_packet[128];
   long int digits_V = log10l(sizeFile) + 1;
-  //sprintf(start_packet, "%d%d%ld", 2, 0, digits_V);
   start_packet[0] = 2;
+
+  // Add file size info to Start Control Packet
   start_packet[1] = 0;
   start_packet[2] = digits_V;
   unsigned char V_string[64];
   sprintf(V_string, "%ld", sizeFile);
   for (int i = 0 ; i < digits_V; i++) {
-    start_packet[i + 3] = V_string[i];
+    start_packet[i + 3] = (int) V_string[i];
   }
+
+  // Add file name info to Start Control Packet
+  start_packet[digits_V + 3] = 1;
+  start_packet[digits_V + 4] = strlen(argv[2]);
+  for (int j = 0; j < strlen(argv[2]); j++) {
+    start_packet[digits_V + 5 + j] = argv[2][j];
+  }
+
+  int start_length = digits_V + 5 + strlen(argv[2]);
 
   // Send Start Control Packet
   printf("-- Start Control Packet --\n");
-  if (llwrite(application.fileDescriptor, start_packet, 3 + digits_V) < 0) {
+  if (llwrite(application.fileDescriptor, start_packet, start_length) < 0) {
     printf("LLWRITE() failed\n");
     exit(4);
   }

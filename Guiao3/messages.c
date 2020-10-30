@@ -137,6 +137,17 @@ void write_RR(int fd) {
   printf("Sent: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR[0], RR[1], RR[2], RR[3], RR[4]);
 }
 
+void write_REJ(int fd) {
+  unsigned char REJ[5] = { FLAG, A_Sender_Receiver, C_REJ(Ns), BCC_REJ(Ns), FLAG };
+  int i = 0;
+  while (i < 5) {
+    write(fd, &REJ[i], 1);
+    i++;
+  }
+
+  printf("Sent: REJ = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", REJ[0], REJ[1], REJ[2], REJ[3], REJ[4]);
+}
+
 int read_RR(int fd, int* received_NS) {
   unsigned char RR_read[5];
   int i = 0, res = 0;
@@ -150,25 +161,14 @@ int read_RR(int fd, int* received_NS) {
     i = process_RR(RR_read[i], &RR_state);
   }
 
-  /*if (((RR_read[2] == C_REJ(0)) || (RR_read[2] == C_REJ(1))) && ((RR_read[3] == BCC_REJ(0)) || (RR_read[3] == BCC_REJ(1)))) {
+  if (((RR_read[2] == C_REJ(0)) || (RR_read[2] == C_REJ(1))) && ((RR_read[3] == BCC_REJ(0)) || (RR_read[3] == BCC_REJ(1)))) {
     printf("Received: REJ = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR_read[0], RR_read[1], RR_read[2], RR_read[3], RR_read[4]);
-    return Ns;
-  }*/
+    return FALSE;
+  }
 
   printf("Received: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR_read[0], RR_read[1], RR_read[2], RR_read[3], RR_read[4]);
 
   *received_NS = (RR_read[2] & 0x80 ? 1 : 0);
 
   return TRUE;
-}
-
-void write_REJ(int fd) {
-  unsigned char REJ[5] = { FLAG, A_Sender_Receiver, C_REJ(Ns), BCC_REJ(Ns), FLAG };
-  int i = 0;
-  while (i < 5) {
-    write(fd, &REJ[i], 1);
-    i++;
-  }
-
-  printf("Sent: REJ = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", REJ[0], REJ[1], REJ[2], REJ[3], REJ[4]);
 }

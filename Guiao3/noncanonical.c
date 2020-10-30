@@ -63,6 +63,30 @@ int main(int argc, char** argv)
     exit(4);
   }
 
+  // Process size of file received in Control Start Packet
+  int size_digits = (int) start_packet[2];
+  long int size = 0;
+  for (int i = 0; i < size_digits; i++) {
+    int pow = 1, n = size_digits - 1 - i;
+    while (n > 0) {
+      pow *= 10;
+      n--;
+    }
+    size += (start_packet[i + 3] - 48) * pow;
+  }
+
+  // Check if type of first parameter is the file name (T = 1)
+  if ((long int) start_packet[size_digits + 3] != 1) {
+    printf("First Parameter is not File Name. (T != 1)");
+    exit(4);
+  }
+
+  int name_bytes = (int) start_packet[size_digits + 4];
+  char file_name[128];
+  for (int j = 0; j < name_bytes; j++) {
+    file_name[j] = start_packet[size_digits + 5 + j];
+  }
+
   FILE *file = fopen(argv[2], "wb+");
 
   // Read Data Packets
@@ -82,6 +106,8 @@ int main(int argc, char** argv)
   }
 
   fclose(file);
+
+  printf("The received file, with original name %s, has %ld bytes. Copied to %s.\n\n", file_name, size, argv[2]);
 
   if (llclose(&application) < 0) {
     printf("LLCLOSE() failed\n");
