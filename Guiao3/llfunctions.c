@@ -17,6 +17,8 @@ struct termios oldtio,newtio;
 
 int Ns = 0;
 
+int contador = 0; // APAGAR
+
 int llopen(struct applicationLayer *application) {
 
   /*
@@ -77,15 +79,6 @@ int llopen(struct applicationLayer *application) {
   }
 
   return application->fileDescriptor;
-}
-
-unsigned char calculateBCC2All(unsigned char *message, int sizeMessage) {
-  unsigned char BCC2 = message[0];
-  for (int i = 1; i < sizeMessage; i++) {
-    BCC2 ^= message[i];
-  }
-
-  return BCC2;
 }
 
 int llwrite(int fd, unsigned char* buffer, int length) {
@@ -165,14 +158,15 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   if (!received_RR) {
     int resent_times_write = 0;
     while (resent_times_write < 3) {
-      if (!read_RR(fd, &received_NS)) {
-        // Re-Write I-frame to the port
-        int b = 0;
-        while (b < length + 6) {
-          write(fd, &buffer[b], 1);
-          b++;
-        }
+      printf("Resending Frame...\n\n");
+      // Re-Write I-frame to the port
+      int b = 0;
+      while (b < length + 6) {
+        write(fd, &buffer[b], 1);
+        b++;
+      }
 
+      if (!read_RR(fd, &received_NS)) {
         resent_times_write++;
       }
       else
@@ -236,10 +230,16 @@ int llread(int fd, unsigned char* buffer) {
     }
   }
 
+  contador++;
+  if (contador == 100) {
+    contador = 0;
+    buffer[8] = 0x33;
+  }
+
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);
 	
   if (BCC2 != buffer[j-2]) {
-    printf("BCC2 ERROR\n");
+    printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
     write_REJ(fd);
     return -1;
   }

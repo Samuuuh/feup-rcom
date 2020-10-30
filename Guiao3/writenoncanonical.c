@@ -20,6 +20,10 @@ volatile int STOP=FALSE;
 
 extern struct termios oldtio;
 
+void alarm_handler() {
+  sleep(3);
+}
+
 int main(int argc, char** argv)
 { 
   if ((argc != 3) || 
@@ -62,6 +66,10 @@ int main(int argc, char** argv)
   // Calculate the number of Data Packets to send
   int packet_number = sizeFile / MAX_SIZE;
   packet_number += ((sizeFile % MAX_SIZE) ? 1 : 0);
+
+  // APAGAR
+  signal(SIGALRM, alarm_handler);
+  alarm(1);
 
   // Create Start Control Packet
   unsigned char start_packet[128];

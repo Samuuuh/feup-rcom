@@ -21,6 +21,15 @@ enum current_state UA_state = start;
 enum current_state DISC_state = start;
 enum current_state RR_state = start;
 
+unsigned char calculateBCC2All(unsigned char *message, int sizeMessage) {
+  unsigned char BCC2 = message[0];
+  for (int i = 1; i < sizeMessage; i++) {
+    BCC2 ^= message[i];
+  }
+
+  return BCC2;
+}
+
 unsigned char calculateBCC2(unsigned char *message, int sizeMessage) {
   unsigned char BCC2 = message[4];
   for (int i = 5; i < sizeMessage; i++) {
