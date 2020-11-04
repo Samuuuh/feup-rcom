@@ -16,7 +16,7 @@
 struct termios oldtio,newtio;
 
 int Ns = 0;
-
+int ERROR = 0;
 int contador = 0; // APAGAR
 
 int llopen(struct applicationLayer *application) {
@@ -176,7 +176,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
       return -1;
   }
 
-  // Processes Ns received
   if (received_NS != Ns) {  // Reader asked for next frame (received RR), change Ns
     Ns = received_NS;
   }
@@ -234,24 +233,31 @@ int llread(int fd, unsigned char* buffer) {
     }
   }
 
-  unsigned char BCC2 = calculateBCC2(buffer, j - 2);
-	
-  if (BCC2 != buffer[j-2]) {
-    printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
-    printf("BCC2 = 0x%02x\n", BCC2);
-    printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
-    write_REJ(fd);
-    return -1;
-  }
-  
   // Return only the DATA, remove the special bytes
   unsigned char frame[128];
   for (int k = 0 ; k < j; k++) {
     frame[k] = buffer[k];
   }
 
-  memset(buffer, 0, sizeof (buffer));
+  // Sends RR answer
+  int received_Ns = (frame[2] & 0x80 ? 1 : 0);
 
+  unsigned char BCC2 = calculateBCC2(buffer, j - 2);
+	
+  if (BCC2 != buffer[j-2]) {
+    printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
+    printf("BCC2 = 0x%02x\n", BCC2);
+    printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
+    if (received_Ns != Ns) {  // Received the wanted frame (Ns requested)
+      write_RR(fd);
+    }
+    else {
+      write_REJ(fd);
+    }
+    return -1;
+  }
+
+  memset(buffer, 0, sizeof (buffer));
   for (int i = 0; i < j - 6; i++) {
     buffer[i] = frame[i + 4];
   }
@@ -263,13 +269,11 @@ int llread(int fd, unsigned char* buffer) {
   }
   printf("\n");
 
-  // Sends RR answer
-  int received_Ns = (frame[2] & 0x80 ? 1 : 0);
   if (received_Ns == Ns) {  // Received the wanted frame (Ns requested)
     Ns = (frame[2] & 0x80 ? 0 : 1);
   }
   write_RR(fd);
-
+  sleep(0.5);
   return j - 6;
 }
 

@@ -189,7 +189,7 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == C_RR(Ns)) {
+      else if ((received == C_RR(0)) || (received == C_RR(1))) {
         *state = c_rcv;
         return 3;
       }
@@ -201,7 +201,7 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_RR(Ns)) {
+      else if ((received == BCC_RR(0)) || (received == BCC_RR(1))) {
         *state = data_rcv;
         return 4;
       }
