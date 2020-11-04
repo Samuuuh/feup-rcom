@@ -17,6 +17,8 @@ struct termios oldtio,newtio;
 
 int Ns = 0;
 
+int contador = 0; // APAGAR
+
 int llopen(struct applicationLayer *application) {
 
   /*
@@ -193,6 +195,8 @@ int llread(int fd, unsigned char* buffer) {
     read(fd, &stuffed_msg[index], 1);
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
+
+    printf("INTERMEDIATE[%d] = 0x%02x\n", index, stuffed_msg[index]);
   }
 
   // Adds initial FLAG, A, C, BCC1 bytes
@@ -234,6 +238,8 @@ int llread(int fd, unsigned char* buffer) {
 	
   if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
+    printf("BCC2 = 0x%02x\n", BCC2);
+    printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
     write_REJ(fd);
     return -1;
   }

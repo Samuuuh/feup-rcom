@@ -55,7 +55,7 @@
 #define TIMEOUT 3
 
 // Used in struct linkLayer
-#define MAX_SIZE 16
+#define MAX_SIZE 8
 
 // ESC byte, used in byte stuffing
 #define ESC 0x7D
