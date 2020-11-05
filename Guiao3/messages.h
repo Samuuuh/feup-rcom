@@ -21,10 +21,12 @@ void write_DISC(struct applicationLayer app);
 
 void read_DISC(int fd);
 
-void write_RR(int fd);
+void write_RR(int fd, int Ns);
+
+void write_REJ(int fd, int Ns);
 
 int read_RR(int fd, int* received_NS);  // TRUE if RR was received, and sets received_NS value
 
-void write_REJ(int fd);
+
 
 // ---------------------------------

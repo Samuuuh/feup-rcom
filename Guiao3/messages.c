@@ -6,8 +6,6 @@
 #include "state_machines.h"
 #include "llfunctions.h"
 
-extern int Ns;
-
 unsigned char SET[5] = {FLAG, A_Sender_Receiver, C_SET, BCC_SET, FLAG};
 unsigned char UA_Sender_Receiver[5] = {FLAG, A_Sender_Receiver, C_UA, BCC_UA_Sender_Receiver, FLAG};
 unsigned char UA_Receiver_Sender[5] = {FLAG, A_Receiver_Sender, C_UA, BCC_UA_Receiver_Sender, FLAG};
@@ -135,7 +133,7 @@ void read_DISC(int fd) {
   printf("Received: DISC = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n", DISC_read[0], DISC_read[1], DISC_read[2], DISC_read[3], DISC_read[4]);
 }
 
-void write_RR(int fd) {
+void write_RR(int fd, int Ns) {
   unsigned char RR[5] = { FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns), FLAG };
   int i = 0;
   while (i < 5) {
@@ -146,7 +144,7 @@ void write_RR(int fd) {
   printf("Sent: RR = 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x \n\n", RR[0], RR[1], RR[2], RR[3], RR[4]);
 }
 
-void write_REJ(int fd) {
+void write_REJ(int fd, int Ns) {
   unsigned char REJ[5] = { FLAG, A_Sender_Receiver, C_REJ(Ns), BCC_REJ(Ns), FLAG };
   int i = 0;
   while (i < 5) {
