@@ -213,11 +213,11 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
-      else if (received == BCC_C_I0) {
+      else if ((received == BCC_C_I0) && (Ns_Recebido_Read == 0)) {
         *state = data_rcv;
         return 4;
       }
-      else if (received == BCC_C_I1) {
+      else if ((received == BCC_C_I1) && (Ns_Recebido_Read == 1)) {
         *state = data_rcv;
         return 4;
       }

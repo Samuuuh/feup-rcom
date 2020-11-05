@@ -15,6 +15,7 @@
 
 struct termios oldtio,newtio;
 
+int erro = 0;
 int Ns_Enviado_Write = 0;
 int Ns_Recebido_Read = 0;
 
@@ -162,9 +163,11 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   // Receives RR or REJ answer
   int received_NS;
   int received_RR = read_RR(fd, &received_NS);
-  if (!received_RR) {
+  printf("received: %d sent %d \n", received_NS, Ns_Enviado_Write);
+  if ((!received_RR) || (received_NS == Ns_Enviado_Write)) { // old if (!received_RR)
     int resent_times_write = 0;
     while (resent_times_write < 3) {
+      printf("erro");
       printf("Resending Frame...\n\n");
       // Re-Write I-frame to the port
       int b = 0;
@@ -173,7 +176,7 @@ int llwrite(int fd, unsigned char* buffer, int length) {
         b++;
       }
 
-      if (!read_RR(fd, &received_NS)) {
+      if ((!read_RR(fd, &received_NS)) || (received_NS == Ns_Enviado_Write)) {// old if ((!read_RR(fd, &received_NS)))
         resent_times_write++;
       }
       else
@@ -183,15 +186,27 @@ int llwrite(int fd, unsigned char* buffer, int length) {
       return -1;
   }
 
-  printf("received ns %d sent %d", received_NS, Ns_Enviado_Write);
+  printf("2 received ns %d sent %d\n", received_NS, Ns_Enviado_Write);
+
+  // Se o valor for diferente, alterar o Ns.
   if (received_NS != Ns_Enviado_Write) {  // Reader asked for next frame (received RR), change Ns
     Ns_Enviado_Write = received_NS;
+  }
+  else {
+    // Reenviar outra vez até receber o prox Ns?? feito em cima 
   }
 
   return length;
 }
 
 int llread(int fd, unsigned char* buffer) {
+  if(erro == 400) {
+    printf("ERRO1\n");
+    Ns_Enviado_Write ^= 1;
+  }
+
+  erro++;
+
   enum current_state DATA_state = start;
   int j = 0;
   unsigned char stuffed_msg[128];
@@ -284,10 +299,17 @@ int llread(int fd, unsigned char* buffer) {
   }
   printf("\n");
 
+  // Se o Ns recebido for igual ao Ns enviado pelo writer, então alterar o valor. Se não, descartar a mensagem. Enviar Ns de qualquer forma
   if(Ns_Recebido_Read == Ns_Enviado_Write) {
     Ns_Enviado_Write ^= 1;
   }
-
+  else {
+    //s descartar mensagem
+    Ns_Enviado_Write ^= 1;
+    j = 0;
+    printf("ERRO");
+  }
+  printf("sent n %d\n", Ns_Enviado_Write);
   write_RR(fd, Ns_Enviado_Write);
 
   /*
