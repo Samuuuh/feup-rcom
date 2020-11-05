@@ -248,12 +248,12 @@ int llread(int fd, unsigned char* buffer) {
     printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
     printf("BCC2 = 0x%02x\n", BCC2);
     printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
-    if (received_Ns != Ns) {  // Received the wanted frame (Ns requested)
+    // COMENTAR
+    /* if (received_Ns != Ns) {  // Received the wanted frame (Ns requested)
       write_RR(fd);
     }
-    else {
+    else {*/
       write_REJ(fd);
-    }
     return -1;
   }
 
@@ -273,7 +273,7 @@ int llread(int fd, unsigned char* buffer) {
     Ns = (frame[2] & 0x80 ? 0 : 1);
   }
   write_RR(fd);
-  sleep(0.5);
+
   return j - 6;
 }
 

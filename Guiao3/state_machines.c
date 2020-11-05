@@ -189,8 +189,22 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
+      /* TESTE HERE
       else if ((received == C_RR(0)) || (received == C_RR(1))) {
         *state = c_rcv;
+        return 3;
+      }
+      */
+      else if (received == C_RR(0)) {
+        *state = c_rcv;
+        Ns = 0;
+        printf(" + new Ns: ", Ns);
+        return 3;
+      }
+      else if (received == C_RR(1)) {
+        *state = c_rcv;
+        Ns = 1;
+        printf(" + new Ns: ", Ns);
         return 3;
       }
       else *state = start;
@@ -201,10 +215,25 @@ int process_DATA(char* message, int index, enum current_state *state) {
         *state = flag_rcv;
         return 1;
       }
+      /* TEST HERE 
       else if ((received == BCC_RR(0)) || (received == BCC_RR(1))) {
         *state = data_rcv;
         return 4;
       }
+      */
+      else if (received == BCC_RR(0)) {
+        *state = data_rcv;
+        Ns = 0;
+        printf(" + new Ns: ", Ns);
+        return 4;
+      }
+      else if (received == BCC_RR(1)) {
+        *state = data_rcv;
+        Ns = 1;
+        printf(" + new Ns: ", Ns);
+        return 4;
+      }
+      printf("fail");
       else *state = start;
       break;
     case data_rcv:
