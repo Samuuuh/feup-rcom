@@ -18,6 +18,10 @@
 #define C_SET 0x03    // Defines framing of type SET (set up)
 #define C_DISC 0x0B    // Defines framing of type DISC (disconnect)
 #define C_UA 0x07    // Defines framing of type UA (unnumbered acknowledgment)
+
+#define C_I0 0x00
+#define C_I1 0x40
+
 #define C_RR(N) (N << 7 | 0b101)  // C_RR - Defines framing of type RR (N = 0 -> 0x05, N = 1 -> 0x85)
 #define C_REJ(N) (N << 7 | 0b1)  //C_REJ - Defines framing of type REJ (N = 0 -> 0x01, N = 1 -> 0x81)
 
@@ -35,6 +39,10 @@
 #define BCC_UA_Receiver_Sender (A_Receiver_Sender ^ C_UA)
 #define BCC_DISC_Sender_Receiver (A_Sender_Receiver ^ C_DISC)
 #define BCC_DISC_Receiver_Sender (A_Receiver_Sender ^ C_DISC)
+
+#define BCC_C_I0 (A_Sender_Receiver ^ 0x00)
+#define BCC_C_I1 (A_Sender_Receiver ^ 0x40)
+
 #define BCC_RR(N) (A_Sender_Receiver ^ C_RR(N))
 #define BCC_REJ(N) (A_Sender_Receiver ^ C_REJ(N))
 

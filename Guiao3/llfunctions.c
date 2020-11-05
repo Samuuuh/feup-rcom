@@ -15,9 +15,8 @@
 
 struct termios oldtio,newtio;
 
-int Ns = 0;
-int ERROR = 0;
-int contador = 0; // APAGAR
+int Ns_Enviado_Write = 0;
+int Ns_Recebido_Read = 0;
 
 int llopen(struct applicationLayer *application) {
 
@@ -133,7 +132,15 @@ int llwrite(int fd, unsigned char* buffer, int length) {
 
   // Adds the first 4 special bytes (F, A, C, BCC1)
   int ind = 4, k = 0;
-  sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_RR(Ns), BCC_RR(Ns));
+
+  if(Ns_Enviado_Write == 0) {
+    sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_I0, BCC_C_I0);
+  }
+  else {
+    sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_I1, BCC_C_I1);
+  }
+
+  
   while (k < j) {
     buffer[ind] = stuffed_msg[k];
     ind++;
@@ -176,8 +183,9 @@ int llwrite(int fd, unsigned char* buffer, int length) {
       return -1;
   }
 
-  if (received_NS != Ns) {  // Reader asked for next frame (received RR), change Ns
-    Ns = received_NS;
+  printf("received ns %d sent %d", received_NS, Ns_Enviado_Write);
+  if (received_NS != Ns_Enviado_Write) {  // Reader asked for next frame (received RR), change Ns
+    Ns_Enviado_Write = received_NS;
   }
 
   return length;
@@ -195,7 +203,7 @@ int llread(int fd, unsigned char* buffer) {
 
     index = process_DATA(stuffed_msg, index, &DATA_state);
 
-    printf("INTERMEDIATE[%d] = 0x%02x\n", index, stuffed_msg[index]);
+    printf("\n");
   }
 
   // Adds initial FLAG, A, C, BCC1 bytes
@@ -207,9 +215,17 @@ int llread(int fd, unsigned char* buffer) {
   
   // Check BCC1
   unsigned char BCC1 = (stuffed_msg[1] ^ stuffed_msg[2]);
-  if (BCC1 != BCC_RR(Ns)) {
-    printf("BCC1 ERROR\n");
-    return -1;
+  if(Ns_Recebido_Read == 0) {
+    if (BCC1 != BCC_C_I0) {
+      printf("BCC1 ERROR\n");
+      return -1;
+    }
+  }
+  else {
+    if (BCC1 != BCC_C_I1) {
+      printf("BCC1 ERROR\n");
+      return -1;
+    }
   }
 
   for (int i = 4; i < index; i++) {
@@ -240,20 +256,19 @@ int llread(int fd, unsigned char* buffer) {
   }
 
   // Sends RR answer
-  int received_Ns = (frame[2] & 0x80 ? 1 : 0);
-
   unsigned char BCC2 = calculateBCC2(buffer, j - 2);
 	
   if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
     printf("BCC2 = 0x%02x\n", BCC2);
     printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
-    // COMENTAR
+    // COMENTAR NÃO É NECESSÁRIO!!!!!!!
     /* if (received_Ns != Ns) {  // Received the wanted frame (Ns requested)
       write_RR(fd);
     }
     else {*/
-      write_REJ(fd);
+    
+    write_REJ(fd, Ns_Recebido_Read);
     return -1;
   }
 
@@ -269,10 +284,31 @@ int llread(int fd, unsigned char* buffer) {
   }
   printf("\n");
 
-  if (received_Ns == Ns) {  // Received the wanted frame (Ns requested)
-    Ns = (frame[2] & 0x80 ? 0 : 1);
+  if(Ns_Recebido_Read == Ns_Enviado_Write) {
+    Ns_Enviado_Write ^= 1;
   }
-  write_RR(fd);
+
+  write_RR(fd, Ns_Enviado_Write);
+
+  /*
+  printf("Message size: %d\n", *sizeMessage);
+  //message tem BCC2 no fim
+  message = (unsigned char *)realloc(message, *sizeMessage - 1);
+
+  *sizeMessage = *sizeMessage - 1;
+  if (mandarDados)
+  {
+    if (trama == esperado)
+    {
+      esperado ^= 1;
+    }
+    else
+      *sizeMessage = 0;
+  }
+  else
+    *sizeMessage = 0;
+
+  */
 
   return j - 6;
 }
