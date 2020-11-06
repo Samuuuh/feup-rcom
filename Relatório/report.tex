@@ -123,8 +123,23 @@ a) O relatório do 1º trabalho laboratorial de RCOM deverá conter a seguinte i
 %----------------------------------------------------------------------------------------
 \chapter[Introdução][Introdução]{Introdução} \label{\thechapter}
 
-1. Introdução
-  (indicação dos objectivos do trabalho e do relatório; descrição da lógica do relatório com indicações sobre o tipo de informação que poderá ser encontrada em cada uma secções seguintes)
+Tendo como principal objetivo implementar um protocolo de transferência de dados recorrendo a uma porta série, este trabalho deve resultar num programa capaz de resistir a fenómenos como a interrupção da porta série ou a receção de informação corrompida, provocada pela indução de “ruído” na porta série. Este relatório procura explicar toda a teoria envolvida neste primeiro trabalho, de forma bem estrutura, nos seguintes tópicos:
+ - Arquitetura
+	Descrição dos blocos funcionais e interfaces
+	- Estrutura do código
+	Explicação das APIs, enumeração das principais estruturas de dados utilizadas, das funções de maior importância e relação com a arquitetura
+	- Casos de Uso Principais
+	Identificação dos casos de uso mais importantes, e demonstração sequencial das chamadas às funções.
+	- Protocolo de ligação lógica
+	Identificação dos principais aspetos funcionais da camada de Ligação de Dados, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
+	- Protocolo de aplicação
+	Identificação dos principais aspetos funcionais da camada da Aplicação, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
+- Validação
+Descrição dos testes efetuados com apresentação quantificada dos resultados.
+- Eficiência do protocolo de ligação de dados
+Caracterização estatística da eficiência do protocolo, feita com recurso a medidas sobre o código desenvolvido.
+- Conclusões
+Síntese da informação apresentada nas secções anteriores, e reflexão sobre os objetivos de aprendizagem alcançados.
 
 \newpage
 %----------------------------------------------------------------------------------------
@@ -132,17 +147,14 @@ a) O relatório do 1º trabalho laboratorial de RCOM deverá conter a seguinte i
 %----------------------------------------------------------------------------------------
 \chapter[Arquitetura][Arquitetura]{Arquitetura} \label{\thechapter}
 
-2. Arquitetura
-  (blocos funcionais e interfaces)
+O programa desenvolvido desdobra-se em duas camadas bem definidas: a camada de Ligação de Dados (Link Layer) e a camada da Aplicação (Application Layer). 
+A primeira, como é responsável pelo estabelecimento da ligação, torna o protocolo sólido, garantindo a sua consistência. Por este motivo, é considerada a camada de mais baixo nível do programa, sendo que trata da abertura da porta série, da transmissão de informação (escrita e leitura), e do seu posterior fecho. É também da sua responsabilidade testar se a informação foi escrita/recebida corretamente, através de byte stuffing, e de testes de erros como os BCC, que serão aqui detalhados mais tarde.Por outro lado, a camada da Aplicação é apenas responsável pelo envio e receção da informação dos ficheiros, pelo que é de um nível superior à camada de ligação de dados. Assim, esta camada chama as funções da camada da ligação de dados, para envio/receção da informação de dados, mantendo-se, no entanto, completamente independente desta, uma vez que desconhece os seus métodos de atuar.
 
 \newpage
 %----------------------------------------------------------------------------------------
 %	CHAPTER 3 - Estrutura do código
 %----------------------------------------------------------------------------------------
 \chapter[Estrutura do código][Estrutura do código]{Estrutura do código} \label{\thechapter}
-
-3. Estrutura do código
-  (APIs, principais estruturas de dados, principais funções e sua relação com a arquitetura)
 
 \newpage
 %----------------------------------------------------------------------------------------
