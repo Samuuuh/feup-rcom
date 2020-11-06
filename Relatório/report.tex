@@ -156,6 +156,26 @@ A primeira, como é responsável pelo estabelecimento da ligação, torna o prot
 %----------------------------------------------------------------------------------------
 \chapter[Estrutura do código][Estrutura do código]{Estrutura do código} \label{\thechapter}
 
+O Makefile por nós criado efetua a compilação do programa, resultando em dois executáveis diferentes, um para o Emissor (writenoncanonical) e outro para o Recetor (noncanonical).
+Emissor:
+O executável relativo ao Emissor exige 2 argumentos: o nome da porta série (por exemplo /dev/ttyS1), e o nome do ficheiro que vai ser transmitido (exemplo: pinguim.gif)
+A sequência de chamadas efetuada por este executável é a seguinte:
+ - llopen: Configura a ligação entre os dois computadores, abrindo a porta série em modo de escrita e leitura. Esta configuração decorre de uma troca de tramas, a trama SET enviada pelo Emissor e a trama UA enviada pelo Recetor. Apesar de a função ser comum aos dois programas, há nela uma distinção das ações conforme o parâmetro status da struct referida no tópico anterior, recebida como parâmetro.
+ - Leitura do ficheiro e armazenamento da sua informação num array de unsigned chars.
+ - Criação do pacote de controlo Start, seguido do seu envio, já recorrendo à função llwrite().
+ - Criação dos pacotes de Informação, que resulta de uma divisão do array referido no segundo passo, e o seu respetivo envio, recorrendo também a llwrite().
+ - Criação do pacote de controlo End, seguido do seu envio, recorrendo à função llwrite().
+ - llclose(): Encerramento da ligação entre os dois computadores, através de uma troca de tramas. Neste caso, o Emissor receberá uma trama DISC, enviando como resposta outra trama DISC, e para terminar receberá uma trama UA.
+
+ Recetor:
+ O executavel relativo ao Recetor exige tambem 2 argumentos: o nome da porta serie (por exemplo /dev/ttyS0), e o nome do ficheiro que vai ser transmitido (exemplo pinguim.gif)
+ - llopen: Configura a ligação entre os dois computadores, abrindo a porta série em modo de escrita e leitura. Esta configuração decorre de uma troca de tramas, a trama SET enviada pelo Emissor e a trama UA enviada pelo Recetor. Apesar de a função ser comum aos dois programas, há nela uma distinção das ações conforme o parâmetro status da struct referida no tópico anterior, recebida como parâmetro.
+- Receção do pacote de controlo Start, recorrendo à função llread().
+- Processamento do pacote de controlo Start recebido, de modo a receber corretamente o nome e o tamanho do ficheiro que vai ser copiado, para efeitos de apenas informar o utilizador destes dados.
+ - Receção dos pacotes de Informação, recorrendo à função llread(). A cada pacote lido, a sua informação é processada (de modo a ficar apenas com os bytes de informação do ficheiro), e esta informação é logo de seguida escrita para o novo ficheiro, criado imediatamente antes desta receção.
+ - Quando recebe o pacote de controlo End, o loop de receção de tramas termina.
+ - llclose(): Encerramento da ligação entre os dois computadores, através de uma troca de tramas. Neste caso, o Recetor enviará uma trama DISC, recebendo como resposta outra trama DISC, e para terminar enviará uma trama UA.
+
 \newpage
 %----------------------------------------------------------------------------------------
 %	CHAPTER 4 - Casos de uso principais

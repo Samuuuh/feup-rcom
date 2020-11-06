@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.13)  6 NOV 2020 19:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.13)  6 NOV 2020 19:23
 entering extended mode
 **c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex
 (c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex
@@ -761,13 +761,13 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 Here is how much of TeX's memory you used:
  13388 strings out of 480236
  195403 string characters out of 2880557
- 571806 words of memory out of 3000000
+ 572806 words of memory out of 3000000
  29707 multiletter control sequences out of 15000+200000
  544077 words of font info for 63 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  60i,15n,66p,1006b,353s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\diogo\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/diogo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.pdf (11 pages, 92136 bytes).
+Output written on c:/Users\diogo\Documents\GitHub\feup-rcom\Relatório\report.pdf (11 pages, 94501 bytes).
 PDF statistics:
  121 PDF objects out of 1000 (max. 8388607)
  21 named destinations out of 1000 (max. 500000)

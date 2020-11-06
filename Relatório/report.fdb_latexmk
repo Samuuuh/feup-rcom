@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1604690325 "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex" "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.pdf" "report" 1604690329
+["pdflatex"] 1604690594 "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex" "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.pdf" "report" 1604690597
   "C:/Users/diogo/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/tcrm1095.pk" 1602693821 12668 8167b0f7f6f3b192e6bbe1ac063f64ec ""
   "C:/Users/diogo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1602611170 10259086 3bc0d786e23405878807e12a8d87b104 ""
   "C:/Users/diogo/AppData/Local/MiKTeX/pdftex/config/pdftex.map" 1602671504 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
@@ -112,15 +112,15 @@
   "C:/Users/diogo/AppData/Local/Programs/MiKTeX/tex/latex/xargs/xargs.sty" 1206231060 12403 a11204384274e5980f17ec9564088fa4 ""
   "C:/Users/diogo/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1463131981 57049 34128738f682d033422ca125f82e5d62 ""
   "C:/Users/diogo/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1419270738 5114 9c1069474ff71dbc47d5006555e352d3 ""
-  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.aux" 1604690329 2913 686f1229baf43dc89c2a62421e49cbe9 ""
-  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex" 1604690324 12297 d0b5fe6d7348b5a335cba1025c15049d ""
-  "report.aux" 1604690329 2913 686f1229baf43dc89c2a62421e49cbe9 "pdflatex"
-  "report.out" 1604690329 531 38693a44fa93c91c8a10c335c61330de "pdflatex"
-  "report.tex" 1604690324 12297 d0b5fe6d7348b5a335cba1025c15049d ""
+  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.aux" 1604690597 2913 686f1229baf43dc89c2a62421e49cbe9 ""
+  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.tex" 1604690593 15340 a2e00a1e91102598a46a0ccf31d58f40 ""
+  "report.aux" 1604690597 2913 686f1229baf43dc89c2a62421e49cbe9 "pdflatex"
+  "report.out" 1604690597 531 38693a44fa93c91c8a10c335c61330de "pdflatex"
+  "report.tex" 1604690593 15340 a2e00a1e91102598a46a0ccf31d58f40 ""
   (generated)
-  "report.pdf"
-  "report.aux"
-  "report.log"
-  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.log"
-  "report.out"
   "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.pdf"
+  "report.pdf"
+  "report.out"
+  "c:/Users/diogo/Documents/GitHub/feup-rcom/Relatório/report.log"
+  "report.log"
+  "report.aux"
