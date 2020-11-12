@@ -227,12 +227,12 @@ A sequência de chamadas efetuada por este executável é a seguinte:
 O executavel relativo ao Recetor exige tambem 2 argumentos: o nome da porta serie (por exemplo /dev/ttyS0), e o nome do ficheiro que vai ser transmitido (exemplo pinguim.gif)
  
 \begin{itemize}
- 	\item llopen: Configura a ligação entre os dois computadores, abrindo a porta série em modo de escrita e leitura. Esta configuração decorre de uma troca de tramas, a trama SET enviada pelo Emissor e a trama UA enviada pelo Recetor. Apesar de a função ser comum aos dois programas, há nela uma distinção das ações conforme o parâmetro status da struct referida no tópico anterior, recebida como parâmetro.
+ 	\item llopen: Igual ao emissor.
  	\item Receção do pacote de controlo Start, recorrendo à função llread().
  	\item Processamento do pacote de controlo Start recebido, de modo a receber corretamente o nome e o tamanho do ficheiro que vai ser copiado, para efeitos de apenas informar o utilizador destes dados.
  	\item Receção dos pacotes de Informação, recorrendo à função llread(). A cada pacote lido, a sua informação é processada (de modo a ficar apenas com os bytes de informação do ficheiro), e esta informação é logo de seguida escrita para o novo ficheiro, criado imediatamente antes desta receção.
  	\item Quando recebe o pacote de controlo End, o loop de receção de tramas termina.
- 	\item llclose(): Encerramento da ligação entre os dois computadores, através de uma troca de tramas. Neste caso, o Recetor enviará uma trama DISC, recebendo como resposta outra trama DISC, e para terminar enviará uma trama UA.
+ 	\item llclose(): Igual ao emissor.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ O executavel relativo ao Recetor exige tambem 2 argumentos: o nome da porta seri
 
 \section{Estratégia de implementação}
 
-\subsection{Estabelecimento da ligação entre os dois computadores, com abertura da porta série}
+\subsection{Estabelecimento da ligação entre os dois computadores}
 O estabelecimento da ligação lógica é realizado na função llopen() do ficheiro “llfunctions.c”, na qual é efetuada a abertura da porta série, em modo de escrita e leitura. Logo após isto, é realizada uma troca de tramas entre o Emissor e o Recetor, que confirma que a ligação foi estabelecida. Segue-se o seu procedimento:
 \begin{itemize}
 	\item Envio de uma trama SET pelo Emissor.
@@ -277,8 +277,7 @@ que escrevem e leem uma única trama, respetivamente.
 
 \subsection{llwrite()}
 \begin{itemize}
-	\item Calcula o BCC2 com os bytes de informação recebidos como parâmetro, que fará parte da estrutura da trama.
-	\item É efetuado o byte stuffing nos bytes de informação e no BCC2.
+	\item Calcula o BCC2 com os bytes de informação recebidos como parâmetro, que fará parte da estrutura da trama. É efetuado o byte stuffing nos bytes de informação e no BCC2.
 	\item Após isto, é composta a trama que vai ser enviada, começando por adicionar os primeiros bytes especiais (FLAG, A, C, BCC1), seguido dos bytes de informação, do BCC2 e a FLAG.
 	\item Com a trama já composta, esta é enviada para a porta série, e é de seguida esperada uma resposta do recetor (RR/REJ), que envolve todo o procedimento de reenvio de tramas.
 	\item É alterado o número de sequência, no caso de a resposta do recetor ser positiva (RR) e com um número de sequência diferente do atual, o que significa que o recetor pediu uma nova trama.
@@ -286,16 +285,15 @@ que escrevem e leem uma única trama, respetivamente.
 
 \subsection{llread()}
 \begin{itemize}
-  	\item A função começa por receber a trama, que é processada byte a byte, recorrendo a uma máquina de estados implementada no ficheiro “statemachines.c”, nomeadamente a função processDATA(), que é uma máquina de estados específica às tramas de informação.
+  	\item A função começa por receber a trama, que é processada byte a byte, recorrendo a uma máquina de estados implementada no ficheiro “statemachines.c”, nomeadamente a função processDATA().
   	\item Uma vez que a trama recebida se trata de uma mensagem com byte stuffing, é necessário fazer o processo inverso, byte destuffing, de modo a enviar a informação correta para o novo ficheiro. Para isto, inicia-se a construção da trama destuffed na variável “buffer”, adicionando primeiro os bytes especiais (FLAG, A, C, BCC1).
-  	\item Segue-se a verificação do BCC1, comparando o valor recebido com um novo valor calculado conforme o número de sequência atual. Se este valor não coincidir, a função retorna um valor negativo, que é detetado no loop de envio dos pacotes da aplicação no ficheiro “noncanonical.c”, de forma a ignorar a trama recebida.
-  	\item Preenche-se a variável com os bytes de informação, realizando o byte destuffing.
+  	\item Segue-se a verificação do BCC1, comparando o valor recebido com um novo valor calculado conforme o número de sequência atual. Se este valor não coincidir, a função retorna um valor negativo, que é detetado no loop de envio dos pacotes da aplicação no ficheiro “noncanonical.c”, de forma a ignorar a trama recebida. Preenche-se a variável com os bytes de informação, realizando o byte destuffing.
   	\item Depois, é efetuada a verificação do BCC2, comparando-se o valor recebido com um novo cálculo deste parâmetro, usando os bytes de informação recebidos (já destuffed). No caso de estes valores não coincidirem, é enviada uma trama REJ para o emissor, que reenviará a trama. É retornado um valor negativo para que a trama recebida seja ignorada.
   	\item Por último, se o valor do número de sequência recebido for igual ao atual, isto é, se foi recebida a trama que o recetor esperava, o valor de NS é alterado, que é o equivalente a pedir a próxima trama, uma vez que é enviada uma trama RR com os campos C e BCC1 afetados com esse valor.
 
 \end{itemize}
 
-\subsection{Byte stuffing e destuffing, de modo a evitar uma má interpretação dos bytes recebidos}
+\subsection{Byte stuffing e destuffing}
 O byte stuffing e destuffing baseia-se em simples verificações, realizadas byte a byte sobre os bytes de informação recebidos (e BCC2 também), 
 que os compara aos bytes especiais, nomeadamente a FLAG (0x7e) e o ESC (0x7d). 
 No caso do byte stuffing, estes bytes são transformados numa sequência de 2 bytes: 0x7d 0x5e para o primeiro e 0x7d e 0x5d para o segundo. 
@@ -331,8 +329,7 @@ A rejeição da trama ocorre quando há algum erro na trama, seja ele no BCC1 ou
  Já no caso de discrepância entre os números de sequências, é enviada uma trama RR com o número de sequência atual, para que o emissor saiba que deve reenviar a trama.
  
  \subsection{Terminação da ligação entre os dois computadores, com fecho da porta série}
-A terminação da ligação lógica é realizado na função llclose() do ficheiro “llfunctions.c”, e baseia-se numa troca de tramas entre o Emissor e o Recetor, que confirma a terminação da ligação. 
-Segue-se o seu procedimento:
+A terminação da ligação lógica é realizado na função llclose() do ficheiro “llfunctions.c”, e baseia-se numa troca de tramas, que confirma a terminação da ligação. 
 \begin{itemize}
 	\item Envio de uma trama DISC pelo Emissor.
 	\item Receção da trama DISC pelo Recetor
@@ -365,15 +362,13 @@ tamanho do ficheiro. Assim, o Recetor abre o ficheiro destino (ou cria-o, se est
 \subsection{Envio e Receção dos pacotes de controlo START e END}
 O Emissor começa por criar o pacote de controlo START. A sua estrutura pode ser vista no Anexo II. Este irá conter dois tipos de informação (dois parâmetros na forma TLV), 
 o tamanho e o nome do ficheiro,
- e o campo C terá o valor 2 (que indica que se trata de um pacote START). 
-Estas informações serão recebidas pelo Recetor, que apresentará no ecrã estes dados.
+ e o campo C terá o valor 2. 
 Após enviar todos os pacotes de dados, o Emissor cria o pacote de controlo END, que será igual ao START, com exceção 
- campo C, que terá o valor 3 (indicador do pacote END). 
+ campo C, que terá o valor 3. 
 O Recetor, recebendo este pacote, saberá que não receberá mais informação, pelo que termina o loop de receção dos
  pacotes, no ficheiro “noncanonical.c”.
 
-\subsection{Divisão da informação do ficheiro conforme o valor de MAX\textunderscore SIZE, e construção de dados, respeitando a 
-sua estrutura}
+\subsection{Divisão da informação do ficheiro conforme o valor de MAX\textunderscore SIZE}
 
 A constante MAX\textunderscore SIZE definida no ficheiro “constdefines.h” indica o número de bytes de informação do
 ficheiro que cada pacote de dados pode conter, no máximo.
