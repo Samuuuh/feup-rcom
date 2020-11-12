@@ -71,8 +71,8 @@
 \author{
 \LARGE \textbf{Turma Grupo}\\\\
 \begin{tabular}{l r}
-	\email{up201806250@fe.up.pt} & Diogo Samuel Gonçalves Fernandes	\\
-	\email{up201806505@fe.up.pt} & Paulo Jorge Salgado Marinho Ribeiro \\
+	  Diogo Samuel Gonçalves Fernandes	& \email{up201806250@fe.up.pt}\\
+	 Paulo Jorge Salgado Marinho Ribeiro  & \email{up201806505@fe.up.pt}\\
 \end{tabular}
 }
 
@@ -97,7 +97,10 @@
 \textbf{Projeto RCOM - 2019/20 - MIEIC}
 \Repeat{2}{\linebreak}
 \begin{tabular}{l r}
-	\textbf{Professor das Aulas Práticas}: 
+	\textbf{Professor}: 
+	\begin{tabular}{l r}
+		Rui Campos & \email{rcampos@fe.up.pt}	\\
+	\end{tabular}
 \end{tabular}
 \Repeat{4}{\linebreak}
 
@@ -360,7 +363,12 @@ este ainda não existir), e vai escrevendo a informação recebida para este, a 
 
 \subsection{Envio e Receção dos pacotes de controlo START e END}
 O Emissor começa por criar o pacote de controlo START, que tem a seguinte estrutura:
-// IMAGEM aqui
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{trama-2.png}
+\caption{\emph{Trama de controlo}}
+\end{figure}
 
 
 Este irá conter dois tipos de informação (dois parâmetros na forma TLV), o tamanho e o nome do ficheiro,
@@ -387,7 +395,6 @@ este não necessita de conhecer o tamanho do pacote de dados que receberá , uma
 lógica permite que este saiba quando um pacote termina – quando recebe a última FLAG. Segue-se um esquema 
 da estrutura dos pacotes de aplicação:
 
- //IMAGEM AQUI
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 7 - Validação
@@ -404,15 +411,67 @@ Para validação do nosso programa, foram efetuados vários testes, aos quais re
 	\item Indução de ruído na porta série, de modo a induzir erros na transmissão da informação das tramas
 \end{itemize}
 
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{trama-1.png}
+\caption{\emph{Pacotes de aplicação}}
+\end{figure}
+
 %----------------------------------------------------------------------------------------
 %	CHAPTER 8 - Estrutura do código
 %----------------------------------------------------------------------------------------
 \chapter[Eficiência do protocolo de ligação de dados][Eficiência do protocolo de ligação de dados]{Eficiência do protocolo de ligação de dados} \label{\thechapter}
 
-8. Eficiência do protocolo de ligação de dados (caraterização estatística da  eficiência do protocolo, feita com recurso a medidas sobre o código desenvolvido. 
-A caracterização teórica de um protocolo Stop Wait, que 
-   deverá ser usada como termo de comparação, encontra-se descrita nos slides de Ligação Lógica das aulas teóricas).
+Com o objetivo de avaliar a eficiência da nossa aplicação, efetuamos vários testes, com alterações a nível da capacidade
+da ligação (Baudrate), do tamanho dos campos de data das tramas I (MAX\textunderscore SIZE), da percentagem de erros (FER) e dos atrasos de propagação.
 
+\section{Variação do FER}
+
+Pela análise do gráfico podemos concluir que, como era esperado, uma maior percentagem de erros
+induzidos nas tramas I leva a uma menor eficiência do programa, devido ao facto de o tratamento destes erros ocupar grande parte do tempo de execução
+(reenvio de tramas, no caso de erros no BCC2, e espera de TIMEOUT segundos por parte do emissor, no caso de erros no BCC1).
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{fer.png}
+\caption{\emph{Variação do FER}}
+\end{figure}
+
+\section{Variação do tamanho dos campos de informação das tramas I}
+
+Analisando este gráfico, rapidamente se conclui que quando maior for o valor do MAX\textunderscore SIZE, que corresponde ao tamanho dos campos Data das tramas I,
+maior será a eficiência do programa. Isto acontece porque, dado o aumento do tamanho das tramas, menor será o número de tramas enviadas, pelo que a
+divisão dos pacotes será mais rápida, o que leva a um menor tempo de execução.
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{maxsize.png}
+\caption{\emph{Variação do max size}}
+\end{figure}
+
+\section{Variação da capacidade da ligação (Baudrate)}
+
+Este gráfico é também de fácil análise, concluindo-se que uma maior capacidade da ligação (Baudrate) leva a uma menor eficiência do programa.
+Ora, uma razão que encontramos para esta variação consiste ????
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{baudrate.png}
+\caption{\emph{Variação da baudrate}}
+\end{figure}
+
+
+,\section{Variação dos atrasos de propagação}
+, ten
+dPela análise deste gráfico conclui-se que quanto maior for o atraso de propagação,o em conta que a eficiência e a baudrate são
+inversamente proporcionais, como é possível verificar na fórmula usada (S = R/C). menor será a eficiência, e este decréscimo
+dá-se de forma acentuada, uma vez que a maior parte do tempo de execução resultará destes atrasos, e não do tempo útil do programa.
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.4]{atraso.png}
+\caption{\emph{Variação dos atrasos de propagação}}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 9 - Conclusões
