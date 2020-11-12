@@ -142,7 +142,6 @@ int llwrite(int fd, unsigned char* buffer, int length) {
     sprintf(buffer, "%c%c%c%c", FLAG, A_Sender_Receiver, C_I1, BCC_C_I1);
   }
 
-  
   while (k < j) {
     buffer[ind] = stuffed_msg[k];
     ind++;
@@ -164,11 +163,9 @@ int llwrite(int fd, unsigned char* buffer, int length) {
   // Receives RR or REJ answer
   int received_NS;
   int received_RR = read_RR(fd, &received_NS);
-  printf("received: %d sent %d \n", received_NS, Ns_Enviado_Write);
-  if ((!received_RR) || (received_NS == Ns_Enviado_Write)) { // old if (!received_RR) add || (t == 500) to simulate error || (t == 500)
+  if ((!received_RR) || (received_NS == Ns_Enviado_Write)) {
     int resent_times_write = 0;
     while (resent_times_write < 3) {
-      printf("erro");
       printf("Resending Frame...\n\n");
       // Re-Write I-frame to the port
       int b = 0;
@@ -187,14 +184,9 @@ int llwrite(int fd, unsigned char* buffer, int length) {
       return -1;
   }
 
-  printf("2 received ns %d sent %d\n", received_NS, Ns_Enviado_Write);
-
-  // Se o valor for diferente, alterar o Ns.
+  // If the value is different, change Ns.
   if (received_NS != Ns_Enviado_Write) {  // Reader asked for next frame (received RR), change Ns
     Ns_Enviado_Write = received_NS;
-  }
-  else {
-    // Reenviar outra vez até receber o prox Ns?? feito em cima 
   }
 
   return length;
@@ -271,13 +263,6 @@ int llread(int fd, unsigned char* buffer) {
 	
   if (BCC2 != buffer[j-2]) {
     printf("BCC2 ERROR. Asking Emissor to resend the packet...\n");
-    printf("BCC2 = 0x%02x\n", BCC2);
-    printf("buffer[j-2] = 0x%02x\n", buffer[j-2]);
-    // COMENTAR NÃO É NECESSÁRIO!!!!!!!
-    /* if (received_Ns != Ns) {  // Received the wanted frame (Ns requested)
-      write_RR(fd);
-    }
-    else {*/
     
     write_REJ(fd, Ns_Recebido_Read);
     return -1;
@@ -295,42 +280,14 @@ int llread(int fd, unsigned char* buffer) {
   }
   printf("\n");
 
-  // Se o Ns recebido for igual ao Ns enviado pelo writer, então alterar o valor. Se não, descartar a mensagem. Enviar Ns de qualquer forma
+  // If received Ns is the same as the Ns sent by the Writer, change its value. Else, ignore the message. Send Ns anyway.
   if(Ns_Recebido_Read == Ns_Enviado_Write) {
-    /*
-    if(erro == 400) {
-      printf("ERRO1\n");
-      Ns_Enviado_Write ^= 1;
-    }
-    */
-
-    Ns_Enviado_Write ^= 1; // ou esperado
+    Ns_Enviado_Write ^= 1;
   }
   else {
-    //s descartar mensagem
     j = 0;
   }
-  printf("sent n %d\n", Ns_Enviado_Write);
   write_RR(fd, Ns_Enviado_Write);
-
-  /*
-  printf("Message size: %d\n", *sizeMessage);
-  //message tem BCC2 no fim
-  message = (unsigned char *)realloc(message, *sizeMessage - 1);
-
-  *sizeMessage = *sizeMessage - 1;
-  if (mandarDados)
-  {
-    if (trama == esperado)
-    {
-      esperado ^= 1;
-    }
-    else
-      *sizeMessage = 0;
-  }
-  else
-    *sizeMessage = 0;
-  */
 
   return j - 6;
 }

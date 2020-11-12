@@ -93,7 +93,6 @@ int main(int argc, char** argv)
   unsigned char data_packet[128];
   while(TRUE) {
     if ((res = llread(application.fileDescriptor, data_packet)) < 0) {
-      printf("REAAAAAD: %d", res);
       continue; // Re-read Data Packet
     }
     if ((long int) data_packet[0] == 3)   // Received Control End Packet

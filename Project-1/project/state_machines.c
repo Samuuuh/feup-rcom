@@ -165,18 +165,15 @@ int process_DISC(char received, enum current_state *state) {
 }
 
 int process_DATA(char* message, int index, enum current_state *state) {
-  printf("Ns: %d Received 0x%02x State: ", Ns_Enviado_Write,  message[index]);
   unsigned char received = message[index];
   switch(*state) {
     case start:
-      printf("Start: ");
       if (received == FLAG) {
         *state = flag_rcv;
         return 1;
       }
       break;
     case flag_rcv:
-      printf("Flag_rcv: ");
       if (received == FLAG) {
         *state = flag_rcv;
         return 1;
@@ -188,7 +185,6 @@ int process_DATA(char* message, int index, enum current_state *state) {
       else *state = start;
       break;
     case a_rcv:
-      printf("a_rcv: ");
       if (received == FLAG) {
         *state = flag_rcv;
         return 1;
@@ -196,19 +192,16 @@ int process_DATA(char* message, int index, enum current_state *state) {
       else if (received == C_I0) {
         *state = c_rcv;
         Ns_Recebido_Read = 0;
-        printf(" + new Ns:%d ", Ns_Recebido_Read);
         return 3;
       }
       else if (received == C_I1) {
         Ns_Recebido_Read = 1;
         *state = c_rcv;
-        printf(" + new Ns: %d", Ns_Recebido_Read);
         return 3;
       }
       else *state = start;
       break;
     case c_rcv:
-      printf("c_rcv: ");
       if (received == FLAG) {
         *state = flag_rcv;
         return 1;
@@ -224,7 +217,6 @@ int process_DATA(char* message, int index, enum current_state *state) {
       else *state = start;
       break;
     case data_rcv:
-      printf("data_rcv: ");
       if (received == FLAG && message[index - 1] != ESC) {
         *state = stop;
       }
