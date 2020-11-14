@@ -140,14 +140,14 @@ este trabalho deve resultar num programa capaz de resistir a fenómenos como a i
 provocada pela indução de "ruído" na porta série. Este relatório procura explicar toda a teoria envolvida neste primeiro trabalho, de forma bem estruturada, 
 nos seguintes tópicos:
 \begin{itemize}
-	\item Arquitetura - Descrição dos blocos funcionais e interfaces
-	\item Estrutura do código - Explicação das APIs, enumeração das principais estruturas de dados utilizadas, das funções de maior importância e relação com a arquitetura
-	\item Casos de Uso Principais - Identificação dos casos de uso mais importantes, e demonstração sequencial das chamadas às funções.
-	\item Protocolo de ligação lógica - Identificação dos principais aspetos funcionais da camada de Ligação de Dados, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
-	\item Protocolo de aplicação - Identificação dos principais aspetos funcionais da camada da Aplicação, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
-	\item Validação - Descrição dos testes efetuados com apresentação quantificada dos resultados.
-	\item Eficiência do protocolo de ligação de dados - Caracterização estatística da eficiência do protocolo, feita com recurso a medidas sobre o código desenvolvido.
-	\item Conclusões - Síntese da informação apresentada nas secções anteriores, e reflexão sobre os objetivos de aprendizagem alcançados.
+	\item \textbf{Arquitetura} - Descrição dos blocos funcionais e interfaces
+	\item \textbf{Estrutura do código} - Explicação das APIs, enumeração das principais estruturas de dados utilizadas, das funções de maior importância e relação com a arquitetura
+	\item \textbf{Casos de Uso Principais} - Identificação dos casos de uso mais importantes, e demonstração sequencial das chamadas às funções.
+	\item \textbf{Protocolo de ligação lógica} - Identificação dos principais aspetos funcionais da camada de Ligação de Dados, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
+	\item \textbf{Protocolo de aplicação} - Identificação dos principais aspetos funcionais da camada da Aplicação, descrição da estratégia de implementação destes aspetos, com o apoio de extratos de código.
+	\item \textbf{Validação} - Descrição dos testes efetuados com apresentação quantificada dos resultados.
+	\item \textbf{Eficiência do protocolo de ligação de dados} - Caracterização estatística da eficiência do protocolo, feita com recurso a medidas sobre o código desenvolvido.
+	\item \textbf{Conclusões} - Síntese da informação apresentada nas secções anteriores, e reflexão sobre os objetivos de aprendizagem alcançados.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ Por este motivo, é considerada a camada de mais baixo nível do programa, sendo
 da transmissão de informação (escrita e leitura) e do seu posterior fecho. 
 É também da sua responsabilidade testar se a informação foi escrita/recebida corretamente, através de byte stuffing e de testes de erros como os BCC.
 
-A camada da da Aplicação (Application Layer) é apenas responsável pelo envio e receção da informação dos ficheiros, pelo que é de um nível superior à camada de ligação de dados.
+A camada da Aplicação (Application Layer) é apenas responsável pelo envio e receção da informação dos ficheiros, pelo que é de um nível superior à camada de ligação de dados.
 Esta chama as funções da camada da ligação de dados, para envio/receção da informação de dados, 
 mantendo-se, completamente independente desta uma vez que desconhece os seus métodos de atuar.
 
@@ -171,12 +171,12 @@ mantendo-se, completamente independente desta uma vez que desconhece os seus mé
 %----------------------------------------------------------------------------------------
 \chapter[Estrutura do código][Estrutura do código]{Estrutura do código} \label{\thechapter}
 
-Esta independência entre camadas está também explícita na sua implementação, uma vez que o código relativo à camada de ligação de dados se 
+Esta independência entre camadas está também explícita nas suas implementações, uma vez que o código relativo à camada de ligação de dados se 
 encontra desenvolvido nos ficheiros “llfunctions.h” e “llfunctions.c”, enquanto que o código relativo à camada da Aplicação encontra-se nos ficheiros 
 “writenoncanonical.c” (parte do Emissor) e “noncanonical.c” (parte do Recetor). Os ficheiros “messages.h” e “messages.c” contêm funções auxiliares 
 usadas pelas principais funções, responsáveis pelo envio/receção de tramas e pelo cálculo do BCC2. 
 Já os ficheiros “state\textunderscore machines.h” e “state\textunderscore machines.c” contêm o código que simula as máquinas de estados necessárias para a receção.
-No ficheiro “constdefines.h” estão definidas todas as estruturas de dados utilizadas, e definidas as principais macros usadas, que enumeramos de seguida.
+No ficheiro “const\textunderscore defines.h” estão definidas todas as estruturas de dados utilizadas, e definidas as principais macros usadas, que enumeramos de seguida.
 
 \section{Estruturas de Dados}
 Recorremos à struct applicationLayer, que se encontra no ficheiro "const\textunderscore defines.h" para armazenar a informação relativa à camada da aplicação, nomeadamente o nome da porta série a utilizar, 
@@ -186,10 +186,10 @@ Recorremos também a estruturas de dados do tipo enum, que são usadas pelas má
 
 As funções que desempenham um papel mais importante neste trabalho são as seguintes:
 \begin{itemize}
-	\item int llopen(struct applicationLayer application);
-	\item int llwrite(int fd, unsigned char buffer, int length);
+	\item int llopen(struct applicationLayer* application);
+	\item int llwrite(int fd, unsigned char* buffer, int length);
 	\item int llread(int fd, unsigned char* buffer);
-	\item int llclose(struct applicationLayer *application);
+	\item int llclose(struct applicationLayer* application);
 \end{itemize}
 
 \section{Macros}
@@ -224,7 +224,7 @@ A sequência de chamadas efetuada por este executável é a seguinte:
 \end{itemize}
 
 \section{Recetor}
-O executavel relativo ao Recetor exige tambem 2 argumentos: o nome da porta serie (por exemplo /dev/ttyS0), e o nome do ficheiro que vai ser transmitido (exemplo pinguim.gif)
+O executável relativo ao Recetor exige também 2 argumentos: o nome da porta série (por exemplo /dev/ttyS0), e o nome do ficheiro que vai ser transmitido (exemplo pinguim.gif)
  
 \begin{itemize}
  	\item llopen: Igual ao emissor.
@@ -356,7 +356,7 @@ A terminação da ligação lógica é realizado na função llclose() do fichei
 \subsection{Leitura do ficheiro a enviar, por parte do emissor, e criação/escrita de um ficheiro destino por parte do recetor.} 
 
 Logo após estabelecer a ligação com o Recetor, o Emissor efetua a abertura do ficheiro a ser copiado, e lê a informação deste,
-copiando-a para um array fileData, no ficheiro “writenoncanonical.c”, Armazenando também o 
+copiando-a para um array fileData, no ficheiro “writenoncanonical.c”, armazenando também o 
 tamanho do ficheiro. Assim, o Recetor abre o ficheiro destino (ou cria-o, se este ainda não existir), e vai escrevendo a informação recebida, a cada pacote recebido.
 
 \subsection{Envio e Receção dos pacotes de controlo START e END}
@@ -370,7 +370,7 @@ O Recetor, recebendo este pacote, saberá que não receberá mais informação, 
 
 \subsection{Divisão da informação do ficheiro conforme o valor de MAX\textunderscore SIZE}
 
-A constante MAX\textunderscore SIZE definida no ficheiro “constdefines.h” indica o número de bytes de informação do
+A constante MAX\textunderscore SIZE definida no ficheiro “const\textunderscore defines.h” indica o número de bytes de informação do
 ficheiro que cada pacote de dados pode conter, no máximo.
 No ficheiro “writecanonical.c”, o emissor começa por calcular o número de pacotes que será preciso enviar, 
 calculado com base no tamanho do ficheiro e no valor desta constante. De seguida, executa um ciclo for, de modo 
@@ -391,7 +391,7 @@ Para validação do nosso programa, foram efetuados vários testes, aos quais re
 \begin{itemize}
 	\item Envio de ficheiros de diversos tamanhos
 	\item Envio de um ficheiro com variacão do baudrate
-	\item Envio de um ficheiro com variacao do tamanho dos pacotes max\textunderscore size
+	\item Envio de um ficheiro com variacao do tamanho dos pacotes MAX\textunderscore SIZE
 	\item Interrupção da porta série por alguns segundos, e retoma desta antes do encerramento do programa
 	\item Indução de ruído na porta série, de modo a induzir erros na transmissão da informação das tramas
 \end{itemize}
@@ -408,25 +408,25 @@ da ligação (Baudrate), do tamanho dos campos de data das tramas I (MAX\textund
 
 Pela análise do gráfico podemos concluir que, como era esperado, uma maior percentagem de erros
 induzidos nas tramas I leva a uma menor eficiência do programa, devido ao facto de o tratamento destes erros ocupar grande parte do tempo de execução
-(reenvio de tramas, no caso de erros no BCC2, e espera de TIMEOUT segundos por parte do emissor, no caso de erros no BCC1).
+(reenvio de tramas, no caso de erros no BCC2, e espera de TIMEOUT segundos por parte do emissor, no caso de erros no BCC1). Ver anexo V.
 
 \section{Variação do tamanho dos campos de informação das tramas I}
 
 Analisando este gráfico, rapidamente se conclui que quando maior for o valor do MAX\textunderscore SIZE, que corresponde ao tamanho dos campos Data das tramas I,
 maior será a eficiência do programa. Isto acontece porque, dado o aumento do tamanho das tramas, menor será o número de tramas enviadas, pelo que a
-divisão dos pacotes será mais rápida, o que leva a um menor tempo de execução.
+divisão dos pacotes será mais rápida, o que leva a um menor tempo de execução. Ver anexo VI.
 
 \section{Variação da capacidade da ligação (Baudrate)}
 
 Este gráfico é também de fácil análise, concluindo-se que uma maior capacidade da ligação (Baudrate) leva a uma menor eficiência do programa.
-Ora, uma razão que encontramos para esta variação consiste no facto de o baudrate ser inversamente proporcional à eficiência: para um MAX\textunderscore SIZE constante, um aumento
-da capacidade de ligação provocaria um maior gasto de recursos, tornando o programa menos eficiente.
+Uma razão que encontramos para esta variação consiste no facto de o baudrate ser inversamente proporcional à eficiência: para um MAX\textunderscore SIZE constante, um aumento
+da capacidade de ligação provocaria um maior gasto de recursos, tornando o programa menos eficiente. Ver anexo VII.
 
 \section{Variação dos atrasos de propagação}
 
 Pela análise deste gráfico conclui-se que quanto maior for o atraso de propagação,o em conta que a eficiência e a baudrate são
-inversamente proporcionais, como é possível verificar na fórmula usada (S = R/C). menor será a eficiência, e este decréscimo
-dá-se de forma acentuada, uma vez que a maior parte do tempo de execução resultará destes atrasos, e não do tempo útil do programa.
+inversamente proporcionais, como é possível verificar na fórmula usada (S = R/C). menor será a eficiência. Este decréscimo 
+dá-se de forma acentuada, uma vez que a maior parte do tempo de execução resultará destes atrasos, e não do tempo do programa. Ver anexo VIII.
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 9 - Conclusões
