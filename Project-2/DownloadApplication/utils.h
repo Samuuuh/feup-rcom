@@ -1,0 +1,1 @@
+int parseArguments(char* argument, char* user, char* pass, char* host, char* url_path);

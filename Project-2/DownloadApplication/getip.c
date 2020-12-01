@@ -6,7 +6,7 @@
 #include <netinet/in.h> 
 #include<arpa/inet.h>
 
-int main(int argc, char *argv[])
+int mainGetIP(int argc, char *argv[])
 {
     struct hostent *h;
 
