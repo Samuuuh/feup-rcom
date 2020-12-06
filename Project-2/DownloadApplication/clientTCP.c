@@ -95,13 +95,11 @@ int main(int argc, char** argv){
 		exit(7);
 	}
 
-	printf("PORT: %d\n", port);
-
 	/*server address handling*/
 	bzero((char*)&server_addr_client,sizeof(server_addr_client));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)h->h_addr)));	/*32 bit Internet address network byte ordered*/
-	server_addr.sin_port = htons(port);		/*server TCP port must be network byte ordered */
+	server_addr_client.sin_family = AF_INET;
+	server_addr_client.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)h->h_addr)));	/*32 bit Internet address network byte ordered*/
+	server_addr_client.sin_port = htons(port);		/*server TCP port must be network byte ordered */
     
 	/*open an TCP socket*/
 	if ((sockfd_client = socket(AF_INET,SOCK_STREAM,0)) < 0) {

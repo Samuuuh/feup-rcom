@@ -6,7 +6,7 @@
 #include <netdb.h> 
 #include <sys/types.h>
 #include <netinet/in.h> 
-#include<arpa/inet.h>
+#include <arpa/inet.h>
 #include <ctype.h>
 #include <libgen.h>
 
@@ -91,7 +91,6 @@ void readServerResponse(int sockfd, char *response, char *fullResponse) {
 
   while(state != code_received) {
     read(sockfd, &character, 1);
-    //printf("Received %c\n", character);
 
     fullResponse[i] = character;
     i++;
@@ -155,11 +154,6 @@ int login(int sockfd, char *user, char *pass) {
 
   readServerResponse(sockfd, response, fullResponse);
 
-  /*if(strncmp(response, "331", 3) != 0) {
-    fprintf(stderr,"Username not accepted\n");
-		return -1;
-  }*/
-
   if (response[0] == '2') {   // Password not requested - Login successful
     return 0;
   }
@@ -205,9 +199,7 @@ int activatePassiveMode(int sockfd) {
   while(state != pasv_end) {
     read(sockfd, &character, 1);
     fullResponse[k] = character;
-    //printf("fullResponse =  %s\n", fullResponse);
     k++;
-    //printf("Received %c\n", character);
 
     switch(state) {
       case pasv_start:
@@ -219,15 +211,12 @@ int activatePassiveMode(int sockfd) {
       case h1:
         if (isdigit(character)) {
           number[i] = character;
-          //printf("DIGIT: %c\n", character);
           i++;
         }
         else if (character == ',') {
           state = h2;
           number[3] = '\0';
-          //printf("H1 = %s\n", number);
           pasv_numbers[j] = atoi(number);
-          //printf("H1_n = %d\n", atoi(number));
           memset(number,0,sizeof(number));
           i = 0;
           j++;
@@ -284,7 +273,6 @@ int activatePassiveMode(int sockfd) {
           state = p2;
           number[3] = '\0';
           pasv_numbers[j] = atoi(number);
-          //printf("NUMEBR = %s\n", number);
           memset(number,0,sizeof(number));
           i = 0;
           j++;
@@ -298,20 +286,13 @@ int activatePassiveMode(int sockfd) {
         else if (character == '\n') {
           state = pasv_end;
           number[3] = '\0';
-          //printf("NUMEBR = %s\n", number);
           pasv_numbers[j] = atoi(number);
         }
         break;
     }
   }
 
-  printf("256*pasv[4] = %d\n", pasv_numbers[4]*256);
-  printf("pasv[5] = %d\n", pasv_numbers[5]);
   int port = pasv_numbers[4]*256 + pasv_numbers[5];
-
-  for (int i = 0 ; i < 6 ; i++) {
-    printf("%d\n", pasv_numbers[i]);
-  }
 
   fullResponse[k] = '\0';
   printf("FULL RESPONSE PASV: %s\n", fullResponse);
@@ -322,20 +303,16 @@ int activatePassiveMode(int sockfd) {
 int download_file(int sockfd, int sockfd_client, char* file_path) {
   // Send username
 	write(sockfd, "retr ", 5);
-  printf("FILE_PATH: %s\n", file_path);
   write(sockfd, file_path, strlen(file_path));
   write(sockfd, "\n", 1);
 
   char response[3];
   char fullResponse[1024];
 
-  printf("\nAQUI AQUI\n");
-
   readServerResponse(sockfd, response, fullResponse);
 
 	if (strncmp(response, "150", 3) != 0) {
 		fprintf(stderr,"Couldn't open file\n");
-    //printf("RESPONSE FILE: %s\n", response);
 		return -1;
 	}
 
@@ -347,10 +324,8 @@ int download_file(int sockfd, int sockfd_client, char* file_path) {
   
   char file_part[BUFFER_SIZE];
   int bytes_read, elems_written;
-  printf("FORA\n");
 
   while((bytes_read = read(sockfd_client, file_part, BUFFER_SIZE)) > 0) {
-    printf("DENTRO\n");
     elems_written = fwrite(file_part, bytes_read, 1, file);
     //printf("FILE_PART = %s\n", file_part);
     if (elems_written != 1) {
