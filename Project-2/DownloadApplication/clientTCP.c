@@ -72,8 +72,9 @@ int main(int argc, char** argv){
 	}
 
 	char serverResponse[3];
+	char fullResponse[1024];
 
-	readServerResponse(sockfd, serverResponse);
+	readServerResponse(sockfd, serverResponse, fullResponse);
 
 	if (strncmp(serverResponse, "220", 3) != 0) {
 		fprintf(stderr,"Connection lost\n");

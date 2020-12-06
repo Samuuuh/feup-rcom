@@ -81,19 +81,20 @@ struct hostent* getIP(char *host) {
     return NULL;
   }
 
-  //printf("Host name  : %s\n", h->h_name);
-  //printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
-
   return h;
 }
 
-void readServerResponse(int sockfd, char *response) {
+void readServerResponse(int sockfd, char *response, char *fullResponse) {
   enum code_state state = start;
   char character;
+  int i = 0;
 
   while(state != code_received) {
     read(sockfd, &character, 1);
     //printf("Received %c\n", character);
+
+    fullResponse[i] = character;
+    i++;
 
     switch(state) {
       case start:
@@ -123,29 +124,47 @@ void readServerResponse(int sockfd, char *response) {
         }
         break;
       case third_digit:
-        if ((character == ' ') || (character == '-')) {
-          state = code_received;
+        if ((character == ' ')) {
+          state = last_line;
         }
         else {
           state = start;
           memset(response,0,sizeof(response));
         }
         break;
+      case last_line:
+        if ((character == '\n')) {
+          state = code_received;
+        }
+        break;
     }
   }
+
+  fullResponse[i] = '\0';
+  printf("FULLRESPONSE: %s\n", fullResponse);
 }
 
 int login(int sockfd, char *user, char *pass) {
-  char response[3];
-
   // Send username
 	write(sockfd, "user ", 5);
   write(sockfd, user, strlen(user));
   write(sockfd, "\n", 1);
 
-  readServerResponse(sockfd, response);
+  char response[3];
+  char fullResponse[1024];
 
-  if(strncmp(response, "331", 3) != 0) {
+  readServerResponse(sockfd, response, fullResponse);
+
+  /*if(strncmp(response, "331", 3) != 0) {
+    fprintf(stderr,"Username not accepted\n");
+		return -1;
+  }*/
+
+  if (response[0] == '2') {   // Password not requested - Login successful
+    return 0;
+  }
+
+  if(response[0] != '3') {
     fprintf(stderr,"Username not accepted\n");
 		return -1;
   }
@@ -155,7 +174,9 @@ int login(int sockfd, char *user, char *pass) {
   write(sockfd, pass, strlen(pass));
   write(sockfd, "\n", 1);
 
-  readServerResponse(sockfd, response);
+  memset(response,0,sizeof(response));
+  memset(fullResponse,0,sizeof(fullResponse));
+  readServerResponse(sockfd, response, fullResponse);
 
   if(strncmp(response, "230", 3) != 0) {
     fprintf(stderr,"Password not accepted\n");
@@ -166,35 +187,47 @@ int login(int sockfd, char *user, char *pass) {
 }
 
 int activatePassiveMode(int sockfd) {
-  char response[3];
-  char number[3];
+  char response[4];
+  char fullResponse[512];
+  char number[4];
   int i = 0;
   int pasv_numbers[6];
   int j = 0;
+  int k = 0;
 
   write(sockfd, "pasv\n", 5);
 
   enum pasv_state state = pasv_start;
   char character;
 
+  memset(fullResponse,0,sizeof(fullResponse));
+
   while(state != pasv_end) {
     read(sockfd, &character, 1);
+    fullResponse[k] = character;
+    //printf("fullResponse =  %s\n", fullResponse);
+    k++;
     //printf("Received %c\n", character);
 
     switch(state) {
       case pasv_start:
         if (character == '(') {
           state = h1;
+          memset(number,0,sizeof(number));
         }
         break;
       case h1:
         if (isdigit(character)) {
           number[i] = character;
+          //printf("DIGIT: %c\n", character);
           i++;
         }
         else if (character == ',') {
           state = h2;
+          number[3] = '\0';
+          //printf("H1 = %s\n", number);
           pasv_numbers[j] = atoi(number);
+          //printf("H1_n = %d\n", atoi(number));
           memset(number,0,sizeof(number));
           i = 0;
           j++;
@@ -207,6 +240,7 @@ int activatePassiveMode(int sockfd) {
         }
         else if (character == ',') {
           state = h3;
+          number[3] = '\0';
           pasv_numbers[j] = atoi(number);
           memset(number,0,sizeof(number));
           i = 0;
@@ -220,6 +254,7 @@ int activatePassiveMode(int sockfd) {
         }
         else if (character == ',') {
           state = h4;
+          number[3] = '\0';
           pasv_numbers[j] = atoi(number);
           memset(number,0,sizeof(number));
           i = 0;
@@ -233,6 +268,7 @@ int activatePassiveMode(int sockfd) {
         }
         else if (character == ',') {
           state = p1;
+          number[3] = '\0';
           pasv_numbers[j] = atoi(number);
           memset(number,0,sizeof(number));
           i = 0;
@@ -246,7 +282,9 @@ int activatePassiveMode(int sockfd) {
         }
         else if (character == ',') {
           state = p2;
+          number[3] = '\0';
           pasv_numbers[j] = atoi(number);
+          //printf("NUMEBR = %s\n", number);
           memset(number,0,sizeof(number));
           i = 0;
           j++;
@@ -257,19 +295,26 @@ int activatePassiveMode(int sockfd) {
           number[i] = character;
           i++;
         }
-        else if (character == ')') {
+        else if (character == '\n') {
           state = pasv_end;
+          number[3] = '\0';
+          //printf("NUMEBR = %s\n", number);
           pasv_numbers[j] = atoi(number);
         }
         break;
     }
   }
 
+  printf("256*pasv[4] = %d\n", pasv_numbers[4]*256);
+  printf("pasv[5] = %d\n", pasv_numbers[5]);
   int port = pasv_numbers[4]*256 + pasv_numbers[5];
 
   for (int i = 0 ; i < 6 ; i++) {
     printf("%d\n", pasv_numbers[i]);
   }
+
+  fullResponse[k] = '\0';
+  printf("FULL RESPONSE PASV: %s\n", fullResponse);
 
   return port;
 }
@@ -277,8 +322,22 @@ int activatePassiveMode(int sockfd) {
 int download_file(int sockfd, int sockfd_client, char* file_path) {
   // Send username
 	write(sockfd, "retr ", 5);
+  printf("FILE_PATH: %s\n", file_path);
   write(sockfd, file_path, strlen(file_path));
   write(sockfd, "\n", 1);
+
+  char response[3];
+  char fullResponse[1024];
+
+  printf("\nAQUI AQUI\n");
+
+  readServerResponse(sockfd, response, fullResponse);
+
+	if (strncmp(response, "150", 3) != 0) {
+		fprintf(stderr,"Couldn't open file\n");
+    //printf("RESPONSE FILE: %s\n", response);
+		return -1;
+	}
 
   char* filename;
 
@@ -293,10 +352,10 @@ int download_file(int sockfd, int sockfd_client, char* file_path) {
   while((bytes_read = read(sockfd_client, file_part, BUFFER_SIZE)) > 0) {
     printf("DENTRO\n");
     elems_written = fwrite(file_part, bytes_read, 1, file);
-    printf("FILE_PART = %s\n", file_part);
+    //printf("FILE_PART = %s\n", file_part);
     if (elems_written != 1) {
       fprintf(stderr,"Error downloading file\n");
-		  return -1;
+		  return -2;
     }
   }
 
