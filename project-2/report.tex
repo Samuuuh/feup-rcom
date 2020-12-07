@@ -1,0 +1,140 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+\documentclass[article, a4paper, 11pt, oneside]{memoir}
+
+% Margins
+\usepackage[top=3cm,left=2cm,right=2cm,bottom=3cm]{geometry}
+
+% Encondings
+\usepackage[utf8]{inputenc}
+
+% Language
+\usepackage[portuguese]{babel}
+
+% Graphics and images
+\usepackage{graphicx}
+	\graphicspath{{./images/}}
+
+% Listings
+\usepackage{listings}
+\lstset{language=C}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\usepackage{amsmath}
+
+% Color
+\usepackage[dvipsnames]{xcolor}
+
+% Tables
+\usepackage{tabularx}
+
+% Math symbols
+\usepackage{amssymb}
+
+% Paragraph Spacing
+\usepackage{parskip}
+\usepackage{indentfirst}
+\setlength{\parskip}{0.2cm}
+
+% Hyperreferences
+\usepackage{hyperref}
+
+% Repeated commands
+\usepackage{expl3}
+\ExplSyntaxOn
+\cs_new_eq:NN \Repeat \prg_replicate:nn
+\ExplSyntaxOff
+
+% Header and Footer Things
+\usepackage{wallpaper}
+\usepackage{fancyhdr}
+
+% Following code to edit the pagestyle
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{RCOM}
+\lhead{Redes de Computadores}
+\rfoot{Página \thepage}
+
+% Commands
+\usepackage{xargs}
+
+%% Linked Email
+\newcommand{\email}[1]{
+{\texttt{\href{mailto:#1}{#1}} }
+}
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+% Title
+\title{\Huge \texttt{Redes de Computadores} }
+% Authors
+\author{
+\LARGE \textbf{Turma 1 Grupo 5}\\\\
+\begin{tabular}{l r}
+	  Diogo Samuel Gonçalves Fernandes	& \email{up201806250@fe.up.pt}\\
+	 Paulo Jorge Salgado Marinho Ribeiro  & \email{up201806505@fe.up.pt}\\
+\end{tabular}
+}
+
+% Date for the report
+\date{\today}
+
+% Table of Contents
+\addto\captionsportuguese{\renewcommand*\contentsname{Índice}}
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT
+%----------------------------------------------------------------------------------------
+\begin{document}
+%----------------------------------------------------------------------------------------
+%	Front Page
+%----------------------------------------------------------------------------------------
+% Title Author and Date
+\maketitle
+
+% More information for front page
+\begin{center}
+\textbf{Projeto RCOM - 2019/20 - MIEIC}
+\Repeat{2}{\linebreak}
+\begin{tabular}{l r}
+	\textbf{Professor}: 
+	\begin{tabular}{l r}
+		Rui Campos & \email{rcampos@fe.up.pt}	\\
+	\end{tabular}
+\end{tabular}
+\Repeat{4}{\linebreak}
+
+\end{center}
+
+\newpage
+%----------------------------------------------------------------------------------------
+%	CHAPTER 1 - Descrição do Problema
+%----------------------------------------------------------------------------------------
+\chapter[Introdução][Introdução]{Introdução} \label{\thechapter}
+
+
+
+\end{document}
