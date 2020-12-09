@@ -43,7 +43,7 @@ int main(int argc, char** argv){
 		exit(2);
 	}
 
-	printf("User: |%s|\nPass: |%s|\nHost: |%s|\nURL path: |%s|\n", user, pass, host, file_path);
+	printf("User: %s\nPassword: %s\nHost: %s\nURL path: %s\n", user, pass, host, file_path);
 
 	if ((h = getIP(host)) == NULL) {
 		fprintf(stderr,"Couldn't get Host IP\n");
@@ -51,7 +51,9 @@ int main(int argc, char** argv){
 	}
 
 	printf("Host name  : %s\n", h->h_name);
-  printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
+  	printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
+	  printf("\n");
+	  printf("\n--------------------------------------------------\n\n");
 	
 	/*server address handling*/
 	bzero((char*)&server_addr,sizeof(server_addr));
@@ -86,7 +88,7 @@ int main(int argc, char** argv){
 		exit(6);
 	}
 
-	printf("User logged in\n");
+	printf(">> Logged in\n");
 
 	int port;
 
@@ -94,6 +96,8 @@ int main(int argc, char** argv){
 		fprintf(stderr,"Couldn't enter passive mode\n");
 		exit(7);
 	}
+
+	printf(">> Passive mode active\n");
 
 	/*server address handling*/
 	bzero((char*)&server_addr_client,sizeof(server_addr_client));
@@ -113,12 +117,15 @@ int main(int argc, char** argv){
 		exit(4);
 	}
 
+	printf(">> Connected to the server\n");
+	printf(">> Starting downloading the file\n");
+
 	if (download_file(sockfd, sockfd_client, file_path) < 0) {
 		fprintf(stderr,"Couldn't download file\n");
 		exit(8);
 	}
 
-	printf("File downloaded successfully!\n");
+	printf(">> File downloaded successfully!\n");
 
 	if (close(sockfd_client) < 0) {
 		perror("Error closing client socket");

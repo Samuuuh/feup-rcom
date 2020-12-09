@@ -140,7 +140,7 @@ void readServerResponse(int sockfd, char *response, char *fullResponse) {
   }
 
   fullResponse[i] = '\0';
-  printf("FULLRESPONSE: %s\n", fullResponse);
+  printf("Server Response: %s", fullResponse);
 }
 
 int login(int sockfd, char *user, char *pass) {
@@ -295,7 +295,7 @@ int activatePassiveMode(int sockfd) {
   int port = pasv_numbers[4]*256 + pasv_numbers[5];
 
   fullResponse[k] = '\0';
-  printf("FULL RESPONSE PASV: %s\n", fullResponse);
+  printf("Server Response: %s", fullResponse);
 
   return port;
 }
