@@ -156,7 +156,7 @@ int login(int sockfd, char *user, char *pass) {
 
   readServerResponse(sockfd, response, fullResponse);
 
-  if(response[0] == '4') {
+  while(response[0] == '4') {
     // Resend username
     write(sockfd, "user ", 5);
     write(sockfd, user, strlen(user));
@@ -184,7 +184,7 @@ int login(int sockfd, char *user, char *pass) {
   memset(fullResponse,0,sizeof(fullResponse));
   readServerResponse(sockfd, response, fullResponse);
 
-  if(response[0] == '4') {
+  while(response[0] == '4') {
     // Resend pass
     write(sockfd, "pass ", 5);
     write(sockfd, pass, strlen(pass));
@@ -331,7 +331,7 @@ int download_file(int sockfd, int sockfd_client, char* file_path) {
 
   readServerResponse(sockfd, response, fullResponse);
 
-  if(response[0] == '4') {
+  while(response[0] == '4') {
     // Resend file request
     write(sockfd, "retr ", 5);
     write(sockfd, file_path, strlen(file_path));
