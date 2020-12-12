@@ -22,7 +22,7 @@
 \usepackage{color}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
-\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{mauve}{rgb}{0.58,0,0.82} 
 
 \lstset{frame=tb,
   language=C,
@@ -115,7 +115,7 @@
 % Title Author and Date
 \maketitle
 
-% More information for front page
++% More information for front page
 \begin{center}
 \textbf{Projeto RCOM - 2019/20 - MIEIC}
 \Repeat{2}{\linebreak}
@@ -135,6 +135,170 @@
 %----------------------------------------------------------------------------------------
 \chapter[Introdução][Introdução]{Introdução} \label{\thechapter}
 
+Este trabalho consiste no desenvolvimento de uma aplicação de download via ftp e na criação de uma rede. O trabalho está portanto, dividido em duas partes distintas:
+
+- Parte 1 - Aplicação de download
+- Parte 2 - Configuração de uma rede
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 2 - Parte 1 - Aplicação de download
+%----------------------------------------------------------------------------------------
+\chapter[Aplicacao][Aplicacao]{Aplicacao} \label{\thechapter}
+
+A primeira parte deste segundo projeto consiste no desenvolvimento de uma aplicação de download,
+que permite transferir um ficheiro de qualquer tipo, de um dado servidor FTP. Após compilar o código
+recorrendo ao comando "make", o utilizador deve escrever na consola o seguinte comando, para correr o programa:
+
+./download ftp://[user]:[pass]@[host]/[url-path]
+
+O campo [user] deverá conter o username com que o utilizador deseja entrar no servidor, e [pass] a respetiva password.
+No caso de desejar entrar de forma anónima, o utilizador deverá introduzir o username "anonymous" e uma qualquer password.
+O campo [host] indicará o endereço do servidor FTP ao qual se deseja conectar, e [url-path] o caminho para o ficheiro que se pretende transferir.
+
+- Arquitetura
+
+A estrutura principal do programa encontra-se bem explícita no ficheiro clientTCP.c.
+O programa começa por processar o argumento introduzido pelo utilizador, armazenando o seu username,
+pass, o host, e o path para o ficheiro, recorrendo à função parseArguments(), definida no ficheiro utils.c. 
+Se o input recebido for inválido, o programa termina e é apresentada uma mensagem indicando a correta utilização do programa.
+
+De seguida, é processado o campo host, obtendo-se o correspondente IP Adress, com recurso à função getIP().
+Este IP Adress é utilizado logo a seguir, na conexão ao servidor, após criação de um socket que será utilizado
+para troca de comandos entre o cliente e o servidor.
+
+Após conectar este socket ao servidor desejado, é lida a resposta do servidor, a qual se espera que contenha o código 220,
+que indica que a conexão foi estabelecida e que o servidor espera pelo login de um novo utilizador. 
+
+Assim, o próximo passo será efetuar o login (função login()), que consiste numa troca de mensagens entre o cliente e o servidor,
+estabelecida da seguinte forma:
+
+  - Envio do comando "user [user] newline", em que [user] é o username recebido como input
+  - Receção da resposta ao comando user. Se o primeiro dígito do código recebido for 2, então não é requerida password, e o login é efetuado com sucesso. Se esse dígito for 3, então é necessária uma password, e os próximos passos são efetuados.
+  - Envio do comando "pass [pass] newline", em que [pass] é a password recebida como input
+  - Receção da resposta ao comando pass. Se o código recebido for 230, então a password foi aceite e o login foi efetuado com sucesso. Caso contrário, o programa termina acusando erro no login.
+
+Após sucesso no login, é necessário pedir ao servidor para transferir dados em modo passivo. Isto é efetuado na função activatePassiveMode(), que começa por enviar o comando "pasv newline" para o servidor.
+Segue-se uma máquina de estados, que vai receber a resposta do servidor a este comando, e que vai armazenar os valores retornados, utilizando-os para calcular a porta para a qual serão enviados os dados. 
+
+Após isto, é efetuada a criação de um novo socket e a sua conexão ao servidor, pela porta resultante do passo anterior, de onde serão lidos os dados do ficheiro.
+
+Já com tudo configurado, é efetuada a transferência do ficheiro, na função download\textunderscore file(), que começa por mandar
+o comando "retr [path] newline" para pedir o ficheiro desejado. Segue-se a leitura da resposta do servidor face a este comando,
+a qual se espera ser o código 150, que indica que o ficheiro está pronto para download e o pedido foi aceite. 
+Assim, pode-se começar a ler a informação do ficheiro, do socket aberto para leitura dos dados, e enviar a informação para um ficheiro criado imediatamente antes,
+cujo nome é obtido aplicando a função basename() ao path recebido como input. Se não tiver ocorrido nenhum erro durante o processo, é apresentada uma mensagem de sucesso,
+que indica que o ficheiro foi transferido. 
+
+Por último, o programa fecha os dois sockets abertos.
+
+- Resultados
+
+O nosso programa foi testado para diversos casos, nomeadamente a utilização de diferentes servidores FTP,
+diferentes logins (introdução de username e password e entrada em modo anónimo), e utilização de diferentes tipos e tamanhos, nos ficheiros transferidos.
+Para maior compreensão do processo, são imprimidos na consola todos os passos efetuados, assim como as respetivas respostas do servidor.
+Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a aplicação encontra-se totalmente funcional.
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 3 - Parte 2 - Experiencias de rede
+%----------------------------------------------------------------------------------------
+\chapter[Rede][Rede]{Rede} \label{\thechapter}
+
+- Experiência 1 - Configurar uma rede IP
+
+Nesta primeira experiência foi ligado o gnu63 ao gnu64.
+
+O que são os pacotes ARP e para o que são usados?
+  O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o endereço MAC associado
+  a um dado endereço de IP.
+
+Quais são o endereço de MAC e IP dos pacotes ARP?
+(Analisar logs)
+
+Que pacotes são gerados pelo comando ping?
+  O comando ping gera pacotes ICMP(Internet Control Message Protocol).
+
+Qual é o endereço MAC e IP dos pacotes gerados pelo comando ping?
+O endereço MAC e IP vai ser o endereço do pc que envia os pacotes e o pc que recebe os pacotes alternadamente.
+(Depois analisar logs)
+
+Como determinar se uma trama de Ethernet é ARP, IP, ICMP?
+Através da identificação do cabeçalho da frame é possível identificar o tipo da trama.
+
+Como determinar o comprimento de uma trama?
+O comprimento de uma trama é determinada utilizando também o cabeçalho da trama Ethenert
+
+O que é a interface loopback e porque é que é importante?
+The loopback interface is used to identify the device. 
+While any interface address can be used to determine if the device is online, 
+the loopback address is the preferred method. 
+Whereas interfaces might be removed or addresses changed based on network topology changes, 
+the loopback address never changes.
+
+- Experiencia 2 - Implementar duas LAN virtuais num switch
+
+Como configurar a vlany0?
+(Ver no ficheiro txt)
+
+Quantos domínios de broadcast existem? Como se pode concluir a partir dos logs?
+Podemos concluir que existem dois domínios de broadcast diferentes.
+Um desses domínios contempla o tux4 e o tux3, enquanto outro contempla apenas o tux2.
+
+
+- Experiência 3 - Configurar Router em Linux
+
+Que rotas existem?
+As rotas existentes são as seguintes:
+(Ver logs)
+
+Qual é o seu significado?
+
+Quais informações uma entrada da tabela de encaminhamento contém?
+Destination: IP de destino
+Gateway: IP do próximo endereço por onde a rota passa
+Netmask: Usado para determinar o ID da rede a partir do endereço IP do destino
+Flags:
+Metric:
+Ref:
+Use:
+Interface: A placa de rede responsável pela transmissão de informação.
+
+Quais mensagens ARP e endereços MAC associados são observados e por quê?
+Sempre que um pc dá ping e não conhece o MAC address de quem enviou o ping, vai ser enviada uma mensagem ARP.
+Essa mensagem tem o MAC do tux de origem associado e um valor a nulo pois não sabe o valor do destino.
+Seguidamente
+(Analisar logs)
+
+Quais pacotes ICMP são observados e por quê?
+(Analisar logs)
+
+Quais são os endereços IP e MAC associados aos pacotes ICMP e por quê?
+Os endereços de IP e MAC associados a pacotes ICMP são os endereços dos computadores de origem e destino.
+
+- Experiência 4 - Configurar um Router comercial e implementar NAT
+
+How to configure a static route in a commercial router?
+What are the paths followed by the packets in the experiments carried out and why?
+How to configure NAT in a commercial router?
+What does NAT do?
+
+- Experiência 5 - DNS
+How to configure the DNS service at an host?
+What packets are exchanged by DNS and what information is transported
+
+- Experiência 6 - TCP connections
+How many TCP connections are opened by your ftp application?
+In what connection is transported the FTP control information?
+What are the phases of a TCP connection?
+How does the ARQ TCP mechanism work? What are the relevant TCP fields? What relevant information can be observed in the logs?
+How does the TCP congestion control mechanism work? What are the relevant fields. How did the throughput of the data connection evolve along  the time? Is it according the TCP congestion control mechanism?
+Is the throughput of a TCP data connections disturbed by the appearance of a second TCP connection? How?
+
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 4 - Conclusões
+%----------------------------------------------------------------------------------------
+\chapter[Conclusões][Conclusões]{Conclusões} \label{\thechapter}
 
 
 \end{document}
+
