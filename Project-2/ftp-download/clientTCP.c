@@ -10,6 +10,8 @@
 #include <signal.h>
 #include <netdb.h>
 #include <string.h>
+#include <libgen.h>
+#include <sys/time.h>
 
 #include "utils.h"
 
@@ -23,8 +25,6 @@ int main(int argc, char** argv){
 	int	sockfd, sockfd_client;
 	struct	sockaddr_in server_addr;
 	struct	sockaddr_in server_addr_client;
-	char	buf[] = "Mensagem de teste na travessia da pilha TCP/IP\n";
-	int	bytes;
 
 	char user[MAX_SIZE];
 	char pass[MAX_SIZE];
@@ -43,6 +43,7 @@ int main(int argc, char** argv){
 		exit(2);
 	}
 
+	printf("\n-------------------- INPUT DATA --------------------\n");
 	printf("User: %s\nPassword: %s\nHost: %s\nURL path: %s\n", user, pass, host, file_path);
 
 	if ((h = getIP(host)) == NULL) {
@@ -50,10 +51,9 @@ int main(int argc, char** argv){
 		exit(3);
 	}
 
-	printf("Host name  : %s\n", h->h_name);
-  	printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
-	  printf("\n");
-	  printf("\n--------------------------------------------------\n\n");
+	printf("\nHost name  : %s\n", h->h_name);
+	printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
+	printf("----------------------------------------------------\n");
 	
 	/*server address handling*/
 	bzero((char*)&server_addr,sizeof(server_addr));
@@ -76,6 +76,8 @@ int main(int argc, char** argv){
 	char serverResponse[3];
 	char fullResponse[1024];
 
+	printf("\n>> Conecting to the server...\n");
+
 	readServerResponse(sockfd, serverResponse, fullResponse);
 
 	if (strncmp(serverResponse, "220", 3) != 0) {
@@ -88,16 +90,15 @@ int main(int argc, char** argv){
 		exit(6);
 	}
 
-	printf(">> Logged in\n");
+	printf(">> Entering passive mode...\n\n");
 
 	int port;
-
 	if ((port = activatePassiveMode(sockfd)) < 0) {
 		fprintf(stderr,"Couldn't enter passive mode\n");
 		exit(7);
 	}
 
-	printf(">> Passive mode active\n");
+	printf(">> Connecting to the client port...\n");
 
 	/*server address handling*/
 	bzero((char*)&server_addr_client,sizeof(server_addr_client));
@@ -117,15 +118,26 @@ int main(int argc, char** argv){
 		exit(4);
 	}
 
-	printf(">> Connected to the server\n");
+	printf("<< Client connection successful\n\n");
+
 	printf(">> Starting downloading the file\n");
+
+	struct timeval init_time;
+	struct timeval current_time;
+	gettimeofday(&init_time, 0);
 
 	if (download_file(sockfd, sockfd_client, file_path) < 0) {
 		fprintf(stderr,"Couldn't download file\n");
 		exit(8);
 	}
 
-	printf(">> File downloaded successfully!\n");
+	gettimeofday(&current_time, 0);
+	double elapsedTime = (current_time.tv_usec - init_time.tv_usec) / 1000.0 +
+					(current_time.tv_sec - init_time.tv_sec) * 1000.0;
+
+	char *filename = basename(file_path);
+
+	printf("File %s downloaded successfully in %f seconds!\n", filename, elapsedTime/1000.0);
 
 	if (close(sockfd_client) < 0) {
 		perror("Error closing client socket");

@@ -140,10 +140,12 @@ void readServerResponse(int sockfd, char *response, char *fullResponse) {
   }
 
   fullResponse[i] = '\0';
-  printf("Server Response: %s", fullResponse);
+  printf("\nServer Response:\n%s\n", fullResponse);
 }
 
 int login(int sockfd, char *user, char *pass) {
+  printf(">> Sending username...\n");
+
   // Send username
 	write(sockfd, "user ", 5);
   write(sockfd, user, strlen(user));
@@ -154,6 +156,14 @@ int login(int sockfd, char *user, char *pass) {
 
   readServerResponse(sockfd, response, fullResponse);
 
+  if(response[0] == '4') {
+    // Resend username
+    write(sockfd, "user ", 5);
+    write(sockfd, user, strlen(user));
+    write(sockfd, "\n", 1);
+		readServerResponse(sockfd, response, fullResponse);
+  }
+
   if (response[0] == '2') {   // Password not requested - Login successful
     return 0;
   }
@@ -163,6 +173,8 @@ int login(int sockfd, char *user, char *pass) {
 		return -1;
   }
 
+  printf(">> Sending password...\n");
+
   // Send pass
 	write(sockfd, "pass ", 5);
   write(sockfd, pass, strlen(pass));
@@ -171,6 +183,14 @@ int login(int sockfd, char *user, char *pass) {
   memset(response,0,sizeof(response));
   memset(fullResponse,0,sizeof(fullResponse));
   readServerResponse(sockfd, response, fullResponse);
+
+  if(response[0] == '4') {
+    // Resend pass
+    write(sockfd, "pass ", 5);
+    write(sockfd, pass, strlen(pass));
+    write(sockfd, "\n", 1);
+		readServerResponse(sockfd, response, fullResponse);
+  }
 
   if(strncmp(response, "230", 3) != 0) {
     fprintf(stderr,"Password not accepted\n");
@@ -295,13 +315,13 @@ int activatePassiveMode(int sockfd) {
   int port = pasv_numbers[4]*256 + pasv_numbers[5];
 
   fullResponse[k] = '\0';
-  printf("Server Response: %s", fullResponse);
+  printf("Server Response: \n%s\n", fullResponse);
 
   return port;
 }
 
 int download_file(int sockfd, int sockfd_client, char* file_path) {
-  // Send username
+  // Send file request
 	write(sockfd, "retr ", 5);
   write(sockfd, file_path, strlen(file_path));
   write(sockfd, "\n", 1);
@@ -310,6 +330,14 @@ int download_file(int sockfd, int sockfd_client, char* file_path) {
   char fullResponse[1024];
 
   readServerResponse(sockfd, response, fullResponse);
+
+  if(response[0] == '4') {
+    // Resend file request
+    write(sockfd, "retr ", 5);
+    write(sockfd, file_path, strlen(file_path));
+    write(sockfd, "\n", 1);
+		readServerResponse(sockfd, response, fullResponse);
+  }
 
 	if (strncmp(response, "150", 3) != 0) {
 		fprintf(stderr,"Couldn't open file\n");
@@ -327,7 +355,6 @@ int download_file(int sockfd, int sockfd_client, char* file_path) {
 
   while((bytes_read = read(sockfd_client, file_part, BUFFER_SIZE)) > 0) {
     elems_written = fwrite(file_part, bytes_read, 1, file);
-    //printf("FILE_PART = %s\n", file_part);
     if (elems_written != 1) {
       fprintf(stderr,"Error downloading file\n");
 		  return -2;
