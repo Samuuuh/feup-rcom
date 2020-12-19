@@ -205,100 +205,268 @@ Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a apl
 
 - Experiência 1 - Configurar uma rede IP
 
-Nesta primeira experiência foi ligado o gnu63 ao gnu64.
+Nesta primeira experiência foi ligado o gnu63 ao gnu64, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. Esta conexão foi testada recorrendo ao comando ping.
 
-O que são os pacotes ARP e para o que são usados?
-  O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o endereço MAC associado
-  a um dado endereço de IP.
+O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o endereço MAC associado
+a um dado endereço de IP. Para o envio de uma trama para dum dado computador presente na rede, o emissor
+necessita do endereço MAC correspondente ao endereço IP de destino. Para isto, é enviado um pacote ARP
+em modo Broadcast, que contém esse IP e que espera o retorno do endereço MAC desejado.
+Isto pode ser observado na Figura 1 (anexos), onde são claros estes pedidos.
 
-Quais são o endereço de MAC e IP dos pacotes ARP?
-(Analisar logs)
+Após fazermos ping do gnu63 para o gnu64, são gerados pacotes ICMP(Internet Control Message Protocol), o que pode ser observado nessa mesma figura.
+É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do gnu63 e do gnu64, respetivamente.
+A distinção entre tramas Ethernet do tipo ARP, IP ou ICMP pode ser feita analisando o cabeçalho dessa trama, que terá valores distintos conforme o tipo de trama.
+Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na figura ?, uma vez que essa informação está também presente no cabeçalho da trama.
 
-Que pacotes são gerados pelo comando ping?
-  O comando ping gera pacotes ICMP(Internet Control Message Protocol).
-
-Qual é o endereço MAC e IP dos pacotes gerados pelo comando ping?
-O endereço MAC e IP vai ser o endereço do pc que envia os pacotes e o pc que recebe os pacotes alternadamente.
-(Depois analisar logs)
-
-Como determinar se uma trama de Ethernet é ARP, IP, ICMP?
-Através da identificação do cabeçalho da frame é possível identificar o tipo da trama.
-
-Como determinar o comprimento de uma trama?
-O comprimento de uma trama é determinada utilizando também o cabeçalho da trama Ethenert
-
-O que é a interface loopback e porque é que é importante?
-The loopback interface is used to identify the device. 
-While any interface address can be used to determine if the device is online, 
-the loopback address is the preferred method. 
-Whereas interfaces might be removed or addresses changed based on network topology changes, 
-the loopback address never changes.
+A interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
+É o método mais usado para determinar se um dispositivo está online, e está presente na figura ?.
 
 - Experiencia 2 - Implementar duas LAN virtuais num switch
 
-Como configurar a vlany0?
-(Ver no ficheiro txt)
+Nesta experiência, foram criadas duas LANs virtuais, sendo a primeira constituída pelo gnu63 e gnu64 e a segunda pelo gnu62.
+O gnu62 uma vez que se encontra numa rede diferente do gnu63 e gnu64 não consegue comunicar com os mesmos.
 
-Quantos domínios de broadcast existem? Como se pode concluir a partir dos logs?
-Podemos concluir que existem dois domínios de broadcast diferentes.
-Um desses domínios contempla o tux4 e o tux3, enquanto outro contempla apenas o tux2.
+Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o comando vlan <yN>, em que y era o número da bancada e N o número que identifica a vlan. Seguiu-se a configuração das vlans,
+onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo aos comandos <interface fastethernet 0/n> em que n é a porta do switch, <switchport mode access> e <switchport access vlan yN>.
 
+Após este processo, passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62,
+uma vez que o gnu63 recebe apenas resposta do gnu64 quando efetua <ping broadcast>, e o gnu62 não recebe qualquer resposta quando o faz.
+
+figura ? - meter figuras
 
 - Experiência 3 - Configurar Router em Linux
 
-Que rotas existem?
-As rotas existentes são as seguintes:
-(Ver logs)
+Nesta experiência, o gnu64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
 
-Qual é o seu significado?
+Para isto, configurou-se a porta eth1 do gnu64 com um IP no mesmo domínio que o gnu62. Depois, foi necessário configurar as rotas com o comando <route add>. No gnu63 adicionou-se a rota
+que redireciona os pacotes para o endereço IP do gnu64 relativo à segunda vlan, e o mesmo foi realizado para o gnu62, mas com o IP relativo à primeira vlan.
+Tudo isto pode ser verificado na figura ?.
+Após isto, torna-se possível realizar ping do gun63 para o gun62, uma vez que os pedidos são encaminhados para o gnu64, que consegue comunicar com os outros dois PCs.
 
-Quais informações uma entrada da tabela de encaminhamento contém?
-Destination: IP de destino
-Gateway: IP do próximo endereço por onde a rota passa
-Netmask: Usado para determinar o ID da rede a partir do endereço IP do destino
-Flags:
-Metric:
-Ref:
-Use:
-Interface: A placa de rede responsável pela transmissão de informação.
+A tabela de forwarding define a forma como uma trama será encaminhada de um switch ou router na rede. Contém o destino da rota, a "gateway", que corresponde ao próximo ponto por onde a rota passará,
+a máscara (netmask), usada para determinar o ID da rede a partir do endereço IP de destino, informações e custo da rota, o número de referências para a rota, um contador de pesquisas da rota, e a placa de rede responsável pela gateway.
 
-Quais mensagens ARP e endereços MAC associados são observados e por quê?
-Sempre que um pc dá ping e não conhece o MAC address de quem enviou o ping, vai ser enviada uma mensagem ARP.
-Essa mensagem tem o MAC do tux de origem associado e um valor a nulo pois não sabe o valor do destino.
-Seguidamente
-(Analisar logs)
+Sempre que um dos PCs dá ping a outro e o PC que recebeu o pedido não conhece o endereço MAC do emissor, envia um pacote ARP a pedir esta informação, como mostrado na experiência 1, que conterá os endereços dos PCs de origem e de destino.
+Os pacotes ICMP observados resultam do comando ping, e tratam-se de pacotes de request e reply, uma vez que ,após a configuração desta experiência, todos os PCs conseguem comunicar entre si.
+No caso de não conseguirem comunicar entre si, seriam enviados pacotes ICMP do tipo Host Unreachable.
+Os endereços IP e MAC dos pacotes ICMP são os dos PCs de origem e destino.
 
-Quais pacotes ICMP são observados e por quê?
-(Analisar logs)
-
-Quais são os endereços IP e MAC associados aos pacotes ICMP e por quê?
-Os endereços de IP e MAC associados a pacotes ICMP são os endereços dos computadores de origem e destino.
+figura ? - meter figuras
 
 - Experiência 4 - Configurar um Router comercial e implementar NAT
 
-How to configure a static route in a commercial router?
-What are the paths followed by the packets in the experiments carried out and why?
-How to configure NAT in a commercial router?
-What does NAT do?
+Nesta experiência, configuramos o router do laboratório, ligando-o à rede local. Posteriormente, configuramos este router
+com NAT, de modo a que todos os computadores da rede tivessem acesso à Internet. Neste caso, apenas o gnu64 não terá acesso à Internet, por não se encontrar na lista de IPs acessíveis do router.
+
+// figura ? - EXPLICAR PERGUNTA 1
+
+Os pacotes enviados durante esta experiência seguem uma dada rota, no caso de esta já estar definida. Caso contrário, estes são direcionados para a rota default do router,
+que indica que o gnu64 existe, e portanto os pacotes serão enviados para este.
+
+Posteriormente, configurou-se NAT no router, usando os comandos presentes no slide 46 do guião deste projeto, que começam por configurar as duas interfaces do router.
+O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público, dado que os IPs públicos são limitados e escassos.
+Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública, ao traduzir estes endereços em endereços legais. 
+Desta forma, apenas um endereço IP é exigido, que irá representar todos os computadores da rede local.
 
 - Experiência 5 - DNS
-How to configure the DNS service at an host?
-What packets are exchanged by DNS and what information is transported
+
+Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à Internet ou a uma rede privada.
+Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
+
+Para a sua configuração foi necessário alterar o ficheiro resolv.conf, adicionando o nome do servidor de DNS e o seu endereço IP, de acordo com o slide 14 do guião do projeto.
+
+Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor. A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, devolverá o endereço IP correspondente.
+Esta troca de pacotes pode ser observada na figura ?
 
 - Experiência 6 - TCP connections
-How many TCP connections are opened by your ftp application?
-In what connection is transported the FTP control information?
-What are the phases of a TCP connection?
-How does the ARQ TCP mechanism work? What are the relevant TCP fields? What relevant information can be observed in the logs?
-How does the TCP congestion control mechanism work? What are the relevant fields. How did the throughput of the data connection evolve along  the time? Is it according the TCP congestion control mechanism?
-Is the throughput of a TCP data connections disturbed by the appearance of a second TCP connection? How?
 
+Esta experiência serviu para observação do comportamento do protocolo TCP, recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
+
+A aplicação estabelece duas conexões TCP - uma para troca de comandos entre o cliente e o servidor FTP, que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
+Cada conexão FTP subdivide-se em três fases: o estabelecimento da conexão, a troca de dados entre o cliente e servidor, e o encerramento da conexão.
+O mecanismo ARQ (Automatic Repeat Request) do TCP (Transmission Control Protocol) é utilizado com o método da janela deslizante, e consiste no controlo dos erros que ocorram durante a transmissão dos dados.
+Recorre a "acknowledgement numbers", que estão incluídos nas tramas enviadas pelo recetor, indicando se esta foi recebida corretamente, sem quaisquer problemas, e recorre também ao "window size", que indica o domínio de pacotes possíveis de ser enviados pelo emissor, e ao "sequence number", que indica o número do pacote a ser enviado.
+O TCP usa um mecanismo de controlo de congestão end-to-end. Isto significa que o emissor limita ou aumenta a taxa de entrega de dados para conexão em função do congestionamento percebido por ele.
+A conexão TCP é composta por diversas variáveis, sendo uma delas a janela de congestionamento, que limitará a taxa de envio de pacotes de um dado emissor TCP.
+Os gráficos obtidos durante a experiência (figura ?) permitem concluir que no início do primeiro download no gnu63, a taxa de transferência aumentou, e após o segundo download verificou-se uma rápida descida seguida de uma ligeira subida, que estabilizou num nível mais baixo do que o nível inicial.
+Assim, conclui-se que o fluxo dos dados está de acordo com o mecanismo de controlo de congestão, tendo em conta que se observa um menor bitrate no momento em que a rede estava mais congestionada (mais downloads simultâneos).
+
+Com o aparecimento de uma segunda conexão TCP, dá-se uma diminuição da taxa de transferência, tendo em conta que esta é distribuída igualmente para cada ligação.
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 4 - Conclusões
 %----------------------------------------------------------------------------------------
 \chapter[Conclusões][Conclusões]{Conclusões} \label{\thechapter}
 
+Este segundo projeto da unidade curricular Redes de Computadores teve como objetivo, numa primeira parte, a implementação de uma aplicação de download de ficheiros recorrendo ao protocolo FTP,
+e, numa segunda parte, à configuração de uma rede de computadores. Apesar de dificultado pelo reduzido tempo que tivemos para aproveitar o laboratório, devido à situação pandémica que atualmente enfrentamos,
+este projeto foi terminado com sucesso, sendo que conseguimos desenvolver todos os aspetos pedidos.
+Ao mesmo tempo, interiorizamos conceitos importantes nesta área, e compreendemos os diversos protocolos que foram abordados.
+
+Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos dos quais nunca antes tínhamos ouvido falar, mas que utilizavamos com frequência no nosso dia-a-dia.
+
+\end{document}
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 5 - Anexos
+%----------------------------------------------------------------------------------------
+\chapter[Anexos][Anexos]{Anexos} \label{\thechapter}
+
+\section{Anexo I - Imagens}
+\subsection{Experiência 1}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp1-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+exp2-step5-ping-gnu62-from-63
+
+\subsection{Experiência 2}
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step5-ping-gnu63-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step5-ping-gnu64-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu62.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu64.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu62.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu64.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Experiência 3}
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp3-step6-ping-60.254-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp3-step6-ping-61.1-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp3-step6-ping-61.253-from-gnu63.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+
+VERIFICAR STEP 10
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth0.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth1.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Experiência 4}
+FALTA A EXP 4
+
+\subsection{Experiência 5}
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp5-step3.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step3-part1.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step3-part2.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+
+\subsection{Experiência 6}
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step5-error.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step5-gnu62-graph.png}
+\caption{\emph{Teste}}
+\end{figure}
+
+\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step5-gnu63-graph.png}
+\caption{\emph{Teste}}
+\end{figure}
 
 \end{document}
 
