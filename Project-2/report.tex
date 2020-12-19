@@ -203,17 +203,20 @@ Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a apl
 %----------------------------------------------------------------------------------------
 \chapter[Rede][Rede]{Rede} \label{\thechapter}
 
-- Experiência 1 - Configurar uma rede IP
+\section{Experiência 1 - Configurar uma rede IP}
 
-Nesta primeira experiência foi ligado o gnu63 ao gnu64, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. Esta conexão foi testada recorrendo ao comando ping.
+Nesta primeira experiência foi ligado o \emph{gnu63} ao \emph{gnu64}, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
+COLOCAR COMANDOS IFCONFIG AQUI
+Esta conexão foi testada recorrendo ao comando ping.
 
 O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o endereço MAC associado
-a um dado endereço de IP. Para o envio de uma trama para dum dado computador presente na rede, o emissor
+a um dado endereço de IP. Para o envio de uma trama para um dado computador presente na rede, o emissor
 necessita do endereço MAC correspondente ao endereço IP de destino. Para isto, é enviado um pacote ARP
 em modo Broadcast, que contém esse IP e que espera o retorno do endereço MAC desejado.
-Isto pode ser observado na Figura 1 (anexos), onde são claros estes pedidos.
+Isto pode ser observado na Figura 1, no pacote número 23 em que é enviado um pacote ARP em broadcast.
 
-Após fazermos ping do gnu63 para o gnu64, são gerados pacotes ICMP(Internet Control Message Protocol), o que pode ser observado nessa mesma figura.
+Após fazermos ping do gnu63 para o gnu64, para além dos pacotes ARP são gerados pacotes ICMP(Internet Control Message Protocol), 
+o que pode ser observado na \emph{Figura 1}.
 É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do gnu63 e do gnu64, respetivamente.
 A distinção entre tramas Ethernet do tipo ARP, IP ou ICMP pode ser feita analisando o cabeçalho dessa trama, que terá valores distintos conforme o tipo de trama.
 Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na figura ?, uma vez que essa informação está também presente no cabeçalho da trama.
@@ -221,20 +224,26 @@ Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta 
 A interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
 É o método mais usado para determinar se um dispositivo está online, e está presente na figura ?.
 
-- Experiencia 2 - Implementar duas LAN virtuais num switch
 
-Nesta experiência, foram criadas duas LANs virtuais, sendo a primeira constituída pelo gnu63 e gnu64 e a segunda pelo gnu62.
+\section{Experiência 2 - Implementar duas LAN virtuais num switch}
+
+Nesta experiência, foram criadas duas LANs virtuais, estando os computadores gnu63 e gnu64 conectados à VLAN 60 e o gnu62 conectado à VLAN 61.
 O gnu62 uma vez que se encontra numa rede diferente do gnu63 e gnu64 não consegue comunicar com os mesmos.
 
-Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o comando vlan <yN>, em que y era o número da bancada e N o número que identifica a vlan. Seguiu-se a configuração das vlans,
-onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo aos comandos <interface fastethernet 0/n> em que n é a porta do switch, <switchport mode access> e <switchport access vlan yN>.
+Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o comando vlan <yN>, 
+em que y era o número da bancada e N o número que identifica a vlan. Seguiu-se a configuração das vlans,
+onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo aos comandos 
+<interface fastethernet 0/n> em que n é a porta do switch, <switchport mode access> e <switchport access vlan yN>.
 
-Após este processo, passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62,
-uma vez que o gnu63 recebe apenas resposta do gnu64 quando efetua <ping broadcast>, e o gnu62 não recebe qualquer resposta quando o faz.
+Após este processo, passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62.
 
-figura ? - meter figuras
+Deste modo, quando é feito ping em modo de broadcast a partir do gnu63, o gnu64 como se encontra na mesma VLAN irá conseguir 
+receber esses pacotes como é possível constatar com as figuras 4 e 5, enquanto que o gnu62 não recebe qualquer pactoe uma vez que se encontra noutra VLAN.
+Da mesma forma, quando é feito ping em modo de broadcast a partir do gnu62, quer o gnu63 quer o gnu64 não irão receber qualquer pacote, como se pode verificar
+nas figuras 7 e 8, uma vez que estes dois se encontram numa rede diferente.
 
-- Experiência 3 - Configurar Router em Linux
+
+\section{Experiência 3 - Configurar Router em Linux}
 
 Nesta experiência, o gnu64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
 
@@ -253,7 +262,7 @@ Os endereços IP e MAC dos pacotes ICMP são os dos PCs de origem e destino.
 
 figura ? - meter figuras
 
-- Experiência 4 - Configurar um Router comercial e implementar NAT
+\section{Experiência 4 - Configurar um Router comercial e implementar NAT}
 
 Nesta experiência, configuramos o router do laboratório, ligando-o à rede local. Posteriormente, configuramos este router
 com NAT, de modo a que todos os computadores da rede tivessem acesso à Internet. Neste caso, apenas o gnu64 não terá acesso à Internet, por não se encontrar na lista de IPs acessíveis do router.
@@ -268,7 +277,7 @@ O NAT (Network Address Translation) tem como objetivo poupar espaço de endereç
 Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública, ao traduzir estes endereços em endereços legais. 
 Desta forma, apenas um endereço IP é exigido, que irá representar todos os computadores da rede local.
 
-- Experiência 5 - DNS
+\section{Experiência 5 - DNS}			
 
 Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à Internet ou a uma rede privada.
 Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
@@ -278,9 +287,10 @@ Para a sua configuração foi necessário alterar o ficheiro resolv.conf, adicio
 Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor. A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, devolverá o endereço IP correspondente.
 Esta troca de pacotes pode ser observada na figura ?
 
-- Experiência 6 - TCP connections
+\section{Experiência 6 - TCP connections}
 
-Esta experiência serviu para observação do comportamento do protocolo TCP, recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
+Esta experiência serviu para observação do comportamento do protocolo TCP, 
+recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
 
 A aplicação estabelece duas conexões TCP - uma para troca de comandos entre o cliente e o servidor FTP, que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
 Cada conexão FTP subdivide-se em três fases: o estabelecimento da conexão, a troca de dados entre o cliente e servidor, e o encerramento da conexão.
@@ -305,8 +315,7 @@ Ao mesmo tempo, interiorizamos conceitos importantes nesta área, e compreendemo
 
 Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos dos quais nunca antes tínhamos ouvido falar, mas que utilizavamos com frequência no nosso dia-a-dia.
 
-\end{document}
-
+\newpage
 %----------------------------------------------------------------------------------------
 %	CHAPTER 5 - Anexos
 %----------------------------------------------------------------------------------------
@@ -315,157 +324,136 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 \section{Anexo I - Imagens}
 \subsection{Experiência 1}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp1-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping gnu64 from gnu63}
 \end{figure}
 
 exp2-step5-ping-gnu62-from-63
 
 \subsection{Experiência 2}
-\subsection{Anexo}
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp2-step5-ping-gnu63-from-gnu63.png}
-\caption{\emph{Teste}}
-\end{figure}
-
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step5-ping-gnu64-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping gnu64 from gnu63}
 \end{figure}
 
-\subsection{Anexo}
+\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu62.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu62}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu63}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu64.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu64}
 \end{figure}
 
-\subsection{Anexo}
+\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu62.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu62}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu63}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu64.png}
-\caption{\emph{Teste}}
+\caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu64}
 \end{figure}
 
+\newpage
 \subsection{Experiência 3}
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step6-ping-60.254-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping 172.16.60.254 a partir do gnu63}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step6-ping-61.1-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping 172.16.61.1 a partir do gnu63}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step6-ping-61.253-from-gnu63.png}
-\caption{\emph{Teste}}
+\caption{Ping 172.16.61.253 a partir do gnu63}
 \end{figure}
-
 
 VERIFICAR STEP 10
 
-\subsection{Anexo}
+\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth0.png}
-\caption{\emph{Teste}}
+\caption{Ping do gnu62 para gnu63 e capturar no eth0 do gnu64}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth1.png}
-\caption{\emph{Teste}}
+\caption{Ping do gnu62 para gnu63 e capturar no eth1 do gnu64}
 \end{figure}
 
 \subsection{Experiência 4}
 FALTA A EXP 4
 
+\newpage
 \subsection{Experiência 5}
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp5-step3.png}
-\caption{\emph{Teste}}
-\end{figure}
-
-\subsection{Anexo}
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp6-step3-part1.png}
-\caption{\emph{Teste}}
-\end{figure}
-
-\subsection{Anexo}
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp6-step3-part2.png}
-\caption{\emph{Teste}}
+\caption{Ping 8.8.8.8}
 \end{figure}
 
 
 \subsection{Experiência 6}
-\subsection{Anexo}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step3-part1.png}
+\caption{FTP download - Part 1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp6-step3-part2.png}
+\caption{FTP download - Part 2}
+\end{figure}
+
+\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp6-step5-error.png}
-\caption{\emph{Teste}}
+\caption{DUP ACK durante a transferência}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp6-step5-gnu62-graph.png}
-\caption{\emph{Teste}}
+\caption{Taxa de transferência no gnu62}
 \end{figure}
 
-\subsection{Anexo}
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp6-step5-gnu63-graph.png}
-\caption{\emph{Teste}}
+\caption{Taxa de transferência no gnu63}
 \end{figure}
 
 \end{document}
