@@ -153,13 +153,14 @@ recorrendo ao comando "make", o utilizador deve escrever na consola o seguinte c
 
 O campo [user] deverá conter o username com que o utilizador deseja entrar no servidor, e [pass] a respetiva password.
 No caso de desejar entrar de forma anónima, o utilizador deverá introduzir o username "anonymous" e uma qualquer password.
+O utilizador pode também entrar em modo anónimo ao omitir os campos do user e da pass, ficando o input na forma ftp://[host]/[url-path].
 O campo [host] indicará o endereço do servidor FTP ao qual se deseja conectar, e [url-path] o caminho para o ficheiro que se pretende transferir.
 
 - Arquitetura
 
 A estrutura principal do programa encontra-se bem explícita no ficheiro clientTCP.c.
 O programa começa por processar o argumento introduzido pelo utilizador, armazenando o seu username,
-pass, o host, e o path para o ficheiro, recorrendo à função parseArguments(), definida no ficheiro utils.c. 
+pass, o host, e o path para o ficheiro, recorrendo à função parseArguments(), definida no ficheiro utils.c.
 Se o input recebido for inválido, o programa termina e é apresentada uma mensagem indicando a correta utilização do programa.
 
 De seguida, é processado o campo host, obtendo-se o correspondente IP Adress, com recurso à função getIP().
@@ -230,12 +231,27 @@ A interface loopback é responsável por realizar o diagnóstico de problemas e 
 Nesta experiência, foram criadas duas LANs virtuais, estando os computadores gnu63 e gnu64 conectados à VLAN 60 e o gnu62 conectado à VLAN 61.
 O gnu62 uma vez que se encontra numa rede diferente do gnu63 e gnu64 não consegue comunicar com os mesmos.
 
-Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o comando vlan <yN>, 
-em que y era o número da bancada e N o número que identifica a vlan. Seguiu-se a configuração das vlans,
-onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo aos comandos 
-<interface fastethernet 0/n> em que n é a porta do switch, <switchport mode access> e <switchport access vlan yN>.
+Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o seguinte comando:
 
-Após este processo, passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62.
+\begin{lstlisting}
+	conf t
+	vlan 60
+	end
+\end{lstlisting} 
+Neste caso, está a ser criada a vlan 60. 
+Seguiu-se a configuração das vlans, onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo ao seguinte comandos:
+
+\begin{lstlisting}
+	conf t
+	interface fastethernet 0/n
+	switchport mode access
+	switchport por access vlan 60
+	end
+\end{lstlisting} 
+
+Nesta caso está a ser adicionada a porta \emph{n} do switch à vlan 60. 
+Após adicionar as duas VLAN e adicionar respetivas portas a cada uma, 
+passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62.
 
 Deste modo, quando é feito ping em modo de broadcast a partir do gnu63, o gnu64 como se encontra na mesma VLAN irá conseguir 
 receber esses pacotes como é possível constatar com as figuras 4 e 5, enquanto que o gnu62 não recebe qualquer pactoe uma vez que se encontra noutra VLAN.
@@ -247,10 +263,19 @@ nas figuras 7 e 8, uma vez que estes dois se encontram numa rede diferente.
 
 Nesta experiência, o gnu64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
 
-Para isto, configurou-se a porta eth1 do gnu64 com um IP no mesmo domínio que o gnu62. Depois, foi necessário configurar as rotas com o comando <route add>. No gnu63 adicionou-se a rota
-que redireciona os pacotes para o endereço IP do gnu64 relativo à segunda vlan, e o mesmo foi realizado para o gnu62, mas com o IP relativo à primeira vlan.
-Tudo isto pode ser verificado na figura ?.
-Após isto, torna-se possível realizar ping do gun63 para o gun62, uma vez que os pedidos são encaminhados para o gnu64, que consegue comunicar com os outros dois PCs.
+Para isto, configurou-se a porta eth1 do gnu64 com um IP no mesmo domínio que o gnu62. Depois, foi necessário configurar as rotas com o comando <route add>. 
+No gnu63 adicionou-se a rota que redireciona os pacotes que têm como destino a vlan 61 para o gnu64, 
+e o mesmo foi realizado para o gnu62, em que os pacotes que têm como destino a vlan 60 são redirecionados para o gnu64.
+Isto pode ser verificado na figura 11 quando a partir do gnu63 foi efetuado o comando para dar ping no gnu62 este obteve resposta, indicando que os computadores conseguem comunicar entre si.
+
+É também possível verificar a forma como o gnu64 opera através da análise das figuras 12 e 13. Na figura 12 é possível observar o trafego de pacotes através da eth0, 
+que corresponde à vlan 60, enquando que na figura 13 é possível observar relativamente aos pacotes que são trocados na eth1, correspondente à vlan 61. Os pacotes recebidos a partir da
+eth0 correspondente à vlan60 provêm do endereço 172.16.60.1 e têm o destino de 172.16.61.1 são reencaminhados para a eth1 correspondente à vlan61
+
+Podemos também realçar que o primeiro pacote trocado é do tipo ARP, uma vez que antes da captura destes logs foram eliminadas as tabelas ARP dos três gnu e estes pacotes são necessários
+para ser possivel a comunicação.
+
+Após isto, torna-se possível realizar ping do gun63 para o gnu62, uma vez que os pedidos são encaminhados para o gnu64 e este por sua vez consegue comunicar com os outros dois PCs.
 
 A tabela de forwarding define a forma como uma trama será encaminhada de um switch ou router na rede. Contém o destino da rota, a "gateway", que corresponde ao próximo ponto por onde a rota passará,
 a máscara (netmask), usada para determinar o ID da rede a partir do endereço IP de destino, informações e custo da rota, o número de referências para a rota, um contador de pesquisas da rota, e a placa de rede responsável pela gateway.
@@ -260,48 +285,92 @@ Os pacotes ICMP observados resultam do comando ping, e tratam-se de pacotes de r
 No caso de não conseguirem comunicar entre si, seriam enviados pacotes ICMP do tipo Host Unreachable.
 Os endereços IP e MAC dos pacotes ICMP são os dos PCs de origem e destino.
 
-figura ? - meter figuras
-
 \section{Experiência 4 - Configurar um Router comercial e implementar NAT}
 
-Nesta experiência, configuramos o router do laboratório, ligando-o à rede local. Posteriormente, configuramos este router
-com NAT, de modo a que todos os computadores da rede tivessem acesso à Internet. Neste caso, apenas o gnu64 não terá acesso à Internet, por não se encontrar na lista de IPs acessíveis do router.
+O principal objetivo desta experiência consiste na configuração do router com NAT.
+O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público, dado que os IPs públicos são limitados e escassos.
+Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública, ao traduzir estes endereços em endereços legais. 
+Desta forma, apenas um endereço IP é exigido, que irá representar todos os computadores da rede local.
+ 
+Para a configuração, foi necessário ligar a entrada FE0 do router ao switch. A porta a que o router se encontra ligado ao switch tem de pertencer à vlan 61 e tal pode ser efetuado como foi
+mencionado no experiência 2. Após o router estar ligado à VLAN 61, é necessário ligar a entrada FE1 do router à primeira entrada da régua 1 (6.1) que irá permitir a ligação à internet.
+Posteriormente é necessário configurar a interface interna e externa do router. Para configurar a interface interna foram executados os seguintes comandos:
 
-// figura ? - EXPLICAR PERGUNTA 1
+\begin{lstlisting}
+	conf t 
+	interface fastethernet 0/0
+	ip address 172.16.61.254 255.255.255.0 
+	no shutdown 
+	ip nat inside 
+	exit 
+\end{lstlisting} 
+
+Após a interface interna estar corretamente configurada, foi necessário configurar a interface externa.
+
+\begin{lstlisting}
+	interface fastethernet 0/1
+	ip address 172.16.2.69 255.255.255.0 
+	no shutdown 
+	ip nat outside 
+	exit 
+\end{lstlisting} 
+
+\begin{lstlisting}
+	ip nat pool ovrld 172.16.2.y9 172.16.2.y9 prefix 24 
+	ip nat inside source list 1 pool ovrld overload 
+\end{lstlisting}
+
+Posteriormente foi criada uma lista de acessos. Neste caso, apenas o gnu64 não terá acesso à Internet, por não se encontrar na lista de IPs acessíveis do router.
+
+\begin{lstlisting}
+	acesslist 1 permit 172.16.40.0 0.0.0.255
+	acesslist 1 permit 172.16.41.0 0.0.0.255
+\end{lstlisting}
+
+Finalmente foram adicionadas as rotas para o router
+\begin{lstlisting}
+	ip route 0.0.0.0 0.0.0.0 172.16.2.254 
+	ip route 172.16.y0.0 255.255.255.0 172.16.61.253
+\end{lstlisting}
 
 Os pacotes enviados durante esta experiência seguem uma dada rota, no caso de esta já estar definida. Caso contrário, estes são direcionados para a rota default do router,
 que indica que o gnu64 existe, e portanto os pacotes serão enviados para este.
 
-Posteriormente, configurou-se NAT no router, usando os comandos presentes no slide 46 do guião deste projeto, que começam por configurar as duas interfaces do router.
-O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público, dado que os IPs públicos são limitados e escassos.
-Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública, ao traduzir estes endereços em endereços legais. 
-Desta forma, apenas um endereço IP é exigido, que irá representar todos os computadores da rede local.
-
 \section{Experiência 5 - DNS}			
 
-Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à Internet ou a uma rede privada.
-Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
+Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à
+ Internet ou a uma rede privada.
+Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, 
+recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
 
 Para a sua configuração foi necessário alterar o ficheiro resolv.conf, adicionando o nome do servidor de DNS e o seu endereço IP, de acordo com o slide 14 do guião do projeto.
 
-Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor. A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, devolverá o endereço IP correspondente.
-Esta troca de pacotes pode ser observada na figura ?
+Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor. A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, 
+devolverá o endereço IP correspondente.
+Esta troca de pacotes pode ser observada na figura 14.
 
 \section{Experiência 6 - TCP connections}
 
 Esta experiência serviu para observação do comportamento do protocolo TCP, 
 recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
 
-A aplicação estabelece duas conexões TCP - uma para troca de comandos entre o cliente e o servidor FTP, que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
+Através da análise das figuras 15 e 16 é possível verificar que a aplicação estabelece duas conexões TCP - uma para troca de comandos entre o cliente e o servidor FTP, 
+que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
 Cada conexão FTP subdivide-se em três fases: o estabelecimento da conexão, a troca de dados entre o cliente e servidor, e o encerramento da conexão.
 O mecanismo ARQ (Automatic Repeat Request) do TCP (Transmission Control Protocol) é utilizado com o método da janela deslizante, e consiste no controlo dos erros que ocorram durante a transmissão dos dados.
-Recorre a "acknowledgement numbers", que estão incluídos nas tramas enviadas pelo recetor, indicando se esta foi recebida corretamente, sem quaisquer problemas, e recorre também ao "window size", que indica o domínio de pacotes possíveis de ser enviados pelo emissor, e ao "sequence number", que indica o número do pacote a ser enviado.
-O TCP usa um mecanismo de controlo de congestão end-to-end. Isto significa que o emissor limita ou aumenta a taxa de entrega de dados para conexão em função do congestionamento percebido por ele.
+Recorre a ACK (Acknowledgement numbers), que estão incluídos nas tramas enviadas pelo recetor, indicando se esta foi recebida corretamente, sem quaisquer problemas, e recorre também ao "window size", que indica o domínio de pacotes possíveis de ser enviados pelo emissor, e ao "sequence number", que indica o número do pacote a ser enviado.
+O TCP usa um mecanismo de controlo de congestão end-to-end. Isto significa que o emissor limita ou aumenta a taxa de transferência de dados para conexão em função do congestionamento percebido por ele.
 A conexão TCP é composta por diversas variáveis, sendo uma delas a janela de congestionamento, que limitará a taxa de envio de pacotes de um dado emissor TCP.
-Os gráficos obtidos durante a experiência (figura ?) permitem concluir que no início do primeiro download no gnu63, a taxa de transferência aumentou, e após o segundo download verificou-se uma rápida descida seguida de uma ligeira subida, que estabilizou num nível mais baixo do que o nível inicial.
-Assim, conclui-se que o fluxo dos dados está de acordo com o mecanismo de controlo de congestão, tendo em conta que se observa um menor bitrate no momento em que a rede estava mais congestionada (mais downloads simultâneos).
 
-Com o aparecimento de uma segunda conexão TCP, dá-se uma diminuição da taxa de transferência, tendo em conta que esta é distribuída igualmente para cada ligação.
+Foi realizada uma segunda experiência em que a meio de uma transferência de um ficheiro no gnu63, era iniciada uma transferência a partir do gnu62. Os gráficos das taxas de transferência
+obtidos podem ser visualizados nas figuras 18 e 19, em que a primeira corresponde à transferência no gnu62 e a segunda à transferência no gnu63.
+Os gráficos obtidos durante a experiência permitem concluir que no início do primeiro download no gnu63, a taxa de transferência aumentou até atingir um máximo. 
+Quando o segundo download no gnu62 foi iniciado, verificou-se que à medida que a taxa de transferência aumentava no gnu62, ocorria uma igual diminuição no gnu63. Quando a transferência no gnu63
+terminou, foi possível observar que a taxa de transferência do gnu62 aumentou, atingiu um máximo e manteve-se constante até ao final da transferência.
+Assim, com o aparecimento de uma segunda conexão TCP, dá-se uma diminuição da taxa de transferência e conclui-se que o fluxo dos dados está de acordo 
+com o mecanismo de controlo de congestão, tendo em conta que se observa uma menor taxa de transferência no momento em que a rede estava mais congestionada (mais downloads simultâneos).
+
+
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 4 - Conclusões
@@ -397,19 +466,17 @@ exp2-step5-ping-gnu62-from-63
 \caption{Ping 172.16.61.253 a partir do gnu63}
 \end{figure}
 
-VERIFICAR STEP 10
-
 \newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth0.png}
-\caption{Ping do gnu62 para gnu63 e capturar no eth0 do gnu64}
+\caption{Ping do gnu63 para gnu62 e capturar no eth0 do gnu64}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth1.png}
-\caption{Ping do gnu62 para gnu63 e capturar no eth1 do gnu64}
+\caption{Ping do gnu63 para gnu62 e capturar no eth1 do gnu64}
 \end{figure}
 
 \subsection{Experiência 4}
@@ -446,13 +513,13 @@ FALTA A EXP 4
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp6-step5-gnu62-graph.png}
+\includegraphics[scale=0.30]{exp6-step5-gnu62-graph.png}
 \caption{Taxa de transferência no gnu62}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp6-step5-gnu63-graph.png}
+\includegraphics[scale=0.30]{exp6-step5-gnu63-graph.png}
 \caption{Taxa de transferência no gnu63}
 \end{figure}
 
