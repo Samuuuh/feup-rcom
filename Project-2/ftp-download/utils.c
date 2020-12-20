@@ -22,25 +22,33 @@ int parseArguments(char* argument, char* user, char* pass, char* host, char* fil
 		return -1;
   }
 
-  // Parse the part of the argument relative to the user
-  int i = 6;
-  while (argument[i] != ':') {
-    user[i - 6] = argument[i];
-    i++;
-  }
-  user[i - 6] = '\0';
+  int i = 6, j;
 
-  // Parse the part of the argument relative to the pass
-  i++;
-  int j = i;
-  while (argument[j] != '@') {
-    pass[j - i] = argument[j];
+  if(strchr(argument, '@') != NULL) {   // User and pass present in input
+    // Parse the part of the argument relative to the user
+    while (argument[i] != ':') {
+      user[i - 6] = argument[i];
+      i++;
+    }
+    user[i - 6] = '\0';
+
+    // Parse the part of the argument relative to the pass
+    i++;
+    j = i;
+    while (argument[j] != '@') {
+      pass[j - i] = argument[j];
+      j++;
+    }
+    pass[j - i] = '\0';
     j++;
   }
-  pass[j - i] = '\0';
+  else {
+    user[0] = '\0';
+    pass[0] = '\0';
+    j = 6;
+  }
 
   // Parse the part of the argument relative to the host
-  j++;
   int k = j;
   while (argument[k] != '/') {
     host[k - j] = argument[k];
