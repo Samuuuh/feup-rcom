@@ -43,6 +43,11 @@ int main(int argc, char** argv){
 		exit(2);
 	}
 
+	if (user[0] == '\0' && pass[0] == '\0') {
+		strcpy(user, "anonymous");
+		strcpy(pass, "anypass");
+	}
+
 	printf("\n-------------------- INPUT DATA --------------------\n");
 	printf("User: %s\nPassword: %s\nHost: %s\nURL path: %s\n", user, pass, host, file_path);
 
