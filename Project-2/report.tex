@@ -211,6 +211,7 @@ diferentes logins (introdução de username e password e entrada em modo anónim
 Para maior compreensão do processo, são imprimidos na consola todos os passos efetuados, assim como as respetivas respostas do servidor.
 Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a aplicação encontra-se totalmente funcional e de acordo com o especificado.
 
+\newpage
 %----------------------------------------------------------------------------------------
 %	CHAPTER 3 - Parte 2 - Experiencias de rede
 %----------------------------------------------------------------------------------------
@@ -338,17 +339,24 @@ ip route 172.16.60.0 255.255.255.0 172.16.61.253
 
 Posteriormente foi pedido para ser retirado o redirecionamento ICMP no GNU62 e a remover a rota para o GNU64.
 Ao ser feito o ping para o GNU63, os pacotes enviados são direcionados para a rota default do router, sendo posteriormente enviadas para o GNU64 e a partir deste
-chega ao GNU63. Após adicionar novamente a rota é possível observar que os pacotes vão diretamente para o GNU64 e após esse seguem para o GNU63. Tal
-permite concluir que os pacotes enviados durante esta seguem uma dada rota, no caso de esta já estar definida.
-Caso contrário, estes são direcionados para a rota default do router.
+chega ao GNU63. Neste caso é possível observar como mostra a \textbf{Figura ?} que o router vai redirecionar os pacotes que chegam até ele. 
 
-Foi efetuada uma última experiência que consistia em voltar a ativar o redirecionamento ICMP e remover a rota para o GNU64. Neste caso é possível observar como
-mostra a \textbf{Figura ?}, que o router envia pacotes para o GNU62 ICMP Redirect, o que permite a este computador estabelecer a ligação com o GNU64.
+Após adicionar novamente a rota é possível observar que os pacotes vão diretamente para o GNU64 e após esse seguem para o GNU63. 
+Tal permite concluir que os pacotes enviados durante esta seguem uma dada rota, no caso de esta já estar definida. 
+Caso contrário, estes são direcionados para a rota default do router. 
 
+Foi efetuada uma última experiência que consistia em voltar a ativar o redirecionamento ICMP e remover a rota para o GNU64. 
+Ao ser efetuado o comando de ping do GNU62 para o GNU63, o router envia apenas um pacote para o ICMP Redirect. Como o redirecionamento está ativo, o
+GNU62 guarda a rota na tabela de reencaminhamento o que permite a este computador estabelecer a ligação com o GNU64. Nesta situação apenas foi observado um 
+pacote do ICMP Redirect, enquanto que na situação acima era recebido um por cada ping.
+
+Após estas experiências, quando foi efetuado ping no router a partir do GNU63 verificamos que não foi obtida resposta pelo que tivemos de implementar o NAT (Network Address Translation). 
 Para a configuração do NAT foi necessária a configuração da interface interna e externa do router, assim como criar uma lista de acessos, sendo este o motivo
-do GNU64 não conseguir ter acesso à internet.
+do GNU64 não conseguir ter acesso à internet. Os comandos a serem executados no router podem ser vistos no slide 46 do guião deste trabalho laboratorial.
 
-O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público.
+O NAT é uma técnica que consiste em reescrever através da utilização de uma tabela hash, 
+os endereços IP que utilizam o router de forma a que
+um computador de uma rede privada tenha acesso a uma rede pública e tem como objetivo poupar espaço de endereçamento público.
 Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública,
 a partir de um único endereço público. 
 Desta forma, apenas um endereço IP é exigido e este irá representar todos os computadores da rede local.
@@ -511,26 +519,14 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 \subsection{Experiência 4}
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.40]{exp4-step3-ping-gnu64-from-gnu63.png}
-\caption{}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp4-step3-ping-ROUTER-from-gnu63.png}
-\caption{}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp4-step4-ping-gnu63-from-gnu62.png}
-\caption{}
+\includegraphics[scale=0.40]{exp4-step4-ping-gnu63-from-gnu62.png}
+\caption{Ping do GNU62 para GNU63 sem rota para GNU64 e com redirecionamento}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp4-step7.png}
-\caption{}
+\caption{Ping do GNU63 para o router com NAT}
 \end{figure}
 
 \newpage
