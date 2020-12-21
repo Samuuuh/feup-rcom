@@ -218,24 +218,36 @@ Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a apl
 
 \subsection{Experiência 1 - Configurar uma rede IP}
 
-Nesta primeira experiência foi ligado o \emph{gnu63} ao \emph{gnu64}, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
-COLOCAR COMANDOS IFCONFIG AQUI
-Esta conexão foi testada recorrendo ao comando ping.
+Nesta primeira experiência foi ligado o GNU3 ao GNU64, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
+\begin{lstlisting}
+	# No GNU63
+	ifconfig eth0 172.16.60.1/24
 
+	# No GNU64
+	ifconfig eth0 172.16.60.254/24
+\end{lstlisting} 
+
+Esta conexão foi testada recorrendo ao comando ping, e uma vez que foi recebida resposta foi possível confirmar que a mesma estava bem configurada. 
+Através da \emph{Figura 1} é possível verificar que se obteve uma resposta do GNU64 (pacotes número 26 e 28) ao ping efetuado a partir do GNU63
+(pacotes números 25 e 27).
+
+É possível verificar também que o primeiro pacote trocado é um pacote do tipo ARP. 
 O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o endereço MAC associado
 a um dado endereço de IP. Para o envio de uma trama para um dado computador presente na rede, o emissor
 necessita do endereço MAC correspondente ao endereço IP de destino. Para isto, é enviado um pacote ARP
 em modo Broadcast, que contém esse IP e que espera o retorno do endereço MAC desejado.
-Isto pode ser observado na Figura 1, no pacote número 23 em que é enviado um pacote ARP em broadcast.
+Isto pode ser observado na \emph{Figura 1}, em que é enviado um pacote ARP em broadcast.
+Além de pacotes ARP, são trocados pacotes do tipo ICMP.
 
-Após fazermos ping do gnu63 para o gnu64, para além dos pacotes ARP são gerados pacotes ICMP(Internet Control Message Protocol), 
-o que pode ser observado na \emph{Figura 1}.
-É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do gnu63 e do gnu64, respetivamente.
+É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do GNU63 e do GNU64, respetivamente no caso das requests.
+No caso das replies, o IP e MAC da origem vai pertencer ao GNU64 e o de destino ao GNU63.
+
 A distinção entre tramas Ethernet do tipo ARP, IP ou ICMP pode ser feita analisando o cabeçalho dessa trama, que terá valores distintos conforme o tipo de trama.
-Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na figura ?, uma vez que essa informação está também presente no cabeçalho da trama.
+Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na \emph{Figura 24}, uma vez que essa informação está também presente no cabeçalho da trama.
 
-A interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
-É o método mais usado para determinar se um dispositivo está online, e está presente na figura ?.
+Por último, a interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
+É o método mais usado para determinar se um dispositivo está online. Esta interface é responsável pelos pacotes que podem
+ser observados nas \emph{Figuras 25 e 26}.
 
 
 \subsection{Experiência 2 - Implementar duas LAN virtuais num switch}
@@ -396,8 +408,7 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 \caption{Ping gnu64 from gnu63}
 \end{figure}
 
-exp2-step5-ping-gnu62-from-63
-
+\newpage
 \subsection{Experiência 2}
 \begin{figure}[h]
 	\centering
@@ -405,7 +416,6 @@ exp2-step5-ping-gnu62-from-63
 \caption{Ping gnu64 from gnu63}
 \end{figure}
 
-\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu62.png}
@@ -418,13 +428,13 @@ exp2-step5-ping-gnu62-from-63
 \caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu63}
 \end{figure}
 
+\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu64.png}
 \caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu64}
 \end{figure}
 
-\newpage
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu62.png}
@@ -476,6 +486,7 @@ exp2-step5-ping-gnu62-from-63
 \caption{Ping do gnu63 para gnu62 e capturar no eth1 do gnu64}
 \end{figure}
 
+\newpage
 \subsection{Experiência 4}
 \begin{figure}[h]
 	\centering
@@ -542,10 +553,589 @@ exp2-step5-ping-gnu62-from-63
 \caption{Taxa de transferência no gnu63}
 \end{figure}
 
+\newpage
 \section{Anexo II - Outras Imagens}
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.30]{package-length.png}
+\caption{Package Lenght}
+\end{figure}
 
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.30]{loopback.png}
+\caption{Loopback}
+\end{figure}
 
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.30]{loopback-2.png}
+\caption{Loopback}
+\end{figure}
+
+\newpage
 \section{Anexo III - Código}
+\subsubsection{utils.h}
+\begin{lstlisting}
+	struct hostent;
+
+	enum code_state {start, first_digit, second_digit, third_digit, last_line, code_received};
+	
+	enum pasv_state {pasv_start, h1, h2, h3, h4, p1, p2, pasv_end};
+	
+	int parseArguments(char* argument, char* user, char* pass, char* host, char* file_path);
+	
+	struct hostent* getIP(char *host);
+	
+	void readServerResponse(int sockfd, char *response, char *fullResponse);
+	
+	int login(int sockfd, char *user, char *pass);
+	
+	int activatePassiveMode(int sockfd);
+	
+	int download_file(int sockfd, int sockfd_client, char* file_path);
+\end{lstlisting}
+
+\subsubsection{utils.c}
+\begin{lstlisting}
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <unistd.h>
+	#include <string.h>
+	#include <errno.h> 
+	#include <netdb.h> 
+	#include <sys/types.h>
+	#include <netinet/in.h> 
+	#include <arpa/inet.h>
+	#include <ctype.h>
+	#include <libgen.h>
+	
+	#include "utils.h"
+	
+	#define BUFFER_SIZE 1024
+	
+	int parseArguments(char* argument, char* user, char* pass, char* host, char* file_path) {
+	
+	  // Parse the initial part of the argument: "ftp://"
+	  if(strncmp(argument, "ftp://", 6) != 0) {
+		fprintf(stderr,"Invalid Argument: it should start with 'ftp://'\n");
+			return -1;
+	  }
+	
+	  int i = 6, j;
+	
+	  if(strchr(argument, '@') != NULL) {   // User and pass present in input
+		// Parse the part of the argument relative to the user
+		while (argument[i] != ':') {
+		  user[i - 6] = argument[i];
+		  i++;
+		}
+		user[i - 6] = '\0';
+	
+		// Parse the part of the argument relative to the pass
+		i++;
+		j = i;
+		while (argument[j] != '@') {
+		  pass[j - i] = argument[j];
+		  j++;
+		}
+		pass[j - i] = '\0';
+		j++;
+	  }
+	  else {
+		user[0] = '\0';
+		pass[0] = '\0';
+		j = 6;
+	  }
+	
+	  // Parse the part of the argument relative to the host
+	  int k = j;
+	  while (argument[k] != '/') {
+		host[k - j] = argument[k];
+		k++;
+	  }
+	  host[k - j] = '\0';
+	
+	  // Parse the part of the argument relative to the url path
+	  k++;
+	  int l = k;
+	  while (argument[l] != '\0') {
+		file_path[l - k] = argument[l];
+		l++;
+	  }
+	  file_path[l - k] = '\0';
+	
+	  return 0;
+	}
+	
+	struct hostent* getIP(char *host) {
+		struct hostent *h;
+	
+	  /*
+	  struct hostent {
+		  char    *h_name;	Official name of the host. 
+		  char    **h_aliases;	A NULL-terminated array of alternate names for the host. 
+		  int     h_addrtype;	The type of address being returned; usually AF_INET.
+		  int     h_length;	The length of the address in bytes.
+		  char    **h_addr_list;	A zero-terminated array of network addresses for the host. 
+		  Host addresses are in Network Byte Order. 
+	  };
+	
+	  #define h_addr h_addr_list[0]	The first address in h_addr_list. 
+	  */
+	
+	  if ((h=gethostbyname(host)) == NULL) {  
+		herror("gethostbyname");
+		return NULL;
+	  }
+	
+	  return h;
+	}
+	
+	void readServerResponse(int sockfd, char *response, char *fullResponse) {
+	  enum code_state state = start;
+	  char character;
+	  int i = 0;
+	
+	  while(state != code_received) {
+		read(sockfd, &character, 1);
+	
+		fullResponse[i] = character;
+		i++;
+	
+		switch(state) {
+		  case start:
+			if (isdigit(character)) {
+			  state = first_digit;
+			  response[0] = character;
+			}
+			break;
+		  case first_digit:
+			if (isdigit(character)) {
+			  state = second_digit;
+			  response[1] = character;
+			}
+			else {
+			  state = start;
+			  memset(response,0,sizeof(response));
+			}
+			break;
+		  case second_digit:
+			if (isdigit(character)) {
+			  state = third_digit;
+			  response[2] = character;
+			}
+			else {
+			  state = start;
+			  memset(response,0,sizeof(response));
+			}
+			break;
+		  case third_digit:
+			if ((character == ' ')) {
+			  state = last_line;
+			}
+			else {
+			  state = start;
+			  memset(response,0,sizeof(response));
+			}
+			break;
+		  case last_line:
+			if ((character == '\n')) {
+			  state = code_received;
+			}
+			break;
+		}
+	  }
+	
+	  fullResponse[i] = '\0';
+	  printf("\nServer Response:\n%s\n", fullResponse);
+	}
+	
+	int login(int sockfd, char *user, char *pass) {
+	  printf(">> Sending username...\n");
+	
+	  // Send username
+		write(sockfd, "user ", 5);
+	  write(sockfd, user, strlen(user));
+	  write(sockfd, "\n", 1);
+	
+	  char response[3];
+	  char fullResponse[1024];
+	
+	  readServerResponse(sockfd, response, fullResponse);
+	
+	  while(response[0] == '4') {
+		// Resend username
+		write(sockfd, "user ", 5);
+		write(sockfd, user, strlen(user));
+		write(sockfd, "\n", 1);
+			readServerResponse(sockfd, response, fullResponse);
+	  }
+	
+	  if (response[0] == '2') {   // Password not requested - Login successful
+		return 0;
+	  }
+	
+	  if(response[0] != '3') {
+		fprintf(stderr,"Username not accepted\n");
+			return -1;
+	  }
+	
+	  printf(">> Sending password...\n");
+	
+	  // Send pass
+		write(sockfd, "pass ", 5);
+	  write(sockfd, pass, strlen(pass));
+	  write(sockfd, "\n", 1);
+	
+	  memset(response,0,sizeof(response));
+	  memset(fullResponse,0,sizeof(fullResponse));
+	  readServerResponse(sockfd, response, fullResponse);
+	
+	  while(response[0] == '4') {
+		// Resend pass
+		write(sockfd, "pass ", 5);
+		write(sockfd, pass, strlen(pass));
+		write(sockfd, "\n", 1);
+			readServerResponse(sockfd, response, fullResponse);
+	  }
+	
+	  if(strncmp(response, "230", 3) != 0) {
+		fprintf(stderr,"Password not accepted\n");
+			return -2;
+	  }
+	
+	  return 0;
+	}
+	
+	int activatePassiveMode(int sockfd) {
+	  char response[4];
+	  char fullResponse[512];
+	  char number[4];
+	  int i = 0;
+	  int pasv_numbers[6];
+	  int j = 0;
+	  int k = 0;
+	
+	  write(sockfd, "pasv\n", 5);
+	
+	  enum pasv_state state = pasv_start;
+	  char character;
+	
+	  memset(fullResponse,0,sizeof(fullResponse));
+	
+	  while(state != pasv_end) {
+		read(sockfd, &character, 1);
+		fullResponse[k] = character;
+		k++;
+	
+		switch(state) {
+		  case pasv_start:
+			if (character == '(') {
+			  state = h1;
+			  memset(number,0,sizeof(number));
+			}
+			break;
+		  case h1:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == ',') {
+			  state = h2;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			  memset(number,0,sizeof(number));
+			  i = 0;
+			  j++;
+			}
+			break;
+		  case h2:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == ',') {
+			  state = h3;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			  memset(number,0,sizeof(number));
+			  i = 0;
+			  j++;
+			}
+			break;
+		  case h3:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == ',') {
+			  state = h4;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			  memset(number,0,sizeof(number));
+			  i = 0;
+			  j++;
+			}
+			break;
+		  case h4:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == ',') {
+			  state = p1;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			  memset(number,0,sizeof(number));
+			  i = 0;
+			  j++;
+			}
+			break;
+		  case p1:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == ',') {
+			  state = p2;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			  memset(number,0,sizeof(number));
+			  i = 0;
+			  j++;
+			}
+			break;
+		  case p2:
+			if (isdigit(character)) {
+			  number[i] = character;
+			  i++;
+			}
+			else if (character == '\n') {
+			  state = pasv_end;
+			  number[3] = '\0';
+			  pasv_numbers[j] = atoi(number);
+			}
+			break;
+		}
+	  }
+	
+	  int port = pasv_numbers[4]*256 + pasv_numbers[5];
+	
+	  fullResponse[k] = '\0';
+	  printf("Server Response: \n%s\n", fullResponse);
+	
+	  return port;
+	}
+	
+	int download_file(int sockfd, int sockfd_client, char* file_path) {
+	  // Send file request
+		write(sockfd, "retr ", 5);
+	  write(sockfd, file_path, strlen(file_path));
+	  write(sockfd, "\n", 1);
+	
+	  char response[3];
+	  char fullResponse[1024];
+	
+	  readServerResponse(sockfd, response, fullResponse);
+	
+	  while(response[0] == '4') {
+		// Resend file request
+		write(sockfd, "retr ", 5);
+		write(sockfd, file_path, strlen(file_path));
+		write(sockfd, "\n", 1);
+			readServerResponse(sockfd, response, fullResponse);
+	  }
+	
+		if (strncmp(response, "150", 3) != 0) {
+			fprintf(stderr,"Couldn't open file\n");
+			return -1;
+		}
+	
+	  char* filename;
+	
+	  filename = basename(file_path);
+	
+	  FILE *file = fopen(filename, "wb+");
+	  
+	  char file_part[BUFFER_SIZE];
+	  int bytes_read, elems_written;
+	
+	  while((bytes_read = read(sockfd_client, file_part, BUFFER_SIZE)) > 0) {
+		elems_written = fwrite(file_part, bytes_read, 1, file);
+		if (elems_written != 1) {
+		  fprintf(stderr,"Error downloading file\n");
+			  return -2;
+		}
+	  }
+	
+	  fclose(file);
+	
+	  return 0;
+	}
+\end{lstlisting}
+
+\subsubsection{clientTCP.c}
+\begin{lstlisting}
+	/*      (C)2000 FEUP  */
+
+	#include <stdio.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+	#include <stdlib.h>
+	#include <unistd.h>
+	#include <signal.h>
+	#include <netdb.h>
+	#include <string.h>
+	#include <libgen.h>
+	#include <sys/time.h>
+	
+	#include "utils.h"
+	
+	#define SERVER_PORT 21
+	#define SERVER_ADDR "192.168.28.96"
+	
+	#define MAX_SIZE 256
+	
+	int main(int argc, char** argv){
+	
+		int	sockfd, sockfd_client;
+		struct	sockaddr_in server_addr;
+		struct	sockaddr_in server_addr_client;
+	
+		char user[MAX_SIZE];
+		char pass[MAX_SIZE];
+		char host[MAX_SIZE];
+		char file_path[MAX_SIZE];
+	
+		struct hostent *h;
+	
+		if (argc != 2) {
+			fprintf(stderr,"Usage: ./download ftp://[user]:[pass]@[host]/[url-path]\n");
+			exit(1);
+		}
+	
+		if (parseArguments(argv[1], user, pass, host, file_path) < 0) {
+			fprintf(stderr,"Usage: ./download ftp://[user]:[pass]@[host]/[url-path]\n");
+			exit(2);
+		}
+	
+		if (user[0] == '\0' && pass[0] == '\0') {
+			strcpy(user, "anonymous");
+			strcpy(pass, "anypass");
+		}
+	
+		printf("\n-------------------- INPUT DATA --------------------\n");
+		printf("User: %s\nPassword: %s\nHost: %s\nURL path: %s\n", user, pass, host, file_path);
+	
+		if ((h = getIP(host)) == NULL) {
+			fprintf(stderr,"Couldn't get Host IP\n");
+			exit(3);
+		}
+	
+		printf("\nHost name  : %s\n", h->h_name);
+		printf("IP Address : %s\n",inet_ntoa(*((struct in_addr *)h->h_addr)));
+		printf("----------------------------------------------------\n");
+		
+		/*server address handling*/
+		bzero((char*)&server_addr,sizeof(server_addr));
+		server_addr.sin_family = AF_INET;
+		server_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)h->h_addr)));	/*32 bit Internet address network byte ordered*/
+		server_addr.sin_port = htons(SERVER_PORT);		/*server TCP port must be network byte ordered */
+		
+		/*open an TCP socket*/
+		if ((sockfd = socket(AF_INET,SOCK_STREAM,0)) < 0) {
+			perror("socket()");
+			exit(4);
+		}
+	
+		/*connect to the server*/
+		if(connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+			perror("connect()");
+			exit(4);
+		}
+	
+		char serverResponse[3];
+		char fullResponse[1024];
+	
+		printf("\n>> Conecting to the server...\n");
+	
+		readServerResponse(sockfd, serverResponse, fullResponse);
+	
+		if (strncmp(serverResponse, "220", 3) != 0) {
+			fprintf(stderr,"Connection lost\n");
+			exit(5);
+		}
+	
+		if (login(sockfd, user, pass) < 0) {
+			fprintf(stderr,"Couldn't login\n");
+			exit(6);
+		}
+	
+		printf(">> Entering passive mode...\n\n");
+	
+		int port;
+		if ((port = activatePassiveMode(sockfd)) < 0) {
+			fprintf(stderr,"Couldn't enter passive mode\n");
+			exit(7);
+		}
+	
+		printf(">> Connecting to the client port...\n");
+	
+		/*server address handling*/
+		bzero((char*)&server_addr_client,sizeof(server_addr_client));
+		server_addr_client.sin_family = AF_INET;
+		server_addr_client.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)h->h_addr)));	/*32 bit Internet address network byte ordered*/
+		server_addr_client.sin_port = htons(port);		/*server TCP port must be network byte ordered */
+		
+		/*open an TCP socket*/
+		if ((sockfd_client = socket(AF_INET,SOCK_STREAM,0)) < 0) {
+			perror("socket()");
+			exit(4);
+		}
+	
+		/*connect to the server*/
+		if(connect(sockfd_client, (struct sockaddr *)&server_addr_client, sizeof(server_addr_client)) < 0) {
+			perror("connect()");
+			exit(4);
+		}
+	
+		printf("<< Client connection successful\n\n");
+	
+		printf(">> Starting downloading the file\n");
+	
+		struct timeval init_time;
+		struct timeval current_time;
+		gettimeofday(&init_time, 0);
+	
+		if (download_file(sockfd, sockfd_client, file_path) < 0) {
+			fprintf(stderr,"Couldn't download file\n");
+			exit(8);
+		}
+	
+		gettimeofday(&current_time, 0);
+		double elapsedTime = (current_time.tv_usec - init_time.tv_usec) / 1000.0 +
+						(current_time.tv_sec - init_time.tv_sec) * 1000.0;
+	
+		char *filename = basename(file_path);
+	
+		printf("File %s downloaded successfully in %f seconds!\n", filename, elapsedTime/1000.0);
+	
+		if (close(sockfd_client) < 0) {
+			perror("Error closing client socket");
+			exit(9);
+		}
+	
+		if (close(sockfd)) {
+			perror("Error closing server socket");
+			exit(9);
+		}
+	
+		exit(0);
+	}
+\end{lstlisting}
 
 \end{document}
 
