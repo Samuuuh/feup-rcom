@@ -16,6 +16,9 @@
 \usepackage{graphicx}
 	\graphicspath{{./images/}}
 
+\usepackage{lmodern}        % Latin Modern family of fonts
+\usepackage[T1]{fontenc} 
+
 % Listings
 \usepackage{listings}
 \lstset{language=C}
@@ -115,7 +118,7 @@
 % Title Author and Date
 \maketitle
 
-+% More information for front page
+% More information for front page
 \begin{center}
 \textbf{Projeto RCOM - 2019/20 - MIEIC}
 \Repeat{2}{\linebreak}
@@ -135,53 +138,62 @@
 %----------------------------------------------------------------------------------------
 \chapter[Introdução][Introdução]{Introdução} \label{\thechapter}
 
-Este trabalho consiste no desenvolvimento de uma aplicação de download via ftp e na criação de uma rede. O trabalho está portanto, dividido em duas partes distintas:
+Este trabalho consiste no desenvolvimento de uma aplicação de download via ftp e na criação de uma rede. 
+O trabalho está portanto, dividido em duas partes distintas:
 
-- Parte 1 - Aplicação de download
-- Parte 2 - Configuração de uma rede
+- Parte 1 - Aplicação de download FTP
+- Parte 2 - Configuração e estudo de uma rede
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2 - Parte 1 - Aplicação de download
 %----------------------------------------------------------------------------------------
-\chapter[Aplicacao][Aplicacao]{Aplicacao} \label{\thechapter}
+\chapter[Aplicação de download FTP][Aplicação de download FTP]{Aplicação de download FTP} \label{\thechapter}
 
 A primeira parte deste segundo projeto consiste no desenvolvimento de uma aplicação de download,
 que permite transferir um ficheiro de qualquer tipo, de um dado servidor FTP. Após compilar o código
 recorrendo ao comando "make", o utilizador deve escrever na consola o seguinte comando, para correr o programa:
 
-./download ftp://[user]:[pass]@[host]/[url-path]
+./download ftp://[\textless user\textgreater :\textless password\textgreater @]\textless host\textgreater/\textless url-path\textgreater{}
 
-O campo [user] deverá conter o username com que o utilizador deseja entrar no servidor, e [pass] a respetiva password.
-No caso de desejar entrar de forma anónima, o utilizador deverá introduzir o username "anonymous" e uma qualquer password.
-O utilizador pode também entrar em modo anónimo ao omitir os campos do user e da pass, ficando o input na forma ftp://[host]/[url-path].
+O campo \textless user\textgreater{} deverá conter o username com que o utilizador deseja entrar no servidor, e \textless password\textgreater{} a respetiva password.
+No caso de desejar entrar de forma anónima, o utilizador pode introduzir o username "anonymous" e qualquer password ou
+pode omitir os campos do \textless user\textgreater :\textless password\textgreater{}, ficando o input na forma:
+
+./download ftp://\textless host\textgreater /\textless url-path\textgreater{}
+
 O campo [host] indicará o endereço do servidor FTP ao qual se deseja conectar, e [url-path] o caminho para o ficheiro que se pretende transferir.
 
-- Arquitetura
+\section{Arquitetura}
 
 A estrutura principal do programa encontra-se bem explícita no ficheiro clientTCP.c.
 O programa começa por processar o argumento introduzido pelo utilizador, armazenando o seu username,
-pass, o host, e o path para o ficheiro, recorrendo à função parseArguments(), definida no ficheiro utils.c.
+password, o host, e o path para o ficheiro, recorrendo à função parseArguments() que se encontra definida no ficheiro utils.c.
 Se o input recebido for inválido, o programa termina e é apresentada uma mensagem indicando a correta utilização do programa.
 
-De seguida, é processado o campo host, obtendo-se o correspondente IP Adress, com recurso à função getIP().
-Este IP Adress é utilizado logo a seguir, na conexão ao servidor, após criação de um socket que será utilizado
+De seguida, é processado o campo host, obtendo-se o endereço IP correspondente, com recurso à função getIP().
+Este endereço IP é utilizado logo na conexão ao servidor, após criação de um socket que será utilizado
 para troca de comandos entre o cliente e o servidor.
 
-Após conectar este socket ao servidor desejado, é lida a resposta do servidor, a qual se espera que contenha o código 220,
+Após conectar este socket ao servidor desejado, é lida a resposta do servidor a qual se espera que contenha o código 220,
 que indica que a conexão foi estabelecida e que o servidor espera pelo login de um novo utilizador. 
 
 Assim, o próximo passo será efetuar o login (função login()), que consiste numa troca de mensagens entre o cliente e o servidor,
 estabelecida da seguinte forma:
 
-  - Envio do comando "user [user] newline", em que [user] é o username recebido como input
-  - Receção da resposta ao comando user. Se o primeiro dígito do código recebido for 2, então não é requerida password, e o login é efetuado com sucesso. Se esse dígito for 3, então é necessária uma password, e os próximos passos são efetuados.
-  - Envio do comando "pass [pass] newline", em que [pass] é a password recebida como input
-  - Receção da resposta ao comando pass. Se o código recebido for 230, então a password foi aceite e o login foi efetuado com sucesso. Caso contrário, o programa termina acusando erro no login.
+\begin{itemize}
+  \item Envio do comando "user [user] newline", em que [user] é o username recebido como input
+  \item Receção da resposta ao comando user. Se o primeiro dígito do código recebido for 2, então não é requerida password, e o login é efetuado com sucesso. Se esse dígito for 3, então é necessária uma password, e os próximos passos são efetuados.
+  \item Envio do comando "pass [pass] newline", em que [pass] é a password recebida como input
+  \item Receção da resposta ao comando pass. Se o código recebido for 230, então a password foi aceite e o login foi efetuado com sucesso. Caso contrário, o programa termina acusando erro no login.
+\end{itemize}
 
-Após sucesso no login, é necessário pedir ao servidor para transferir dados em modo passivo. Isto é efetuado na função activatePassiveMode(), que começa por enviar o comando "pasv newline" para o servidor.
-Segue-se uma máquina de estados, que vai receber a resposta do servidor a este comando, e que vai armazenar os valores retornados, utilizando-os para calcular a porta para a qual serão enviados os dados. 
+Após sucesso no login, é necessário pedir ao servidor para transferir dados em modo passivo. Isto é efetuado na função activatePassiveMode(), que começa por enviar o comando 
+pasv newline para o servidor.
+Segue-se uma máquina de estados, que vai receber a resposta do servidor a este comando, e que vai armazenar os valores retornados, 
+utilizando-os para calcular a porta para a qual serão enviados os dados. 
 
-Após isto, é efetuada a criação de um novo socket e a sua conexão ao servidor, pela porta resultante do passo anterior, de onde serão lidos os dados do ficheiro.
+Após isto, é efetuada a criação de um novo socket e a sua conexão ao servidor, 
+pela porta resultante do passo anterior, de onde serão lidos os dados do ficheiro.
 
 Já com tudo configurado, é efetuada a transferência do ficheiro, na função download\textunderscore file(), que começa por mandar
 o comando "retr [path] newline" para pedir o ficheiro desejado. Segue-se a leitura da resposta do servidor face a este comando,
@@ -192,19 +204,19 @@ que indica que o ficheiro foi transferido.
 
 Por último, o programa fecha os dois sockets abertos.
 
-- Resultados
+\section{Resultados}
 
 O nosso programa foi testado para diversos casos, nomeadamente a utilização de diferentes servidores FTP,
-diferentes logins (introdução de username e password e entrada em modo anónimo), e utilização de diferentes tipos e tamanhos, nos ficheiros transferidos.
+diferentes logins (introdução de username e password e entrada em modo anónimo), e a utilização de diferentes tipos e tamanhos, nos ficheiros transferidos.
 Para maior compreensão do processo, são imprimidos na consola todos os passos efetuados, assim como as respetivas respostas do servidor.
-Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a aplicação encontra-se totalmente funcional.
+Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a aplicação encontra-se totalmente funcional e de acordo com o especificado.
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 3 - Parte 2 - Experiencias de rede
 %----------------------------------------------------------------------------------------
-\chapter[Rede][Rede]{Rede} \label{\thechapter}
+\chapter[Configuração e estudo de uma rede][Configuração e estudo de uma rede]{Configuração e estudo de uma rede} \label{\thechapter}
 
-\section{Experiência 1 - Configurar uma rede IP}
+\subsection{Experiência 1 - Configurar uma rede IP}
 
 Nesta primeira experiência foi ligado o \emph{gnu63} ao \emph{gnu64}, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
 COLOCAR COMANDOS IFCONFIG AQUI
@@ -226,7 +238,7 @@ A interface loopback é responsável por realizar o diagnóstico de problemas e 
 É o método mais usado para determinar se um dispositivo está online, e está presente na figura ?.
 
 
-\section{Experiência 2 - Implementar duas LAN virtuais num switch}
+\subsection{Experiência 2 - Implementar duas LAN virtuais num switch}
 
 Nesta experiência, foram criadas duas LANs virtuais, estando os computadores gnu63 e gnu64 conectados à VLAN 60 e o gnu62 conectado à VLAN 61.
 O gnu62 uma vez que se encontra numa rede diferente do gnu63 e gnu64 não consegue comunicar com os mesmos.
@@ -259,7 +271,7 @@ Da mesma forma, quando é feito ping em modo de broadcast a partir do gnu62, que
 nas figuras 7 e 8, uma vez que estes dois se encontram numa rede diferente.
 
 
-\section{Experiência 3 - Configurar Router em Linux}
+\subsection{Experiência 3 - Configurar Router em Linux}
 
 Nesta experiência, o gnu64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
 
@@ -285,58 +297,43 @@ Os pacotes ICMP observados resultam do comando ping, e tratam-se de pacotes de r
 No caso de não conseguirem comunicar entre si, seriam enviados pacotes ICMP do tipo Host Unreachable.
 Os endereços IP e MAC dos pacotes ICMP são os dos PCs de origem e destino.
 
-\section{Experiência 4 - Configurar um Router comercial e implementar NAT}
+\subsection{Experiência 4 - Configurar um Router comercial e implementar NAT}
 
 O principal objetivo desta experiência consiste na configuração do router com NAT.
-O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público, dado que os IPs públicos são limitados e escassos.
-Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública, ao traduzir estes endereços em endereços legais. 
-Desta forma, apenas um endereço IP é exigido, que irá representar todos os computadores da rede local.
+
+Para a configuração, foi necessário ligar a entrada FE0 do router ao switch.
+A porta a que o router se encontra ligado ao switch tem de pertencer à VLAN61 e tal pode ser efetuado como foi
+mencionado no experiência 2, adicionando a porta à respetiva VLAN. Após o router estar ligado à VLAN61, 
+é necessário ligar a entrada FE1 do router à primeira entrada da régua 1 (6.1) que irá permitir a ligação à internet.
+
+Foi necessário adicionar rotas estáticas para permitir que a conexão com a internet, quer a conexão com a VLAN60.
+Os comandos que permitem a criação destas rotas estáticas são os seguintes:
+
+\begin{lstlisting} 
+ip route 0.0.0.0 0.0.0.0 172.16.2.254
+ip route 172.16.60.0 255.255.255.0 172.16.61.253
+\end{lstlisting} 
+
+Posteriormente foi pedido para ser retirado o redirecionamento ICMP no GNU62 e a remover a rota para o GNU64.
+Ao ser feito o ping para o GNU63, os pacotes enviados são direcionados para a rota default do router, sendo posteriormente enviadas para o GNU64 e a partir deste
+chega ao GNU63. Após adicionar novamente a rota é possível observar que os pacotes vão diretamente para o GNU64 e após esse seguem para o GNU63. Tal
+permite concluir que os pacotes enviados durante esta seguem uma dada rota, no caso de esta já estar definida.
+Caso contrário, estes são direcionados para a rota default do router.
+
+Foi efetuada uma última experiência que consistia em voltar a ativar o redirecionamento ICMP e remover a rota para o GNU64. Neste caso é possível observar como
+mostra a figura ?, que o router envia pacotes para o GNU62 ICMP Redirect, o que permite a este computador estabelecer a ligação com o GNU64.
+
+Para a configuração do NAT foi necessária a configuração da interface interna e externa do router, assim como criar uma lista de acessos, sendo este o motivo
+do GNU64 não conseguir ter acesso à internet.
+
+O NAT (Network Address Translation) tem como objetivo poupar espaço de endereçamento público.
+Resumidamente, permite que as redes privadas que usam endereços IPs não registados se conetem à Internet ou a uma rede pública,
+a partir de um único endereço público. 
+Desta forma, apenas um endereço IP é exigido e este irá representar todos os computadores da rede local.
  
-Para a configuração, foi necessário ligar a entrada FE0 do router ao switch. A porta a que o router se encontra ligado ao switch tem de pertencer à vlan 61 e tal pode ser efetuado como foi
-mencionado no experiência 2. Após o router estar ligado à VLAN 61, é necessário ligar a entrada FE1 do router à primeira entrada da régua 1 (6.1) que irá permitir a ligação à internet.
-Posteriormente é necessário configurar a interface interna e externa do router. Para configurar a interface interna foram executados os seguintes comandos:
+Após a configuração do NAT foi possível a comunicação com o router como é possível verificar na figura ?.
 
-\begin{lstlisting}
-	conf t 
-	interface fastethernet 0/0
-	ip address 172.16.61.254 255.255.255.0 
-	no shutdown 
-	ip nat inside 
-	exit 
-\end{lstlisting} 
-
-Após a interface interna estar corretamente configurada, foi necessário configurar a interface externa.
-
-\begin{lstlisting}
-	interface fastethernet 0/1
-	ip address 172.16.2.69 255.255.255.0 
-	no shutdown 
-	ip nat outside 
-	exit 
-\end{lstlisting} 
-
-\begin{lstlisting}
-	ip nat pool ovrld 172.16.2.y9 172.16.2.y9 prefix 24 
-	ip nat inside source list 1 pool ovrld overload 
-\end{lstlisting}
-
-Posteriormente foi criada uma lista de acessos. Neste caso, apenas o gnu64 não terá acesso à Internet, por não se encontrar na lista de IPs acessíveis do router.
-
-\begin{lstlisting}
-	acesslist 1 permit 172.16.40.0 0.0.0.255
-	acesslist 1 permit 172.16.41.0 0.0.0.255
-\end{lstlisting}
-
-Finalmente foram adicionadas as rotas para o router
-\begin{lstlisting}
-	ip route 0.0.0.0 0.0.0.0 172.16.2.254 
-	ip route 172.16.y0.0 255.255.255.0 172.16.61.253
-\end{lstlisting}
-
-Os pacotes enviados durante esta experiência seguem uma dada rota, no caso de esta já estar definida. Caso contrário, estes são direcionados para a rota default do router,
-que indica que o gnu64 existe, e portanto os pacotes serão enviados para este.
-
-\section{Experiência 5 - DNS}			
+\subsection{Experiência 5 - DNS}			
 
 Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à
  Internet ou a uma rede privada.
@@ -349,7 +346,7 @@ Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedi
 devolverá o endereço IP correspondente.
 Esta troca de pacotes pode ser observada na figura 14.
 
-\section{Experiência 6 - TCP connections}
+\subsection{Experiência 6 - TCP connections}
 
 Esta experiência serviu para observação do comportamento do protocolo TCP, 
 recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
@@ -390,7 +387,7 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 %----------------------------------------------------------------------------------------
 \chapter[Anexos][Anexos]{Anexos} \label{\thechapter}
 
-\section{Anexo I - Imagens}
+\section{Anexo I - Imagens de experiências}
 \subsection{Experiência 1}
 
 \begin{figure}[h]
@@ -480,7 +477,29 @@ exp2-step5-ping-gnu62-from-63
 \end{figure}
 
 \subsection{Experiência 4}
-FALTA A EXP 4
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.40]{exp4-step3-ping-gnu64-from-gnu63.png}
+\caption{}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp4-step3-ping-ROUTER-from-gnu63.png}
+\caption{}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp4-step4-ping-gnu63-from-gnu62.png}
+\caption{}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.55]{exp4-step7.png}
+\caption{}
+\end{figure}
 
 \newpage
 \subsection{Experiência 5}
@@ -522,6 +541,11 @@ FALTA A EXP 4
 \includegraphics[scale=0.30]{exp6-step5-gnu63-graph.png}
 \caption{Taxa de transferência no gnu63}
 \end{figure}
+
+\section{Anexo II - Outras Imagens}
+
+
+\section{Anexo III - Código}
 
 \end{document}
 
