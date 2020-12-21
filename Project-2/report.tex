@@ -183,7 +183,7 @@ estabelecida da seguinte forma:
 \begin{itemize}
   \item Envio do comando "user [user] newline", em que [user] é o username recebido como input
   \item Receção da resposta ao comando user. Se o primeiro dígito do código recebido for 2, então não é requerida password, e o login é efetuado com sucesso. Se esse dígito for 3, então é necessária uma password, e os próximos passos são efetuados.
-  \item Envio do comando "pass [pass] newline", em que [pass] é a password recebida como input
+  \item Envio do comando "pass [password] newline", em que [password] é a password recebida como input
   \item Receção da resposta ao comando pass. Se o código recebido for 230, então a password foi aceite e o login foi efetuado com sucesso. Caso contrário, o programa termina acusando erro no login.
 \end{itemize}
 
@@ -229,7 +229,7 @@ Nesta primeira experiência foi ligado o GNU3 ao GNU64, recorrendo à configura�
 \end{lstlisting} 
 
 Esta conexão foi testada recorrendo ao comando ping, e uma vez que foi recebida resposta foi possível confirmar que a mesma estava bem configurada. 
-Através da \textbf{Figura 1} é possível verificar que se obteve uma resposta do GNU64 (pacotes número 26 e 28) ao ping efetuado a partir do GNU63
+Através da \textbf{figura 1} é possível verificar que se obteve uma resposta do GNU64 (pacotes número 26 e 28) ao ping efetuado a partir do GNU63
 (pacotes números 25 e 27).
 
 É possível verificar também que o primeiro pacote trocado é um pacote do tipo ARP. 
@@ -237,18 +237,18 @@ O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o ender
 a um dado endereço de IP. Para o envio de uma trama para um dado computador presente na rede, o emissor
 necessita do endereço MAC correspondente ao endereço IP de destino. Para isto, é enviado um pacote ARP
 em modo Broadcast, que contém esse IP e que espera o retorno do endereço MAC desejado.
-Isto pode ser observado na \textbf{Figura 1}, em que é enviado um pacote ARP em broadcast.
+Isto pode ser observado na \textbf{figura 1}, em que é enviado um pacote ARP em broadcast.
 Além de pacotes ARP, são trocados pacotes do tipo ICMP.
 
 É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do GNU63 e do GNU64, respetivamente no caso das requests.
 No caso das replies, o IP e MAC da origem vai pertencer ao GNU64 e o de destino ao GNU63.
 
 A distinção entre tramas Ethernet do tipo ARP, IP ou ICMP pode ser feita analisando o cabeçalho dessa trama, que terá valores distintos conforme o tipo de trama.
-Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na \textbf{Figura 24}, uma vez que essa informação está também presente no cabeçalho da trama.
+Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na \textbf{figura 24}, uma vez que essa informação está também presente no cabeçalho da trama.
 
 Por último, a interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
 É o método mais usado para determinar se um dispositivo está online. Esta interface é responsável pelos pacotes que podem
-ser observados nas \textbf{Figuras 25 e 26}.
+ser observados nas \textbf{figuras 25 e 26}.
 
 
 \subsection{Experiência 2 - Implementar duas LAN virtuais num switch}
@@ -282,9 +282,9 @@ passam a existir dois domínios de transmissão, sendo que um deles contém o GN
 
 Deste modo, quando é feito ping em modo de broadcast a partir do GNU63, o GNU64 como se encontra na mesma VLAN e portanto no mesmo domínio de transmissão
 irá conseguir 
-receber esses pacotes como é possível constatar com as \textbf{Figuras 4 e 5}, enquanto que o GNU62 não recebe qualquer pacote uma vez que se encontra noutra VLAN.
+receber esses pacotes como é possível constatar com as \textbf{figuras 4 e 5}, enquanto que o GNU62 não recebe qualquer pacote uma vez que se encontra noutra VLAN.
 Da mesma forma, quando é feito ping em modo de broadcast a partir do GNU62, quer o GNU63 e GNU64 não irão receber qualquer pacote, como se pode verificar
-nas \textbf{Figuras 7 e 8}, uma vez que estes dois se encontram num domínio de transmissão diferente.
+nas \textbf{figuras 7 e 8}, uma vez que estes dois se encontram num domínio de transmissão diferente.
 
 
 \subsection{Experiência 3 - Configurar Router em Linux}
@@ -294,12 +294,12 @@ Nesta experiência, o GNU64 foi configurado de modo a funcionar como um router, 
 Para isto, configurou-se a porta ETH1 do GNU64 com um IP no mesmo domínio que o GNU62. Depois, foi necessário configurar as rotas com o comando <route add>. 
 No GNU63 adicionou-se a rota que redireciona os pacotes que têm como destino a VLAN61 para o GNU64, 
 e o mesmo foi realizado para o GNU62, em que os pacotes que têm como destino a VLAN60 são redirecionados para o GNU64.
-Isto pode ser verificado na \textbf{Figura 11} quando a partir do GNU63 foi efetuado o comando para dar ping no GNU62 este obteve resposta, 
+Isto pode ser verificado na \textbf{figura 11} quando a partir do GNU63 foi efetuado o comando para dar ping no GNU62 este obteve resposta, 
 indicando que os computadores conseguem comunicar entre si.
 
-É também possível verificar a forma como o GNU64 opera através da análise das \textbf{Figuras 12 e 13}. Na \textbf{Figura 12} é possível observar o tráfego de 
+É também possível verificar a forma como o GNU64 opera através da análise das \textbf{figuras 12 e 13}. Na \textbf{figura 12} é possível observar o tráfego de 
 pacotes através da ETH0, 
-que corresponde à VLAN60, enquando que na \textbf{Figura 13} é possível observar relativamente aos pacotes que são trocados na ETH1, correspondente à VLAN61. 
+que corresponde à VLAN60, enquando que na \textbf{figura 13} é possível observar relativamente aos pacotes que são trocados na ETH1, correspondente à VLAN61. 
 Os pacotes recebidos a partir da
 ETH0 correspondente à VLAN60 provêm do endereço 172.16.60.1 e têm o destino de 172.16.61.1 são reencaminhados para a ETH1 correspondente à VLAN61
 Podemos também realçar que o primeiro pacote trocado é do tipo ARP, uma vez que antes da captura destes logs foram eliminadas as tabelas ARP dos três gnu e estes pacotes são necessários
@@ -339,7 +339,7 @@ ip route 172.16.60.0 255.255.255.0 172.16.61.253
 
 Posteriormente foi pedido para ser retirado o redirecionamento ICMP no GNU62 e a remover a rota para o GNU64.
 Ao ser feito o ping para o GNU63, os pacotes enviados são direcionados para a rota default do router, sendo posteriormente enviadas para o GNU64 e a partir deste
-chega ao GNU63. Neste caso é possível observar como mostra a \textbf{Figura ?} que o router vai redirecionar os pacotes que chegam até ele. 
+chega ao GNU63. Neste caso é possível observar como mostra a \textbf{figura 14} que o router vai redirecionar os pacotes que chegam até ele. 
 
 Após adicionar novamente a rota é possível observar que os pacotes vão diretamente para o GNU64 e após esse seguem para o GNU63. 
 Tal permite concluir que os pacotes enviados durante esta seguem uma dada rota, no caso de esta já estar definida. 
@@ -347,12 +347,13 @@ Caso contrário, estes são direcionados para a rota default do router.
 
 Foi efetuada uma última experiência que consistia em voltar a ativar o redirecionamento ICMP e remover a rota para o GNU64. 
 Ao ser efetuado o comando de ping do GNU62 para o GNU63, o router envia apenas um pacote para o ICMP Redirect. Como o redirecionamento está ativo, o
-GNU62 guarda a rota na tabela de reencaminhamento o que permite a este computador estabelecer a ligação com o GNU64. Nesta situação apenas foi observado um 
-pacote do ICMP Redirect, enquanto que na situação acima era recebido um por cada ping.
+GNU62 guarda a rota na tabela de reencaminhamento o que permite a este computador estabelecer a ligação com o GNU64. Nesta situação foi observado apenas um 
+pacote do ICMP Redirect ao contrário do que acontecia anteriormente como mostra a \textbf{figura 14} em que a cada ping era recebido um ICMP Redirect.
 
-Após estas experiências, quando foi efetuado ping no router a partir do GNU63 verificamos que não foi obtida resposta pelo que tivemos de implementar o NAT (Network Address Translation). 
+Após estas experiências, quando foi efetuado ping no router a partir do GNU63 verificamos que não foi obtida qualquer resposta pelo que tivemos de 
+implementar o NAT (Network Address Translation). 
 Para a configuração do NAT foi necessária a configuração da interface interna e externa do router, assim como criar uma lista de acessos, sendo este o motivo
-do GNU64 não conseguir ter acesso à internet. Os comandos a serem executados no router podem ser vistos no slide 46 do guião deste trabalho laboratorial.
+do GNU64 não conseguir ter acesso à internet. Os comandos a serem executados no router podem ser vistos nos anexos deste relatório.
 
 O NAT é uma técnica que consiste em reescrever através da utilização de uma tabela hash, 
 os endereços IP que utilizam o router de forma a que
@@ -361,12 +362,12 @@ Resumidamente, permite que as redes privadas que usam endereços IPs não regist
 a partir de um único endereço público. 
 Desta forma, apenas um endereço IP é exigido e este irá representar todos os computadores da rede local.
  
-Após a configuração do NAT foi possível a comunicação com o router como é possível verificar na \textbf{Figura ?}.
+Após a configuração do NAT foi possível a comunicação com o router como é possível verificar na \textbf{figura 16}.
 
 \subsection{Experiência 5 - DNS}			
 
 Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão 
-de nomes para computadores, serviços ou qualquer máquina conectada à
+de nomes para computadores, serviços ou qualquer equipamento conectado à
  Internet ou a uma rede privada.
 Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, 
 recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
@@ -377,14 +378,14 @@ adicionando o nome do servidor de DNS e o seu endereço IP, de acordo com o slid
 Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor.
 A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, 
 devolverá o endereço IP correspondente.
-Esta troca de pacotes pode ser observada na \textbf{Figura 14}.
+Esta troca de pacotes pode ser observada na \textbf{figura 17}.
 
 \subsection{Experiência 6 - TCP connections}
 
 Esta experiência serviu para observação do comportamento do protocolo TCP, 
 recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
 
-Através da análise das \textbf{Figura 15 e 16} é possível verificar que a aplicação estabelece duas conexões TCP - 
+Através da análise das \textbf{figura 18} é possível verificar que a aplicação estabelece duas conexões TCP - 
 uma para troca de comandos entre o cliente e o servidor FTP, 
 que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
 Cada conexão FTP subdivide-se em três fases: o estabelecimento da conexão, a troca de dados entre o cliente e servidor, e o encerramento da conexão.
@@ -399,7 +400,7 @@ A conexão TCP é composta por diversas variáveis, sendo uma delas a janela de 
 
 Foi realizada uma segunda experiência em que a meio de uma transferência de um ficheiro no GNU63, 
 era iniciada uma transferência a partir do GNU62. Os gráficos das taxas de transferência
-obtidos podem ser visualizados nas \textbf{Figuras 18 e 19}, em que a primeira corresponde à transferência no GNU62 e a segunda à transferência no GNU63.
+obtidos podem ser visualizados nas \textbf{figuras 21 e 22}, em que a primeira corresponde à transferência no GNU62 e a segunda à transferência no GNU63.
 Os gráficos obtidos durante a experiência permitem concluir que no início do primeiro download no GNU63, a taxa de transferência aumentou até atingir um máximo. 
 Quando o segundo download no gnu62 foi iniciado, verificou-se que à medida que a taxa de transferência aumentava no GNU62, ocorria uma igual diminuição no GNU63. 
 Quando a transferência no GNU63
@@ -433,52 +434,54 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp1-gnu63.png}
+\includegraphics[scale=0.45]{exp1-gnu63.png}
 \caption{Ping gnu64 from gnu63}
 \end{figure}
 
-\newpage
 \subsection{Experiência 2}
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp2-step5-ping-gnu64-from-gnu63.png}
+\includegraphics[scale=0.45]{exp2-step5-ping-gnu64-from-gnu63.png}
 \caption{Ping gnu64 from gnu63}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu62.png}
-\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu62}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu63.png}
-\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu63}
 \end{figure}
 
 \newpage
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp2-step8-broadcast-gnu63-from-gnu64.png}
+\includegraphics[scale=0.50]{exp2-step8-broadcast-gnu63-from-gnu62.png}
+\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu62}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.45]{exp2-step8-broadcast-gnu63-from-gnu63.png}
+\caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu63}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.45]{exp2-step8-broadcast-gnu63-from-gnu64.png}
 \caption{Ping broadcast a partir do gnu63 (ping –b 172.16.60.255) capturado no gnu64}
 \end{figure}
 
+\newpage
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu62.png}
+\includegraphics[scale=0.45]{exp2-step10-broadcast-gnu62-from-gnu62.png}
 \caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu62}
 \end{figure}
 
+
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu63.png}
+\includegraphics[scale=0.45]{exp2-step10-broadcast-gnu62-from-gnu63.png}
 \caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu63}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp2-step10-broadcast-gnu62-from-gnu64.png}
+\includegraphics[scale=0.45]{exp2-step10-broadcast-gnu62-from-gnu64.png}
 \caption{Ping broadcast a partir do gnu62 (ping –b 172.16.61.255) capturado no gnu64}
 \end{figure}
 
@@ -505,7 +508,7 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 \newpage
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp3-step10-ping-gnu62-from-gnu63-eth0.png}
+\includegraphics[scale=0.60]{exp3-step10-ping-gnu62-from-gnu63-eth0.png}
 \caption{Ping do gnu63 para gnu62 e capturar no eth0 do gnu64}
 \end{figure}
 
@@ -525,48 +528,53 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp4-step7.png}
+\includegraphics[scale=0.50]{exp4-traceroute.png}
+\caption{Traceroute}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.43]{exp4-step7.png}
 \caption{Ping do GNU63 para o router com NAT}
 \end{figure}
 
-\newpage
 \subsection{Experiência 5}
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp5-step3.png}
+\includegraphics[scale=0.40]{exp5-step3.png}
 \caption{Ping 8.8.8.8}
 \end{figure}
 
-
+\newpage
 \subsection{Experiência 6}
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp6-step3-part1.png}
+\includegraphics[scale=0.37]{exp6-step3-part1.png}
 \caption{FTP download - Part 1}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp6-step3-part2.png}
+\includegraphics[scale=0.37]{exp6-step3-part2.png}
 \caption{FTP download - Part 2}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+\includegraphics[scale=0.37]{exp6-step5-error.png}
+\caption{DUP ACK durante a transferência}
 \end{figure}
 
 \newpage
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.55]{exp6-step5-error.png}
-\caption{DUP ACK durante a transferência}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-\includegraphics[scale=0.30]{exp6-step5-gnu62-graph.png}
+\includegraphics[scale=0.35]{exp6-step5-gnu62-graph.png}
 \caption{Taxa de transferência no gnu62}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.30]{exp6-step5-gnu63-graph.png}
+\includegraphics[scale=0.35]{exp6-step5-gnu63-graph.png}
 \caption{Taxa de transferência no gnu63}
 \end{figure}
 
@@ -581,14 +589,45 @@ Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos
 \begin{figure}[h]
 	\centering
 \includegraphics[scale=0.30]{loopback.png}
-\caption{Loopback}
+\caption{LOOP}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-\includegraphics[scale=0.30]{loopback-2.png}
-\caption{Loopback}
+\includegraphics[scale=0.45]{loopback-2.png}
+\caption{LOOP}
 \end{figure}
+
+\newpage
+\subsection{Configuração do NAT}
+\begin{lstlisting}
+	# Configurar a interface interna do router
+	conf t 
+	interface fastethernet 0/0
+	ip address 172.16.y1.254 255.255.255.0 
+	no shutdown 
+	ip nat inside 
+	exit 
+	
+	# Configurar a interface externa do router
+	interface fastethernet 0/1
+	ip address 172.16.2.y9 255.255.255.0 
+	no shutdown 
+	ip nat outside 
+	exit 
+	
+	# NAT
+	ip nat pool ovrld 172.16.2.y9 172.16.2.y9 prefix 24 
+	ip nat inside source list 1 pool ovrld overload 
+	
+	# Lista de acesso
+	access-list 1 permit 172.16.y0.0 0.0.0.7 
+	access-list 1 permit 172.16.y1.0 0.0.0.7 
+	
+	# Rotas
+	ip route 0.0.0.0 0.0.0.0 172.16.2.254 
+	ip route 172.16.y0.0 255.255.255.0 172.16.y1.253 
+\end{lstlisting}
 
 \newpage
 \section{Anexo III - Código}
