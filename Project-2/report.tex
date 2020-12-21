@@ -228,7 +228,7 @@ Nesta primeira experiência foi ligado o GNU3 ao GNU64, recorrendo à configura�
 \end{lstlisting} 
 
 Esta conexão foi testada recorrendo ao comando ping, e uma vez que foi recebida resposta foi possível confirmar que a mesma estava bem configurada. 
-Através da \emph{Figura 1} é possível verificar que se obteve uma resposta do GNU64 (pacotes número 26 e 28) ao ping efetuado a partir do GNU63
+Através da \textbf{Figura 1} é possível verificar que se obteve uma resposta do GNU64 (pacotes número 26 e 28) ao ping efetuado a partir do GNU63
 (pacotes números 25 e 27).
 
 É possível verificar também que o primeiro pacote trocado é um pacote do tipo ARP. 
@@ -236,76 +236,86 @@ O ARP (Address Resolution Protocol) é um protocolo utilizado para obter o ender
 a um dado endereço de IP. Para o envio de uma trama para um dado computador presente na rede, o emissor
 necessita do endereço MAC correspondente ao endereço IP de destino. Para isto, é enviado um pacote ARP
 em modo Broadcast, que contém esse IP e que espera o retorno do endereço MAC desejado.
-Isto pode ser observado na \emph{Figura 1}, em que é enviado um pacote ARP em broadcast.
+Isto pode ser observado na \textbf{Figura 1}, em que é enviado um pacote ARP em broadcast.
 Além de pacotes ARP, são trocados pacotes do tipo ICMP.
 
 É também possível verificar que os IPs de origem e destino dos pacotes ping são os IPs e MACs do GNU63 e do GNU64, respetivamente no caso das requests.
 No caso das replies, o IP e MAC da origem vai pertencer ao GNU64 e o de destino ao GNU63.
 
 A distinção entre tramas Ethernet do tipo ARP, IP ou ICMP pode ser feita analisando o cabeçalho dessa trama, que terá valores distintos conforme o tipo de trama.
-Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na \emph{Figura 24}, uma vez que essa informação está também presente no cabeçalho da trama.
+Por sua vez, o comprimento das tramas pode ser obtido no wireshark, como consta na \textbf{Figura 24}, uma vez que essa informação está também presente no cabeçalho da trama.
 
 Por último, a interface loopback é responsável por realizar o diagnóstico de problemas e testes de conectividade.
 É o método mais usado para determinar se um dispositivo está online. Esta interface é responsável pelos pacotes que podem
-ser observados nas \emph{Figuras 25 e 26}.
+ser observados nas \textbf{Figuras 25 e 26}.
 
 
 \subsection{Experiência 2 - Implementar duas LAN virtuais num switch}
 
-Nesta experiência, foram criadas duas LANs virtuais, estando os computadores gnu63 e gnu64 conectados à VLAN 60 e o gnu62 conectado à VLAN 61.
-O gnu62 uma vez que se encontra numa rede diferente do gnu63 e gnu64 não consegue comunicar com os mesmos.
+Nesta experiência, foram criadas duas LANs virtuais, ficando o GNU63 e o GNU64 conectados à VLAN60 e o GNU62 conectado à VLAN61.
+O GNU62 uma vez que se vai encontrar numa rede diferente do GNU63 e GNU64 não consegue comunicar com os mesmos.
 
-Para criar as VLANs, tivemos de configurar o switch adicionando-as usando o seguinte comando:
 
+Para configurar esta rede foi necessário ligar o GNU62 ao switch e posteriormente foi necessário criar as VLANs e atribuir as respetivas portas.
+As VLANs foram criadas através do switch sendo utilizado o seguinte comando:
 \begin{lstlisting}
 	conf t
-	vlan 60
+	vlan <y>
 	end
 \end{lstlisting} 
-Neste caso, está a ser criada a vlan 60. 
-Seguiu-se a configuração das vlans, onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo ao seguinte comandos:
+Em que \textless y \textgreater{} representa o número da VLAN.
 
+Seguiu-se a configuração das VLANs, onde foi necessário adicionar as portas do switch às respetivas VLANs, recorrendo ao seguinte comandos:
 \begin{lstlisting}
 	conf t
-	interface fastethernet 0/n
+	interface fastethernet 0/<n>
 	switchport mode access
-	switchport por access vlan 60
+	switchport por access vlan <y>
 	end
 \end{lstlisting} 
+Nesta caso está a ser adicionada a porta \textless n\textgreater{} do switch à vlan\textless y\textgreater{}. No nosso caso, o valor de y foi 60 e 61, 
+como mencionado previamente.
 
-Nesta caso está a ser adicionada a porta \emph{n} do switch à vlan 60. 
 Após adicionar as duas VLAN e adicionar respetivas portas a cada uma, 
-passam a existir dois domínios de transmissão, sendo que um contém o gnu63 e gnu64 e o outro contém gnu62.
+passam a existir dois domínios de transmissão, sendo que um deles contém o GNU63 e GNU64 e o outro contém o GNU62.
 
-Deste modo, quando é feito ping em modo de broadcast a partir do gnu63, o gnu64 como se encontra na mesma VLAN irá conseguir 
-receber esses pacotes como é possível constatar com as figuras 4 e 5, enquanto que o gnu62 não recebe qualquer pactoe uma vez que se encontra noutra VLAN.
-Da mesma forma, quando é feito ping em modo de broadcast a partir do gnu62, quer o gnu63 quer o gnu64 não irão receber qualquer pacote, como se pode verificar
-nas figuras 7 e 8, uma vez que estes dois se encontram numa rede diferente.
+Deste modo, quando é feito ping em modo de broadcast a partir do GNU63, o GNU64 como se encontra na mesma VLAN e portanto no mesmo domínio de transmissão
+irá conseguir 
+receber esses pacotes como é possível constatar com as \textbf{Figuras 4 e 5}, enquanto que o GNU62 não recebe qualquer pacote uma vez que se encontra noutra VLAN.
+Da mesma forma, quando é feito ping em modo de broadcast a partir do GNU62, quer o GNU63 e GNU64 não irão receber qualquer pacote, como se pode verificar
+nas \textbf{Figuras 7 e 8}, uma vez que estes dois se encontram num domínio de transmissão diferente.
 
 
 \subsection{Experiência 3 - Configurar Router em Linux}
 
-Nesta experiência, o gnu64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
+Nesta experiência, o GNU64 foi configurado de modo a funcionar como um router, estabelecendo assim a ligação entre as duas VLANs criadas anteriormente.
 
-Para isto, configurou-se a porta eth1 do gnu64 com um IP no mesmo domínio que o gnu62. Depois, foi necessário configurar as rotas com o comando <route add>. 
-No gnu63 adicionou-se a rota que redireciona os pacotes que têm como destino a vlan 61 para o gnu64, 
-e o mesmo foi realizado para o gnu62, em que os pacotes que têm como destino a vlan 60 são redirecionados para o gnu64.
-Isto pode ser verificado na figura 11 quando a partir do gnu63 foi efetuado o comando para dar ping no gnu62 este obteve resposta, indicando que os computadores conseguem comunicar entre si.
+Para isto, configurou-se a porta ETH1 do GNU64 com um IP no mesmo domínio que o GNU62. Depois, foi necessário configurar as rotas com o comando <route add>. 
+No GNU63 adicionou-se a rota que redireciona os pacotes que têm como destino a VLAN61 para o GNU64, 
+e o mesmo foi realizado para o GNU62, em que os pacotes que têm como destino a VLAN60 são redirecionados para o GNU64.
+Isto pode ser verificado na \textbf{Figura 11} quando a partir do GNU63 foi efetuado o comando para dar ping no GNU62 este obteve resposta, 
+indicando que os computadores conseguem comunicar entre si.
 
-É também possível verificar a forma como o gnu64 opera através da análise das figuras 12 e 13. Na figura 12 é possível observar o trafego de pacotes através da eth0, 
-que corresponde à vlan 60, enquando que na figura 13 é possível observar relativamente aos pacotes que são trocados na eth1, correspondente à vlan 61. Os pacotes recebidos a partir da
-eth0 correspondente à vlan60 provêm do endereço 172.16.60.1 e têm o destino de 172.16.61.1 são reencaminhados para a eth1 correspondente à vlan61
-
+É também possível verificar a forma como o GNU64 opera através da análise das \textbf{Figuras 12 e 13}. Na \textbf{Figura 12} é possível observar o tráfego de 
+pacotes através da ETH0, 
+que corresponde à VLAN60, enquando que na \textbf{Figura 13} é possível observar relativamente aos pacotes que são trocados na ETH1, correspondente à VLAN61. 
+Os pacotes recebidos a partir da
+ETH0 correspondente à VLAN60 provêm do endereço 172.16.60.1 e têm o destino de 172.16.61.1 são reencaminhados para a ETH1 correspondente à VLAN61
 Podemos também realçar que o primeiro pacote trocado é do tipo ARP, uma vez que antes da captura destes logs foram eliminadas as tabelas ARP dos três gnu e estes pacotes são necessários
 para ser possivel a comunicação.
 
-Após isto, torna-se possível realizar ping do gun63 para o gnu62, uma vez que os pedidos são encaminhados para o gnu64 e este por sua vez consegue comunicar com os outros dois PCs.
+Após isto, torna-se possível realizar ping do GNU63 para o GNU62 e vice-versa, uma vez que os pedidos são encaminhados para o GNU64 e este por sua vez consegue comunicar com os outros dois PCs.
 
-A tabela de forwarding define a forma como uma trama será encaminhada de um switch ou router na rede. Contém o destino da rota, a "gateway", que corresponde ao próximo ponto por onde a rota passará,
-a máscara (netmask), usada para determinar o ID da rede a partir do endereço IP de destino, informações e custo da rota, o número de referências para a rota, um contador de pesquisas da rota, e a placa de rede responsável pela gateway.
+A tabela de forwarding define a forma como uma trama será encaminhada de um switch ou router na rede. Contém o destino da rota, a "gateway", que corresponde 
+ao próximo ponto por onde a rota passará,
+a máscara (netmask), usada para determinar o ID da rede a partir do endereço IP de destino, 
+informações e custo da rota, o número de referências para a rota, 
+um contador de pesquisas da rota, e a placa de rede responsável pela gateway.
 
-Sempre que um dos PCs dá ping a outro e o PC que recebeu o pedido não conhece o endereço MAC do emissor, envia um pacote ARP a pedir esta informação, como mostrado na experiência 1, que conterá os endereços dos PCs de origem e de destino.
-Os pacotes ICMP observados resultam do comando ping, e tratam-se de pacotes de request e reply, uma vez que ,após a configuração desta experiência, todos os PCs conseguem comunicar entre si.
+Sempre que um GNU dá ping a outro e o GNU que recebeu o pedido não conhece o endereço MAC do emissor, é enviado um pacote ARP a pedir esta informação, 
+como mostrado na experiência 1, que conterá os endereços dos GNU de origem e de destino.
+Os pacotes ICMP observados resultam do comando ping, e tratam-se de pacotes de request e reply, uma vez que, após a configuração desta experiência, 
+todos os PCs conseguem comunicar entre si.
 No caso de não conseguirem comunicar entre si, seriam enviados pacotes ICMP do tipo Host Unreachable.
 Os endereços IP e MAC dos pacotes ICMP são os dos PCs de origem e destino.
 
@@ -333,7 +343,7 @@ permite concluir que os pacotes enviados durante esta seguem uma dada rota, no c
 Caso contrário, estes são direcionados para a rota default do router.
 
 Foi efetuada uma última experiência que consistia em voltar a ativar o redirecionamento ICMP e remover a rota para o GNU64. Neste caso é possível observar como
-mostra a figura ?, que o router envia pacotes para o GNU62 ICMP Redirect, o que permite a este computador estabelecer a ligação com o GNU64.
+mostra a \textbf{Figura ?}, que o router envia pacotes para o GNU62 ICMP Redirect, o que permite a este computador estabelecer a ligação com o GNU64.
 
 Para a configuração do NAT foi necessária a configuração da interface interna e externa do router, assim como criar uma lista de acessos, sendo este o motivo
 do GNU64 não conseguir ter acesso à internet.
@@ -343,41 +353,52 @@ Resumidamente, permite que as redes privadas que usam endereços IPs não regist
 a partir de um único endereço público. 
 Desta forma, apenas um endereço IP é exigido e este irá representar todos os computadores da rede local.
  
-Após a configuração do NAT foi possível a comunicação com o router como é possível verificar na figura ?.
+Após a configuração do NAT foi possível a comunicação com o router como é possível verificar na \textbf{Figura ?}.
 
 \subsection{Experiência 5 - DNS}			
 
-Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão de nomes para computadores, serviços ou qualquer máquina conectada à
+Nesta experiência, foi configurado o DNS (Domain Name Service). Trata-se de um sistema hierárquico e distribuído de gestão 
+de nomes para computadores, serviços ou qualquer máquina conectada à
  Internet ou a uma rede privada.
 Isto é, é um sistema que traduz os hostnames nos respetivos endereços IP, 
 recorrendo a servidores de DNS que contém uma base de dados com esta correspondência entre hostnames e IPs.
 
-Para a sua configuração foi necessário alterar o ficheiro resolv.conf, adicionando o nome do servidor de DNS e o seu endereço IP, de acordo com o slide 14 do guião do projeto.
+Para a sua configuração foi necessário alterar o ficheiro resolv.conf, 
+adicionando o nome do servidor de DNS e o seu endereço IP, de acordo com o slide 14 do guião do projeto.
 
-Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor. A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, 
+Quando se faz ping a um servidor externo, é enviado um pacote de DNS com o pedido do IP do servidor.
+A resposta chega na forma de um outro pacote DNS, que após fazer a conversão, 
 devolverá o endereço IP correspondente.
-Esta troca de pacotes pode ser observada na figura 14.
+Esta troca de pacotes pode ser observada na \textbf{Figura 14}.
 
 \subsection{Experiência 6 - TCP connections}
 
 Esta experiência serviu para observação do comportamento do protocolo TCP, 
 recorrendo à aplicação que desenvolvemos na parte 1 deste projeto. 
 
-Através da análise das figuras 15 e 16 é possível verificar que a aplicação estabelece duas conexões TCP - uma para troca de comandos entre o cliente e o servidor FTP, 
+Através da análise das \textbf{Figura 15 e 16} é possível verificar que a aplicação estabelece duas conexões TCP - 
+uma para troca de comandos entre o cliente e o servidor FTP, 
 que trata do transporte do controlo de informação FTP, e outra para a receção dos dados enviados pelo servidor.
 Cada conexão FTP subdivide-se em três fases: o estabelecimento da conexão, a troca de dados entre o cliente e servidor, e o encerramento da conexão.
-O mecanismo ARQ (Automatic Repeat Request) do TCP (Transmission Control Protocol) é utilizado com o método da janela deslizante, e consiste no controlo dos erros que ocorram durante a transmissão dos dados.
-Recorre a ACK (Acknowledgement numbers), que estão incluídos nas tramas enviadas pelo recetor, indicando se esta foi recebida corretamente, sem quaisquer problemas, e recorre também ao "window size", que indica o domínio de pacotes possíveis de ser enviados pelo emissor, e ao "sequence number", que indica o número do pacote a ser enviado.
-O TCP usa um mecanismo de controlo de congestão end-to-end. Isto significa que o emissor limita ou aumenta a taxa de transferência de dados para conexão em função do congestionamento percebido por ele.
+O mecanismo ARQ (Automatic Repeat Request) do TCP (Transmission Control Protocol) é utilizado com o método da janela deslizante, 
+e consiste no controlo dos erros que ocorram durante a transmissão dos dados.
+Recorre a ACK (Acknowledgement numbers), que estão incluídos nas tramas enviadas pelo recetor, indicando se esta foi 
+recebida corretamente, sem quaisquer problemas, e recorre também ao "window size", que indica o domínio de pacotes 
+possíveis de ser enviados pelo emissor, e ao "sequence number", que indica o número do pacote a ser enviado.
+O TCP usa um mecanismo de controlo de congestão end-to-end. Isto significa que o emissor limita ou aumenta a taxa de 
+transferência de dados para conexão em função do congestionamento percebido por ele.
 A conexão TCP é composta por diversas variáveis, sendo uma delas a janela de congestionamento, que limitará a taxa de envio de pacotes de um dado emissor TCP.
 
-Foi realizada uma segunda experiência em que a meio de uma transferência de um ficheiro no gnu63, era iniciada uma transferência a partir do gnu62. Os gráficos das taxas de transferência
-obtidos podem ser visualizados nas figuras 18 e 19, em que a primeira corresponde à transferência no gnu62 e a segunda à transferência no gnu63.
-Os gráficos obtidos durante a experiência permitem concluir que no início do primeiro download no gnu63, a taxa de transferência aumentou até atingir um máximo. 
-Quando o segundo download no gnu62 foi iniciado, verificou-se que à medida que a taxa de transferência aumentava no gnu62, ocorria uma igual diminuição no gnu63. Quando a transferência no gnu63
-terminou, foi possível observar que a taxa de transferência do gnu62 aumentou, atingiu um máximo e manteve-se constante até ao final da transferência.
+Foi realizada uma segunda experiência em que a meio de uma transferência de um ficheiro no GNU63, 
+era iniciada uma transferência a partir do GNU62. Os gráficos das taxas de transferência
+obtidos podem ser visualizados nas \textbf{Figuras 18 e 19}, em que a primeira corresponde à transferência no GNU62 e a segunda à transferência no GNU63.
+Os gráficos obtidos durante a experiência permitem concluir que no início do primeiro download no GNU63, a taxa de transferência aumentou até atingir um máximo. 
+Quando o segundo download no gnu62 foi iniciado, verificou-se que à medida que a taxa de transferência aumentava no GNU62, ocorria uma igual diminuição no GNU63. 
+Quando a transferência no GNU63
+terminou, foi possível observar que a taxa de transferência do GNU62 aumentou, atingiu um máximo e manteve-se constante até ao final da transferência.
 Assim, com o aparecimento de uma segunda conexão TCP, dá-se uma diminuição da taxa de transferência e conclui-se que o fluxo dos dados está de acordo 
-com o mecanismo de controlo de congestão, tendo em conta que se observa uma menor taxa de transferência no momento em que a rede estava mais congestionada (mais downloads simultâneos).
+com o mecanismo de controlo de congestão, tendo em conta que se observa uma menor taxa de transferência no momento em que a rede estava mais congestionada 
+(mais downloads simultâneos).
 
 
 
