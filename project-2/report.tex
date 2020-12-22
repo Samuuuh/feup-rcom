@@ -141,8 +141,10 @@
 Este trabalho consiste no desenvolvimento de uma aplicação de download via ftp e na criação de uma rede. 
 O trabalho está portanto, dividido em duas partes distintas:
 
-- Parte 1 - Aplicação de download FTP
-- Parte 2 - Configuração e estudo de uma rede
+\begin{itemize}
+	\item Parte 1 - Aplicação de download FTP
+	\item Parte 2 - Configuração e estudo de uma rede
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2 - Parte 1 - Aplicação de download
@@ -219,7 +221,7 @@ Concluímos todos os requisitos desta primeira parte com sucesso, pelo que a apl
 
 \subsection{Experiência 1 - Configurar uma rede IP}
 
-Nesta primeira experiência foi ligado o GNU3 ao GNU64, recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
+Nesta primeira experiência foi ligado o GNU3 ao GNU64, ligando ambos os GNU ao switch e recorrendo à configuração dos seus endereços IP para que pudessem comunicar entre si. 
 \begin{lstlisting}
 	# No GNU63
 	ifconfig eth0 172.16.60.1/24
@@ -302,7 +304,7 @@ pacotes através da ETH0,
 que corresponde à VLAN60, enquando que na \textbf{figura 13} é possível observar relativamente aos pacotes que são trocados na ETH1, correspondente à VLAN61. 
 Os pacotes recebidos a partir da
 ETH0 correspondente à VLAN60 provêm do endereço 172.16.60.1 e têm o destino de 172.16.61.1 são reencaminhados para a ETH1 correspondente à VLAN61
-Podemos também realçar que o primeiro pacote trocado é do tipo ARP, uma vez que antes da captura destes logs foram eliminadas as tabelas ARP dos três gnu e estes pacotes são necessários
+Podemos também realçar que o primeiro pacote trocado é do tipo ARP, uma vez que antes da captura destes logs foram eliminadas as tabelas ARP dos três GNUs e estes pacotes são necessários
 para ser possivel a comunicação.
 
 Após isto, torna-se possível realizar ping do GNU63 para o GNU62 e vice-versa, uma vez que os pedidos são encaminhados para o GNU64 e este por sua vez consegue comunicar com os outros dois PCs.
@@ -421,7 +423,7 @@ e, numa segunda parte, à configuração de uma rede de computadores. Apesar de 
 este projeto foi terminado com sucesso, sendo que conseguimos desenvolver todos os aspetos pedidos.
 Ao mesmo tempo, interiorizamos conceitos importantes nesta área, e compreendemos os diversos protocolos que foram abordados.
 
-Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos dos quais nunca antes tínhamos ouvido falar, mas que utilizavamos com frequência no nosso dia-a-dia.
+Em suma, conseguimos alcançar todos os nossos objetivos, e conhecemos conceitos dos quais nunca antes tínhamos ouvido falar, mas que utilizávamos com frequência no nosso dia-a-dia.
 
 \newpage
 %----------------------------------------------------------------------------------------
